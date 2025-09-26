@@ -589,6 +589,19 @@ const Personnel = () => {
     }
   };
 
+  const translateDay = (day) => {
+    const translations = {
+      'monday': 'Lundi',
+      'tuesday': 'Mardi', 
+      'wednesday': 'Mercredi',
+      'thursday': 'Jeudi',
+      'friday': 'Vendredi',
+      'saturday': 'Samedi',
+      'sunday': 'Dimanche'
+    };
+    return translations[day] || day;
+  };
+
   const handleFormationToggle = (formationId) => {
     const updatedFormations = newUser.formations.includes(formationId)
       ? newUser.formations.filter(id => id !== formationId)
