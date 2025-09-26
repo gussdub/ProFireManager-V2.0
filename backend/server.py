@@ -238,7 +238,8 @@ async def get_users(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Accès refusé")
     
     users = await db.users.find().to_list(1000)
-    return [User(**user) for user in users]
+    cleaned_users = [clean_mongo_doc(user) for user in users]
+    return [User(**user) for user in cleaned_users]
 
 @api_router.get("/users/{user_id}", response_model=User)
 async def get_user(user_id: str, current_user: User = Depends(get_current_user)):
