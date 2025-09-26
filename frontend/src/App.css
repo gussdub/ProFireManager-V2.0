@@ -79,35 +79,35 @@ body {
   position: relative;
 }
 
-/* CSS Flame - Ton sur ton style */
+/* CSS Flame - Logo exact comme image fournie */
+.flame-icon {
+  width: 32px;
+  height: 40px;
+  position: relative;
+}
+
 .flame-icon::before {
   content: '';
   position: absolute;
-  width: 24px;
-  height: 30px;
+  width: 20px;
+  height: 28px;
   background: #dc2626;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  transform: rotate(-45deg);
   left: 50%;
-  top: 50%;
-  transform-origin: center;
-  margin-left: -12px;
-  margin-top: -15px;
+  top: 2px;
+  transform: translateX(-50%);
 }
 
 .flame-icon::after {
   content: '';
   position: absolute;
-  width: 16px;
-  height: 20px;
-  background: #b91c1c;
+  width: 12px;
+  height: 18px;
+  background: white;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  transform: rotate(-45deg);
   left: 50%;
-  top: 50%;
-  transform-origin: center;
-  margin-left: -8px;
-  margin-top: -10px;
+  top: 8px;
+  transform: translateX(-50%);
   z-index: 1;
 }
 
@@ -123,17 +123,15 @@ body {
 }
 
 .sidebar-logo .logo-flame .flame-icon::before {
-  width: 12px;
-  height: 15px;
-  margin-left: -6px;
-  margin-top: -7px;
+  width: 10px;
+  height: 14px;
+  top: 1px;
 }
 
 .sidebar-logo .logo-flame .flame-icon::after {
-  width: 8px;
-  height: 10px;
-  margin-left: -4px;
-  margin-top: -5px;
+  width: 6px;
+  height: 9px;
+  top: 4px;
 }
 
 .logo h1 {
