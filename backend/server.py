@@ -142,6 +142,38 @@ class DemandeRemplacementCreate(BaseModel):
     date: str
     raison: str
 
+class Formation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nom: str
+    description: str = ""
+    duree_heures: int = 0
+    validite_mois: int = 12  # Durée de validité en mois
+    obligatoire: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class FormationCreate(BaseModel):
+    nom: str
+    description: str = ""
+    duree_heures: int = 0
+    validite_mois: int = 12
+    obligatoire: bool = False
+
+class Disponibilite(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    jour_semaine: str  # monday, tuesday, etc.
+    heure_debut: str
+    heure_fin: str
+    statut: str = "disponible"  # disponible, indisponible, preference
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DisponibiliteCreate(BaseModel):
+    user_id: str
+    jour_semaine: str
+    heure_debut: str
+    heure_fin: str
+    statut: str = "disponible"
+
 class Statistiques(BaseModel):
     personnel_actif: int
     gardes_cette_semaine: int
