@@ -445,12 +445,13 @@ async def init_demo_data():
             "prenom": "Jean",
             "email": "admin@firemanager.ca",
             "telephone": "514-111-2233",
+            "contact_urgence": "514-999-1111",
             "grade": "Directeur",
             "type_emploi": "temps_plein",
             "role": "admin",
             "numero_employe": "ADM001",
             "date_embauche": "14/01/2020",
-            "formations": ["Officier 2", "Pompier 1"],
+            "formations": [],
             "mot_de_passe": "admin123"
         },
         {
@@ -458,12 +459,13 @@ async def init_demo_data():
             "prenom": "Sophie",
             "email": "superviseur@firemanager.ca",
             "telephone": "514-444-5566",
+            "contact_urgence": "514-888-2222",
             "grade": "Directeur",
             "type_emploi": "temps_plein",
             "role": "superviseur",
             "numero_employe": "POM001",
             "date_embauche": "07/01/2022",
-            "formations": ["Pompier 1", "Premiers Répondants"],
+            "formations": [],
             "mot_de_passe": "superviseur123"
         },
         {
@@ -471,12 +473,13 @@ async def init_demo_data():
             "prenom": "Pierre",
             "email": "employe@firemanager.ca",
             "telephone": "418-555-9999",
+            "contact_urgence": "418-777-3333",
             "grade": "Capitaine",
             "type_emploi": "temps_plein",
             "role": "employe",
             "numero_employe": "POM002",
             "date_embauche": "21/09/2019",
-            "formations": ["Classe 4A", "Désincarcération"],
+            "formations": [],
             "mot_de_passe": "employe123"
         },
         {
@@ -484,6 +487,7 @@ async def init_demo_data():
             "prenom": "Claire",
             "email": "partiel@firemanager.ca",
             "telephone": "514-888-9900",
+            "contact_urgence": "514-666-4444",
             "grade": "Pompier",
             "type_emploi": "temps_partiel",
             "role": "employe",
@@ -493,6 +497,57 @@ async def init_demo_data():
             "mot_de_passe": "partiel123"
         }
     ]
+    
+    # First create formations
+    demo_formations = [
+        {
+            "nom": "Classe 4A",
+            "description": "Formation de conduite véhicules lourds",
+            "duree_heures": 40,
+            "validite_mois": 60,
+            "obligatoire": False
+        },
+        {
+            "nom": "Désincarcération",
+            "description": "Techniques de désincarcération",
+            "duree_heures": 24,
+            "validite_mois": 36,
+            "obligatoire": True
+        },
+        {
+            "nom": "Pompier 1",
+            "description": "Formation de base pompier niveau 1",
+            "duree_heures": 200,
+            "validite_mois": 24,
+            "obligatoire": True
+        },
+        {
+            "nom": "Officier 2",
+            "description": "Formation officier niveau 2",
+            "duree_heures": 120,
+            "validite_mois": 36,
+            "obligatoire": False
+        },
+        {
+            "nom": "Premiers Répondants",
+            "description": "Formation premiers secours",
+            "duree_heures": 16,
+            "validite_mois": 12,
+            "obligatoire": True
+        }
+    ]
+    
+    formation_ids = {}
+    for formation_data in demo_formations:
+        formation_obj = Formation(**formation_data)
+        await db.formations.insert_one(formation_obj.dict())
+        formation_ids[formation_data["nom"]] = formation_obj.id
+    
+    # Update users with formation IDs
+    demo_users[0]["formations"] = [formation_ids["Officier 2"], formation_ids["Pompier 1"]]  # Jean
+    demo_users[1]["formations"] = [formation_ids["Pompier 1"], formation_ids["Premiers Répondants"]]  # Sophie  
+    demo_users[2]["formations"] = [formation_ids["Classe 4A"], formation_ids["Désincarcération"]]  # Pierre
+    demo_users[3]["formations"] = []  # Claire - aucune formation
     
     for user_data in demo_users:
         user_dict = user_data.copy()
