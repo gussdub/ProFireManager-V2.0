@@ -175,7 +175,10 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Utilisateur non trouvé")
     return User(**user)
 
-# Authentication routes
+# Root route
+@api_router.get("/")
+async def root():
+    return {"message": "ProFireManager API v2.0", "status": "running"}
 @api_router.post("/auth/login")
 async def login(user_login: UserLogin):
     user_data = await db.users.find_one({"email": user_login.email})
