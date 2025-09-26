@@ -505,7 +505,273 @@ const Personnel = () => {
   );
 };
 
-// Mon Profil Component
+// Planning Component
+const Planning = () => {
+  const { user } = useAuth();
+  const [currentWeek, setCurrentWeek] = useState(() => {
+    const today = new Date();
+    const monday = new Date(today.setDate(today.getDate() - today.getDay() + 1));
+    return monday.toISOString().split('T')[0];
+  });
+  const [planning, setPlanning] = useState(null);
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [assignations, setAssignations] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState(null);
+  const { toast } = useToast();
+
+  const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const weekDates = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date(currentWeek);
+    date.setDate(date.getDate() + i);
+    return date;
+  });
+
+  useEffect(() => {
+    fetchPlanningData();
+  }, [currentWeek]);
+
+  const fetchPlanningData = async () => {
+    setLoading(true);
+    try {
+      const [planningRes, typesRes, assignationsRes, usersRes] = await Promise.all([
+        axios.get(`${API}/planning/${currentWeek}`),
+        axios.get(`${API}/types-garde`),
+        axios.get(`${API}/planning/assignations/${currentWeek}`),
+        user.role !== 'employe' ? axios.get(`${API}/users`) : Promise.resolve({ data: [] })
+      ]);
+      
+      setPlanning(planningRes.data);
+      setTypesGarde(typesRes.data);
+      setAssignations(assignationsRes.data);
+      setUsers(usersRes.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement du planning:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger le planning",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAssignUser = async (userId, typeGardeId, date) => {
+    if (user.role === 'employe') return;
+
+    try {
+      await axios.post(`${API}/planning/assignation`, {
+        user_id: userId,
+        type_garde_id: typeGardeId,
+        date: date,
+        assignation_type: "manuel"
+      });
+
+      toast({
+        title: "Attribution réussie",
+        description: "L'assignation a été créée avec succès",
+        variant: "success"
+      });
+
+      fetchPlanningData();
+      setShowAssignModal(false);
+    } catch (error) {
+      toast({
+        title: "Erreur d'attribution",
+        description: "Impossible de créer l'assignation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getAssignationForSlot = (date, typeGardeId) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return assignations.find(a => a.date === dateStr && a.type_garde_id === typeGardeId);
+  };
+
+  const getUserById = (userId) => {
+    return users.find(u => u.id === userId);
+  };
+
+  const getTypeGardeColor = (typeGarde) => {
+    return typeGarde.couleur || '#6B7280';
+  };
+
+  const navigateWeek = (direction) => {
+    const newDate = new Date(currentWeek);
+    newDate.setDate(newDate.getDate() + (direction * 7));
+    setCurrentWeek(newDate.toISOString().split('T')[0]);
+  };
+
+  const openAssignModal = (date, typeGarde) => {
+    if (user.role === 'employe') return;
+    setSelectedSlot({ date, typeGarde });
+    setShowAssignModal(true);
+  };
+
+  if (loading) return <div className="loading" data-testid="planning-loading">Chargement du planning...</div>;
+
+  return (
+    <div className="planning">
+      <div className="planning-header">
+        <div>
+          <h1 data-testid="planning-title">Planning des gardes</h1>
+          <p>Affectation manuelle privilégiée et attribution automatique</p>
+        </div>
+        <div className="planning-controls">
+          <Button variant="outline" data-testid="week-view-btn">Vue semaine</Button>
+          <Button 
+            variant="default" 
+            disabled={user.role === 'employe'}
+            data-testid="auto-assign-btn"
+          >
+            ✨ Attribution auto
+          </Button>
+          <Button 
+            variant="destructive" 
+            disabled={user.role === 'employe'}
+            data-testid="manual-assign-btn"
+          >
+            + Assignation manuelle
+          </Button>
+        </div>
+      </div>
+
+      {/* Week Navigation */}
+      <div className="week-navigation">
+        <Button variant="ghost" onClick={() => navigateWeek(-1)} data-testid="prev-week-btn">
+          ← Semaine précédente
+        </Button>
+        <h2 className="week-title">
+          Semaine du {weekDates[0].toLocaleDateString('fr-FR')} au {weekDates[6].toLocaleDateString('fr-FR')}
+        </h2>
+        <Button variant="ghost" onClick={() => navigateWeek(1)} data-testid="next-week-btn">
+          Semaine suivante →
+        </Button>
+      </div>
+
+      {/* Legend */}
+      <div className="planning-legend">
+        <h3>Planning hebdomadaire - Gardes par horaires</h3>
+        <div className="legend-items">
+          <div className="legend-item">
+            <span className="legend-color complete"></span>
+            Garde complète
+          </div>
+          <div className="legend-item">
+            <span className="legend-color partial"></span>
+            Garde partielle
+          </div>
+          <div className="legend-item">
+            <span className="legend-color vacant"></span>
+            Garde vacante
+          </div>
+        </div>
+      </div>
+
+      {/* Planning Grid */}
+      <div className="planning-grid">
+        <div className="grid-header">
+          <div className="header-cell">Horaires</div>
+          {weekDays.map((day, index) => (
+            <div key={day} className="header-cell">
+              <div className="day-name">{day}</div>
+              <div className="day-date">{weekDates[index].getDate()}</div>
+            </div>
+          ))}
+        </div>
+
+        {typesGarde.map(typeGarde => (
+          <div key={typeGarde.id} className="grid-row">
+            <div className="time-cell">
+              <div className="time-label">{typeGarde.nom}</div>
+              <div className="time-range">
+                {typeGarde.heure_debut} - {typeGarde.heure_fin}
+              </div>
+              <div className="time-details">
+                {typeGarde.personnel_requis} personnel requis
+              </div>
+            </div>
+
+            {weekDates.map((date, dayIndex) => {
+              const assignation = getAssignationForSlot(date, typeGarde.id);
+              const assignedUser = assignation ? getUserById(assignation.user_id) : null;
+
+              return (
+                <div 
+                  key={dayIndex} 
+                  className={`planning-cell ${assignation ? 'assigned' : 'vacant'}`}
+                  style={{ borderLeftColor: getTypeGardeColor(typeGarde) }}
+                  onClick={() => openAssignModal(date, typeGarde)}
+                  data-testid={`planning-cell-${dayIndex}-${typeGarde.id}`}
+                >
+                  {assignedUser ? (
+                    <div className="assignment-content">
+                      <div className="assigned-user">
+                        {assignedUser.prenom} {assignedUser.nom}
+                      </div>
+                      <div className="user-grade">{assignedUser.grade}</div>
+                      <div className="assignment-type">
+                        {assignation.assignation_type === 'auto' ? 'Auto' : 'Manuel'}
+                      </div>
+                      <div className="personnel-count">
+                        +{typeGarde.personnel_requis - 1} autres
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="vacant-content">
+                      <div className="vacant-label">+{typeGarde.personnel_requis} autres</div>
+                      <div className="auto-assign">Auto</div>
+                      <div className="personnel-needed">{typeGarde.personnel_requis} personnel</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+
+      {/* Assignment Modal */}
+      {showAssignModal && selectedSlot && (
+        <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="assign-modal">
+            <div className="modal-header">
+              <h3>Assigner une garde</h3>
+              <Button variant="ghost" onClick={() => setShowAssignModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <p><strong>Garde:</strong> {selectedSlot.typeGarde.nom}</p>
+              <p><strong>Date:</strong> {selectedSlot.date.toLocaleDateString('fr-FR')}</p>
+              <p><strong>Horaires:</strong> {selectedSlot.typeGarde.heure_debut} - {selectedSlot.typeGarde.heure_fin}</p>
+              
+              <div className="user-selection">
+                <h4>Sélectionner un pompier:</h4>
+                <div className="user-list">
+                  {users.map(user => (
+                    <div 
+                      key={user.id} 
+                      className="user-option"
+                      onClick={() => handleAssignUser(user.id, selectedSlot.typeGarde.id, selectedSlot.date.toISOString().split('T')[0])}
+                      data-testid={`assign-user-${user.id}`}
+                    >
+                      <span className="user-name">{user.prenom} {user.nom}</span>
+                      <span className="user-grade">{user.grade}</span>
+                      <span className="user-status">{user.statut}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const MonProfil = () => {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState(null);
