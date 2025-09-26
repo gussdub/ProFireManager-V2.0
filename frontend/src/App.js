@@ -224,7 +224,7 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
         <div className="sidebar-logo">
           <div className="logo-flame">
             <div className="flame-container">
-              <div className="flame-icon"></div>
+              <i className="fas fa-fire flame-icon"></i>
             </div>
           </div>
           <div>
