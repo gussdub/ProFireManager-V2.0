@@ -54,7 +54,7 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Logo flame styles */
+/* Logo flame styles - Ton sur ton design */
 .logo-flame {
   display: flex;
   justify-content: center;
@@ -70,11 +70,45 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .flame-icon {
-  font-size: 3rem;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  width: 32px;
+  height: 40px;
+  position: relative;
+}
+
+/* CSS Flame - Ton sur ton style */
+.flame-icon::before {
+  content: '';
+  position: absolute;
+  width: 24px;
+  height: 30px;
+  background: #dc2626;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  margin-left: -12px;
+  margin-top: -15px;
+}
+
+.flame-icon::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 20px;
+  background: #b91c1c;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  transform: rotate(-45deg);
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+  margin-left: -8px;
+  margin-top: -10px;
+  z-index: 1;
 }
 
 /* Sidebar logo flame */
@@ -84,7 +118,22 @@ body {
 }
 
 .sidebar-logo .logo-flame .flame-icon {
-  font-size: 1.5rem;
+  width: 16px;
+  height: 20px;
+}
+
+.sidebar-logo .logo-flame .flame-icon::before {
+  width: 12px;
+  height: 15px;
+  margin-left: -6px;
+  margin-top: -7px;
+}
+
+.sidebar-logo .logo-flame .flame-icon::after {
+  width: 8px;
+  height: 10px;
+  margin-left: -4px;
+  margin-top: -5px;
 }
 
 .logo h1 {
