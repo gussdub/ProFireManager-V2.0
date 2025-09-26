@@ -1775,7 +1775,7 @@ const AppLayout = () => {
       case 'rapports':
         return <div className="page-placeholder">Rapports - En développement</div>;
       case 'parametres':
-        return <div className="page-placeholder">Paramètres - En développement</div>;
+        return <Parametres />;
       case 'monprofil':
         return <MonProfil />;
       default:
