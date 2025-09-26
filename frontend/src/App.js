@@ -129,7 +129,7 @@ const Login = () => {
           <div className="logo">
             <div className="logo-flame">
               <div className="flame-container">
-                <div className="flame-icon"></div>
+                <i className="fas fa-fire flame-icon"></i>
               </div>
             </div>
             <h1>ProFireManager</h1>
