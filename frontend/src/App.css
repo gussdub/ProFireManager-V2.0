@@ -2087,7 +2087,145 @@ body {
   margin-top: 0.5rem;
 }
 
-/* User Details View */
+/* Emergency contact in personnel table */
+.user-emergency {
+  font-size: 0.75rem;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+/* Formations selection */
+.formations-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+}
+
+.formation-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.formation-checkbox:hover {
+  background-color: #f8fafc;
+}
+
+.formation-checkbox input[type="checkbox"] {
+  margin-top: 0.125rem;
+  accent-color: #3B82F6;
+}
+
+.formation-label {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.formation-label strong {
+  color: #1e293b;
+}
+
+.formation-label small {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+.obligatoire {
+  color: #dc2626;
+  font-weight: bold;
+  margin-left: 0.25rem;
+}
+
+.no-formations {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+/* Disponibilités Modal */
+.disponibilites-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.disponibilites-header p {
+  color: #64748b;
+  margin-bottom: 1rem;
+}
+
+.disponibilites-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.disponibilite-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  align-items: center;
+}
+
+.dispo-day strong {
+  color: #1e293b;
+  text-transform: capitalize;
+}
+
+.dispo-time {
+  color: #374151;
+  font-weight: 500;
+}
+
+.dispo-status .status {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.dispo-status .status.disponible {
+  color: #059669;
+}
+
+.dispo-status .status.indisponible {
+  color: #dc2626;
+}
+
+.dispo-status .status.preference {
+  color: #d97706;
+}
+
+.no-disponibilites {
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+}
+
+.no-disponibilites .text-muted {
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Availability button in employment cell */
+.employment-cell .mt-1 {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  height: auto;
+}
 .user-details-view {
   display: flex;
   flex-direction: column;
