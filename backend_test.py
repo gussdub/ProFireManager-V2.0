@@ -1,7 +1,14 @@
+#!/usr/bin/env python3
+"""
+ProFireManager Backend API Test Suite
+Tests all endpoints with focus on MongoDB ObjectId serialization fix
+"""
+
 import requests
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
+from typing import Dict, Any, Optional
 
 class ProFireManagerAPITester:
     def __init__(self, base_url="https://emergency-shifts-1.preview.emergentagent.com"):
