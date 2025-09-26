@@ -1072,7 +1072,7 @@ const AppLayout = () => {
       case 'personnel':
         return <Personnel />;
       case 'planning':
-        return <div className="page-placeholder">Planning - En développement</div>;
+        return <Planning />;
       case 'remplacements':
         return <div className="page-placeholder">Remplacements - En développement</div>;
       case 'formations':
