@@ -266,7 +266,8 @@ async def create_type_garde(type_garde: TypeGardeCreate, current_user: User = De
 @api_router.get("/types-garde", response_model=List[TypeGarde])
 async def get_types_garde(current_user: User = Depends(get_current_user)):
     types_garde = await db.types_garde.find().to_list(1000)
-    return [TypeGarde(**type_garde) for type_garde in types_garde]
+    cleaned_types = [clean_mongo_doc(type_garde) for type_garde in types_garde]
+    return [TypeGarde(**type_garde) for type_garde in cleaned_types]
 
 # Helper function to clean MongoDB documents
 def clean_mongo_doc(doc):
