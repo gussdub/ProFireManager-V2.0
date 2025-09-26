@@ -979,7 +979,146 @@ const Personnel = () => {
         </div>
       )}
 
-      {/* Disponibilités Modal */}
+      {/* Edit User Modal */}
+      {showEditModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-user-modal">
+            <div className="modal-header">
+              <h3>Modifier le pompier</h3>
+              <Button variant="ghost" onClick={() => setShowEditModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label htmlFor="edit-prenom">Prénom *</Label>
+                    <Input
+                      id="edit-prenom"
+                      value={newUser.prenom}
+                      onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
+                      data-testid="edit-user-prenom-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="edit-nom">Nom *</Label>
+                    <Input
+                      id="edit-nom"
+                      value={newUser.nom}
+                      onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
+                      data-testid="edit-user-nom-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label htmlFor="edit-email">Email *</Label>
+                  <Input
+                    id="edit-email"
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                    data-testid="edit-user-email-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label htmlFor="edit-telephone">Téléphone</Label>
+                    <Input
+                      id="edit-telephone"
+                      value={newUser.telephone}
+                      onChange={(e) => setNewUser({...newUser, telephone: e.target.value})}
+                      data-testid="edit-user-phone-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="edit-contact-urgence">Contact d'urgence</Label>
+                    <Input
+                      id="edit-contact-urgence"
+                      value={newUser.contact_urgence}
+                      onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
+                      data-testid="edit-user-emergency-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label htmlFor="edit-grade">Grade *</Label>
+                    <select
+                      id="edit-grade"
+                      value={newUser.grade}
+                      onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
+                      className="form-select"
+                      data-testid="edit-user-grade-select"
+                    >
+                      {grades.map(grade => (
+                        <option key={grade} value={grade}>{grade}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="edit-type-emploi">Type d'emploi *</Label>
+                    <select
+                      id="edit-type-emploi"
+                      value={newUser.type_emploi}
+                      onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
+                      className="form-select"
+                      data-testid="edit-user-employment-select"
+                    >
+                      <option value="temps_plein">Temps plein</option>
+                      <option value="temps_partiel">Temps partiel</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Formations</Label>
+                  <div className="formations-selection">
+                    {formations.map(formation => (
+                      <label key={formation.id} className="formation-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={newUser.formations.includes(formation.id)}
+                          onChange={() => handleFormationToggle(formation.id)}
+                          data-testid={`edit-formation-${formation.id}`}
+                        />
+                        <span className="formation-label">
+                          <strong>{formation.nom}</strong>
+                          {formation.obligatoire && <span className="obligatoire">*</span>}
+                          <br />
+                          <small>{formation.description}</small>
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label htmlFor="edit-mot-de-passe">Nouveau mot de passe (optionnel)</Label>
+                  <Input
+                    id="edit-mot-de-passe"
+                    type="password"
+                    value={newUser.mot_de_passe}
+                    onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
+                    placeholder="Laisser vide pour conserver l'ancien"
+                    data-testid="edit-user-password-input"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleUpdateUser} data-testid="update-user-btn">
+                  Mettre à jour
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {showDisponibilitesModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowDisponibilitesModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="disponibilites-modal">
