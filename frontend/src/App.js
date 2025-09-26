@@ -523,7 +523,7 @@ const AppLayout = () => {
 
   return (
     <div className="app-layout">
-      <Sidebar />
+      <Sidebar currentPage={currentPage} setCurrentPage={setCurrentPage} />
       <main className="main-content" data-testid="main-content">
         {renderCurrentPage()}
       </main>
