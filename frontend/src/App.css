@@ -55,7 +55,7 @@ body {
   margin-bottom: 2rem;
 }
 
-/* Logo flame styles - Ton sur ton design */
+/* Logo flame styles - Using FontAwesome */
 .logo-flame {
   display: flex;
   justify-content: center;
@@ -71,45 +71,11 @@ body {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
 
 .flame-icon {
-  width: 32px;
-  height: 40px;
-  position: relative;
-}
-
-/* CSS Flame - Logo exact comme image fournie */
-.flame-icon {
-  width: 32px;
-  height: 40px;
-  position: relative;
-}
-
-.flame-icon::before {
-  content: '';
-  position: absolute;
-  width: 20px;
-  height: 28px;
-  background: #dc2626;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  left: 50%;
-  top: 2px;
-  transform: translateX(-50%);
-}
-
-.flame-icon::after {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 18px;
-  background: white;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  left: 50%;
-  top: 8px;
-  transform: translateX(-50%);
-  z-index: 1;
+  font-size: 2.5rem;
+  color: #dc2626;
 }
 
 /* Sidebar logo flame */
@@ -119,20 +85,7 @@ body {
 }
 
 .sidebar-logo .logo-flame .flame-icon {
-  width: 16px;
-  height: 20px;
-}
-
-.sidebar-logo .logo-flame .flame-icon::before {
-  width: 10px;
-  height: 14px;
-  top: 1px;
-}
-
-.sidebar-logo .logo-flame .flame-icon::after {
-  width: 6px;
-  height: 9px;
-  top: 4px;
+  font-size: 1.25rem;
 }
 
 .logo h1 {
