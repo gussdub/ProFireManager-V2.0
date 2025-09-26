@@ -209,8 +209,9 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
     { id: 'planning', label: 'Planning', icon: '📅', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'remplacements', label: 'Remplacements', icon: '🔄', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'formations', label: 'Formations', icon: '📚', roles: ['admin', 'superviseur', 'employe'] },
-    { id: 'rapports', label: 'Rapports', icon: '📈', roles: ['admin', 'superviseur'] },
-    { id: 'parametres', label: 'Paramètres', icon: '⚙️', roles: ['admin'] }
+    { id: 'rapports', label: 'Rapports', icon: '📈', roles: ['admin'] },
+    { id: 'parametres', label: 'Paramètres', icon: '⚙️', roles: ['admin'] },
+    { id: 'monprofil', label: 'Mon profil', icon: '👤', roles: ['admin', 'superviseur', 'employe'] }
   ];
 
   const filteredMenuItems = menuItems.filter(item => 
