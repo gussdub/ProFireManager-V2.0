@@ -249,6 +249,8 @@ async def get_user(user_id: str, current_user: User = Depends(get_current_user))
     user = await db.users.find_one({"id": user_id})
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    user = clean_mongo_doc(user)
     return User(**user)
 
 # Types de garde routes
