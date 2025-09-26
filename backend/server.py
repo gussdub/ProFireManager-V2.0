@@ -321,7 +321,9 @@ async def get_assignations(semaine_debut: str, current_user: User = Depends(get_
 async def create_demande_remplacement(demande: DemandeRemplacementCreate, current_user: User = Depends(get_current_user)):
     demande_obj = DemandeRemplacement(**demande.dict(), demandeur_id=current_user.id)
     await db.demandes_remplacement.insert_one(demande_obj.dict())
-    return demande_obj
+    # Clean the object before returning to avoid ObjectId serialization issues
+    cleaned_demande = clean_mongo_doc(demande_obj.dict())
+    return DemandeRemplacement(**cleaned_demande)
 
 @api_router.get("/remplacements", response_model=List[DemandeRemplacement])
 async def get_demandes_remplacement(current_user: User = Depends(get_current_user)):
