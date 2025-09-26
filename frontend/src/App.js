@@ -127,7 +127,11 @@ const Login = () => {
       <div className="login-box">
         <div className="login-header">
           <div className="logo">
-            <span className="logo-icon">🚒</span>
+            <div className="logo-flame">
+              <div className="flame-container">
+                <div className="flame-icon">🔥</div>
+              </div>
+            </div>
             <h1>ProFireManager</h1>
             <p className="version">v2.0 Avancé</p>
           </div>
