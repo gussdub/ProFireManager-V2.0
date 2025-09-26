@@ -349,10 +349,12 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
 # Initialize demo data
 @api_router.post("/init-demo-data")
 async def init_demo_data():
-    # Check if data already exists
-    existing_users = await db.users.count_documents({})
-    if existing_users > 0:
-        return {"message": "Les données de démonstration existent déjà"}
+    # Clear existing data
+    await db.users.delete_many({})
+    await db.types_garde.delete_many({})
+    await db.assignations.delete_many({})
+    await db.planning.delete_many({})
+    await db.demandes_remplacement.delete_many({})
     
     # Create demo users
     demo_users = [
