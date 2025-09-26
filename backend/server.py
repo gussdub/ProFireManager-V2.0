@@ -308,7 +308,9 @@ async def get_assignations(semaine_debut: str, current_user: User = Depends(get_
         }
     }).to_list(1000)
     
-    return [Assignation(**assignation) for assignation in assignations]
+    # Clean MongoDB documents
+    cleaned_assignations = [clean_mongo_doc(assignation) for assignation in assignations]
+    return [Assignation(**assignation) for assignation in cleaned_assignations]
 
 # Remplacements routes
 @api_router.post("/remplacements", response_model=DemandeRemplacement)
