@@ -505,7 +505,332 @@ const Personnel = () => {
   );
 };
 
-// Planning Component
+// Remplacements Component
+const Remplacements = () => {
+  const { user } = useAuth();
+  const [demandes, setDemandes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [newDemande, setNewDemande] = useState({
+    type_garde_id: '',
+    date: '',
+    raison: ''
+  });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchRemplacements();
+    fetchTypesGarde();
+  }, []);
+
+  const fetchRemplacements = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/remplacements`);
+      setDemandes(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des remplacements:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les demandes de remplacement",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchTypesGarde = async () => {
+    try {
+      const response = await axios.get(`${API}/types-garde`);
+      setTypesGarde(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des types de garde:', error);
+    }
+  };
+
+  const handleCreateDemande = async () => {
+    if (!newDemande.type_garde_id || !newDemande.date || !newDemande.raison.trim()) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/remplacements`, newDemande);
+      toast({
+        title: "Demande créée",
+        description: "Votre demande de remplacement a été soumise",
+        variant: "success"
+      });
+      setShowCreateModal(false);
+      setNewDemande({ type_garde_id: '', date: '', raison: '' });
+      fetchRemplacements();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la demande",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getStatutColor = (statut) => {
+    switch (statut) {
+      case 'en_cours': return '#F59E0B';
+      case 'approuve': return '#10B981';
+      case 'refuse': return '#EF4444';
+      default: return '#6B7280';
+    }
+  };
+
+  const getStatutLabel = (statut) => {
+    switch (statut) {
+      case 'en_cours': return 'En cours';
+      case 'approuve': return 'Approuvé';
+      case 'refuse': return 'Refusé';
+      default: return statut;
+    }
+  };
+
+  const getTypeGardeName = (typeGardeId) => {
+    const typeGarde = typesGarde.find(t => t.id === typeGardeId);
+    return typeGarde ? typeGarde.nom : 'Non spécifié';
+  };
+
+  if (loading) return <div className="loading" data-testid="replacements-loading">Chargement des remplacements...</div>;
+
+  return (
+    <div className="remplacements">
+      <div className="remplacements-header">
+        <div>
+          <h1 data-testid="replacements-title">Gestion des remplacements</h1>
+          <p>Demandes de remplacement et validation automatisée</p>
+        </div>
+        <div className="remplacements-controls">
+          <Button 
+            variant="default" 
+            onClick={() => setShowCreateModal(true)}
+            data-testid="create-replacement-btn"
+          >
+            + Nouvelle demande
+          </Button>
+          {user.role !== 'employe' && (
+            <Button variant="outline" data-testid="validate-replacements-btn">
+              Valider les demandes
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Statistics Cards */}
+      <div className="replacement-stats">
+        <div className="stat-card pending">
+          <div className="stat-icon">⏳</div>
+          <div className="stat-content">
+            <h3>En cours</h3>
+            <p className="stat-number">{demandes.filter(d => d.statut === 'en_cours').length}</p>
+            <p className="stat-label">Demandes en attente</p>
+          </div>
+        </div>
+
+        <div className="stat-card approved">
+          <div className="stat-icon">✅</div>
+          <div className="stat-content">
+            <h3>Approuvées</h3>
+            <p className="stat-number">{demandes.filter(d => d.statut === 'approuve').length}</p>
+            <p className="stat-label">Ce mois</p>
+          </div>
+        </div>
+
+        <div className="stat-card refused">
+          <div className="stat-icon">❌</div>
+          <div className="stat-content">
+            <h3>Refusées</h3>
+            <p className="stat-number">{demandes.filter(d => d.statut === 'refuse').length}</p>
+            <p className="stat-label">Ce mois</p>
+          </div>
+        </div>
+
+        <div className="stat-card coverage">
+          <div className="stat-icon">📊</div>
+          <div className="stat-content">
+            <h3>Taux de couverture</h3>
+            <p className="stat-number">94%</p>
+            <p className="stat-label">Remplacements trouvés</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Replacements List */}
+      <div className="replacements-list">
+        <div className="list-header">
+          <h2>Toutes les demandes</h2>
+          <div className="filter-controls">
+            <Button variant="ghost" size="sm">Toutes</Button>
+            <Button variant="ghost" size="sm">En cours</Button>
+            <Button variant="ghost" size="sm">Approuvées</Button>
+          </div>
+        </div>
+
+        <div className="replacements-table">
+          <div className="table-header">
+            <div className="header-cell">DEMANDEUR</div>
+            <div className="header-cell">TYPE DE GARDE</div>
+            <div className="header-cell">DATE</div>
+            <div className="header-cell">RAISON</div>
+            <div className="header-cell">STATUT</div>
+            <div className="header-cell">REMPLAÇANT</div>
+            <div className="header-cell">ACTIONS</div>
+          </div>
+
+          {demandes.map(demande => (
+            <div key={demande.id} className="table-row" data-testid={`replacement-row-${demande.id}`}>
+              <div className="demandeur-cell">
+                <div className="user-avatar">
+                  <span className="avatar-icon">👤</span>
+                </div>
+                <div>
+                  <p className="user-name">Demandeur #{demande.demandeur_id?.slice(-4)}</p>
+                  <p className="request-date">
+                    Demandé le {new Date(demande.created_at).toLocaleDateString('fr-FR')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="type-garde-cell">
+                <span className="type-garde-name">
+                  {getTypeGardeName(demande.type_garde_id)}
+                </span>
+              </div>
+
+              <div className="date-cell">
+                <span className="garde-date">
+                  {new Date(demande.date).toLocaleDateString('fr-FR')}
+                </span>
+              </div>
+
+              <div className="raison-cell">
+                <p className="raison-text">{demande.raison}</p>
+              </div>
+
+              <div className="statut-cell">
+                <span 
+                  className="statut-badge" 
+                  style={{ backgroundColor: getStatutColor(demande.statut) }}
+                  data-testid={`status-${demande.id}`}
+                >
+                  {getStatutLabel(demande.statut)}
+                </span>
+              </div>
+
+              <div className="remplacant-cell">
+                {demande.remplacant_id ? (
+                  <span className="remplacant-name">
+                    Remplaçant #{demande.remplacant_id?.slice(-4)}
+                  </span>
+                ) : (
+                  <span className="no-remplacant">En recherche...</span>
+                )}
+              </div>
+
+              <div className="actions-cell">
+                <Button variant="ghost" className="action-btn" data-testid={`view-replacement-${demande.id}`}>👁️</Button>
+                {user.role !== 'employe' && (
+                  <>
+                    <Button variant="ghost" className="action-btn" data-testid={`approve-replacement-${demande.id}`}>✅</Button>
+                    <Button variant="ghost" className="action-btn danger" data-testid={`reject-replacement-${demande.id}`}>❌</Button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))}
+
+          {demandes.length === 0 && (
+            <div className="empty-state">
+              <p>Aucune demande de remplacement</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Create Replacement Modal */}
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="create-replacement-modal">
+            <div className="modal-header">
+              <h3>Nouvelle demande de remplacement</h3>
+              <Button variant="ghost" onClick={() => setShowCreateModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-field">
+                <Label htmlFor="type-garde">Type de garde</Label>
+                <select
+                  id="type-garde"
+                  value={newDemande.type_garde_id}
+                  onChange={(e) => setNewDemande({...newDemande, type_garde_id: e.target.value})}
+                  className="form-select"
+                  data-testid="select-garde-type"
+                >
+                  <option value="">Sélectionner un type de garde</option>
+                  {typesGarde.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.nom} ({type.heure_debut} - {type.heure_fin})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="date">Date de la garde</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={newDemande.date}
+                  onChange={(e) => setNewDemande({...newDemande, date: e.target.value})}
+                  data-testid="select-date"
+                />
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="raison">Raison du remplacement</Label>
+                <textarea
+                  id="raison"
+                  value={newDemande.raison}
+                  onChange={(e) => setNewDemande({...newDemande, raison: e.target.value})}
+                  placeholder="Expliquez la raison de votre demande de remplacement..."
+                  rows="4"
+                  className="form-textarea"
+                  data-testid="replacement-reason"
+                />
+              </div>
+
+              <div className="modal-actions">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleCreateDemande}
+                  data-testid="submit-replacement-btn"
+                >
+                  Créer la demande
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const Planning = () => {
   const { user } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(() => {
