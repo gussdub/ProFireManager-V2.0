@@ -51,13 +51,14 @@ class User(BaseModel):
     prenom: str
     email: str
     telephone: str = ""
+    contact_urgence: str = ""  # Nouveau champ
     grade: str  # Capitaine, Directeur, Pompier, Lieutenant
     type_emploi: str  # temps_plein, temps_partiel
     role: str  # admin, superviseur, employe
     statut: str = "Actif"  # Actif, Inactif
     numero_employe: str
     date_embauche: str
-    formations: List[str] = []
+    formations: List[str] = []  # IDs des formations
     mot_de_passe_hash: str = ""
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -66,6 +67,7 @@ class UserCreate(BaseModel):
     prenom: str
     email: str
     telephone: str = ""
+    contact_urgence: str = ""  # Nouveau champ
     grade: str
     type_emploi: str
     role: str
