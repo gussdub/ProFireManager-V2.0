@@ -936,6 +936,17 @@ const Personnel = () => {
                   />
                 </div>
 
+                <div className="form-field">
+                  <Label htmlFor="contact-urgence">Contact d'urgence</Label>
+                  <Input
+                    id="contact-urgence"
+                    value={newUser.contact_urgence}
+                    onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
+                    placeholder="Numéro à contacter en cas d'urgence"
+                    data-testid="user-emergency-input"
+                  />
+                </div>
+
                 <div className="form-row">
                   <div className="form-field">
                     <Label htmlFor="grade">Grade</Label>
