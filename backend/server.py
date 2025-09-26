@@ -287,7 +287,57 @@ async def get_user(user_id: str, current_user: User = Depends(get_current_user))
     user = clean_mongo_doc(user)
     return User(**user)
 
-# Types de garde routes
+@api_router.put("/users/{user_id}", response_model=User)
+async def update_user(user_id: str, user_update: UserCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Update user data
+    user_dict = user_update.dict()
+    if user_dict["mot_de_passe"]:
+        user_dict["mot_de_passe_hash"] = get_password_hash(user_dict.pop("mot_de_passe"))
+    else:
+        user_dict.pop("mot_de_passe")
+        user_dict["mot_de_passe_hash"] = existing_user["mot_de_passe_hash"]
+    
+    user_dict["id"] = user_id
+    user_dict["statut"] = existing_user.get("statut", "Actif")
+    user_dict["created_at"] = existing_user.get("created_at")
+    
+    result = await db.users.replace_one({"id": user_id}, user_dict)
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de mettre à jour l'utilisateur")
+    
+    updated_user = await db.users.find_one({"id": user_id})
+    updated_user = clean_mongo_doc(updated_user)
+    return User(**updated_user)
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Delete user
+    result = await db.users.delete_one({"id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de supprimer l'utilisateur")
+    
+    # Also delete related data
+    await db.disponibilites.delete_many({"user_id": user_id})
+    await db.assignations.delete_many({"user_id": user_id})
+    await db.demandes_remplacement.delete_many({"demandeur_id": user_id})
+    
+    return {"message": "Utilisateur supprimé avec succès"}
 @api_router.post("/types-garde", response_model=TypeGarde)
 async def create_type_garde(type_garde: TypeGardeCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
