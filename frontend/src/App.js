@@ -196,9 +196,8 @@ const Login = () => {
 };
 
 // Sidebar Navigation
-const Sidebar = () => {
+const Sidebar = ({ currentPage, setCurrentPage }) => {
   const { user, logout } = useAuth();
-  const [currentPage, setCurrentPage] = useState('dashboard');
 
   const menuItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'superviseur', 'employe'] },
