@@ -369,7 +369,37 @@ async def get_demandes_remplacement(current_user: User = Depends(get_current_use
     cleaned_demandes = [clean_mongo_doc(demande) for demande in demandes]
     return [DemandeRemplacement(**demande) for demande in cleaned_demandes]
 
-# Statistics routes
+# Formations routes
+@api_router.post("/formations", response_model=Formation)
+async def create_formation(formation: FormationCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    formation_obj = Formation(**formation.dict())
+    await db.formations.insert_one(formation_obj.dict())
+    return formation_obj
+
+@api_router.get("/formations", response_model=List[Formation])
+async def get_formations(current_user: User = Depends(get_current_user)):
+    formations = await db.formations.find().to_list(1000)
+    cleaned_formations = [clean_mongo_doc(formation) for formation in formations]
+    return [Formation(**formation) for formation in cleaned_formations]
+
+# Disponibilités routes
+@api_router.post("/disponibilites", response_model=Disponibilite)
+async def create_disponibilite(disponibilite: DisponibiliteCreate, current_user: User = Depends(get_current_user)):
+    disponibilite_obj = Disponibilite(**disponibilite.dict())
+    await db.disponibilites.insert_one(disponibilite_obj.dict())
+    return disponibilite_obj
+
+@api_router.get("/disponibilites/{user_id}", response_model=List[Disponibilite])
+async def get_user_disponibilites(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    disponibilites = await db.disponibilites.find({"user_id": user_id}).to_list(1000)
+    cleaned_disponibilites = [clean_mongo_doc(dispo) for dispo in disponibilites]
+    return [Disponibilite(**dispo) for dispo in cleaned_disponibilites]
 @api_router.get("/statistiques", response_model=Statistiques)
 async def get_statistiques(current_user: User = Depends(get_current_user)):
     # Calculate statistics
