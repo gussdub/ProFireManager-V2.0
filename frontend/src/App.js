@@ -217,7 +217,11 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
     <div className="sidebar">
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <span className="logo-icon">🚒</span>
+          <div className="logo-flame">
+            <div className="flame-container">
+              <div className="flame-icon">🔥</div>
+            </div>
+          </div>
           <div>
             <h2>ProFireManager</h2>
             <p className="version">v2.0 Avancé</p>
