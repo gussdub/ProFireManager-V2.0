@@ -265,6 +265,13 @@ async def get_types_garde(current_user: User = Depends(get_current_user)):
     types_garde = await db.types_garde.find().to_list(1000)
     return [TypeGarde(**type_garde) for type_garde in types_garde]
 
+# Helper function to clean MongoDB documents
+def clean_mongo_doc(doc):
+    """Remove MongoDB ObjectId and other non-serializable fields"""
+    if doc and "_id" in doc:
+        doc.pop("_id", None)
+    return doc
+
 # Planning routes
 @api_router.get("/planning/{semaine_debut}")
 async def get_planning(semaine_debut: str, current_user: User = Depends(get_current_user)):
@@ -275,6 +282,8 @@ async def get_planning(semaine_debut: str, current_user: User = Depends(get_curr
         planning_obj = Planning(semaine_debut=semaine_debut, semaine_fin=semaine_fin)
         await db.planning.insert_one(planning_obj.dict())
         planning = planning_obj.dict()
+    else:
+        planning = clean_mongo_doc(planning)
     
     return planning
 
