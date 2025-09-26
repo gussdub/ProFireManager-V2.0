@@ -815,6 +815,8 @@ const AppLayout = () => {
         return <div className="page-placeholder">Rapports - En développement</div>;
       case 'parametres':
         return <div className="page-placeholder">Paramètres - En développement</div>;
+      case 'monprofil':
+        return <MonProfil />;
       default:
         return <Dashboard />;
     }
