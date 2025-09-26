@@ -998,7 +998,7 @@ const Personnel = () => {
                     userDisponibilites.map(dispo => (
                       <div key={dispo.id} className="disponibilite-item">
                         <div className="dispo-day">
-                          <strong>{dispo.jour_semaine}</strong>
+                          <strong>{translateDay(dispo.jour_semaine)}</strong>
                         </div>
                         <div className="dispo-time">
                           {dispo.heure_debut} - {dispo.heure_fin}
