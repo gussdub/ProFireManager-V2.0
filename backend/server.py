@@ -330,7 +330,8 @@ async def get_demandes_remplacement(current_user: User = Depends(get_current_use
     else:
         demandes = await db.demandes_remplacement.find().to_list(1000)
     
-    return [DemandeRemplacement(**demande) for demande in demandes]
+    cleaned_demandes = [clean_mongo_doc(demande) for demande in demandes]
+    return [DemandeRemplacement(**demande) for demande in cleaned_demandes]
 
 # Statistics routes
 @api_router.get("/statistiques", response_model=Statistiques)
