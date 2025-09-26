@@ -505,7 +505,377 @@ const Personnel = () => {
   );
 };
 
-// Remplacements Component
+// Parametres Component
+const Parametres = () => {
+  const { user } = useAuth();
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
+  const [newTypeGarde, setNewTypeGarde] = useState({
+    nom: '',
+    heure_debut: '',
+    heure_fin: '',
+    personnel_requis: 1,
+    duree_heures: 8,
+    couleur: '#3B82F6',
+    jours_application: [],
+    officier_obligatoire: false
+  });
+  const { toast } = useToast();
+
+  const joursOptions = [
+    { value: 'monday', label: 'Lundi' },
+    { value: 'tuesday', label: 'Mardi' },
+    { value: 'wednesday', label: 'Mercredi' },
+    { value: 'thursday', label: 'Jeudi' },
+    { value: 'friday', label: 'Vendredi' },
+    { value: 'saturday', label: 'Samedi' },
+    { value: 'sunday', label: 'Dimanche' }
+  ];
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    fetchTypesGarde();
+  }, [user]);
+
+  const fetchTypesGarde = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/types-garde`);
+      setTypesGarde(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des types de garde:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateTypeGarde = async () => {
+    if (!newTypeGarde.nom || !newTypeGarde.heure_debut || !newTypeGarde.heure_fin) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/types-garde`, newTypeGarde);
+      toast({
+        title: "Type de garde créé",
+        description: "Le nouveau type de garde a été ajouté avec succès",
+        variant: "success"
+      });
+      setShowCreateTypeModal(false);
+      setNewTypeGarde({
+        nom: '',
+        heure_debut: '',
+        heure_fin: '',
+        personnel_requis: 1,
+        duree_heures: 8,
+        couleur: '#3B82F6',
+        jours_application: [],
+        officier_obligatoire: false
+      });
+      fetchTypesGarde();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le type de garde",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleJourChange = (jour) => {
+    const updatedJours = newTypeGarde.jours_application.includes(jour)
+      ? newTypeGarde.jours_application.filter(j => j !== jour)
+      : [...newTypeGarde.jours_application, jour];
+    
+    setNewTypeGarde({...newTypeGarde, jours_application: updatedJours});
+  };
+
+  if (user?.role !== 'admin') {
+    return (
+      <div className="access-denied">
+        <h1>Accès refusé</h1>
+        <p>Cette section est réservée aux administrateurs.</p>
+      </div>
+    );
+  }
+
+  if (loading) return <div className="loading" data-testid="parametres-loading">Chargement des paramètres...</div>;
+
+  return (
+    <div className="parametres">
+      <div className="parametres-header">
+        <div>
+          <h1 data-testid="parametres-title">Paramètres du système</h1>
+          <p>Configuration des types de gardes et paramètres avancés</p>
+        </div>
+      </div>
+
+      {/* Types de Gardes Section */}
+      <div className="settings-section">
+        <div className="section-header">
+          <div>
+            <h2>Types de Gardes</h2>
+            <p>Gérez les différents types de gardes et leurs paramètres</p>
+          </div>
+          <Button 
+            variant="default" 
+            onClick={() => setShowCreateTypeModal(true)}
+            data-testid="create-type-garde-btn"
+          >
+            + Nouveau Type
+          </Button>
+        </div>
+
+        <div className="types-garde-list">
+          {typesGarde.map(type => (
+            <div key={type.id} className="type-garde-card" data-testid={`type-garde-${type.id}`}>
+              <div className="type-garde-header">
+                <div className="type-info">
+                  <h3>{type.nom}</h3>
+                  <div className="type-schedule">
+                    <span className="schedule-time">
+                      ⏰ {type.heure_debut} - {type.heure_fin}
+                    </span>
+                    <span className="personnel-required">
+                      👥 {type.personnel_requis} personnel requis
+                    </span>
+                    <span className="duration">
+                      ⌛ {type.duree_heures}h
+                    </span>
+                  </div>
+                </div>
+                <div className="type-actions">
+                  <Button variant="ghost" data-testid={`edit-type-${type.id}`}>✏️</Button>
+                  <Button variant="ghost" className="danger" data-testid={`delete-type-${type.id}`}>🗑️</Button>
+                </div>
+              </div>
+
+              <div className="type-details">
+                <div className="type-color">
+                  <span className="color-preview" style={{ backgroundColor: type.couleur }}></span>
+                  <span>Couleur: {type.couleur}</span>
+                </div>
+                
+                {type.jours_application?.length > 0 && (
+                  <div className="type-days">
+                    <span>📅 Jours: {type.jours_application.join(', ')}</span>
+                  </div>
+                )}
+
+                {type.officier_obligatoire && (
+                  <div className="type-officer">
+                    <span>🎖️ Officier obligatoire</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Paramètres d'Attribution Section */}
+      <div className="settings-section">
+        <div className="section-header">
+          <div>
+            <h2>Paramètres d'Attribution Automatique</h2>
+            <p>Configurez les règles d'attribution automatique des gardes</p>
+          </div>
+        </div>
+
+        <div className="attribution-settings">
+          <div className="setting-item">
+            <h3>Ordre de priorité</h3>
+            <div className="priority-list">
+              <div className="priority-item">
+                <span className="priority-number">1</span>
+                <span className="priority-text">Assignations manuelles privilégiées</span>
+              </div>
+              <div className="priority-item">
+                <span className="priority-number">2</span>
+                <span className="priority-text">Respecter les disponibilités des employés</span>
+              </div>
+              <div className="priority-item">
+                <span className="priority-number">3</span>
+                <span className="priority-text">Respecter les grades (1 officier par garde si requis)</span>
+              </div>
+              <div className="priority-item">
+                <span className="priority-number">4</span>
+                <span className="priority-text">Rotation équitable des employés</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="setting-item">
+            <h3>Paramètres avancés</h3>
+            <div className="advanced-settings">
+              <label className="setting-checkbox">
+                <input type="checkbox" defaultChecked />
+                <span>Attribution automatique activée</span>
+              </label>
+              <label className="setting-checkbox">
+                <input type="checkbox" defaultChecked />
+                <span>Notification par email des assignations</span>
+              </label>
+              <label className="setting-checkbox">
+                <input type="checkbox" />
+                <span>Permettre les assignations en doublon</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Paramètres de Remplacement Section */}
+      <div className="settings-section">
+        <div className="section-header">
+          <div>
+            <h2>Paramètres des Remplacements</h2>
+            <p>Configurez les règles de validation des demandes de remplacement</p>
+          </div>
+        </div>
+
+        <div className="replacement-settings">
+          <div className="setting-group">
+            <label>
+              Délai de réponse (heures)
+              <Input type="number" defaultValue="48" className="setting-input" />
+            </label>
+            <label>
+              Nombre max de personnes à contacter
+              <Input type="number" defaultValue="5" className="setting-input" />
+            </label>
+            <label className="setting-checkbox">
+              <input type="checkbox" defaultChecked />
+              <span>Accepter les remplacements de grade équivalent uniquement</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      {/* Create Type Modal */}
+      {showCreateTypeModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateTypeModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-type-modal">
+            <div className="modal-header">
+              <h3>Nouveau type de garde</h3>
+              <Button variant="ghost" onClick={() => setShowCreateTypeModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label htmlFor="nom">Nom du type de garde</Label>
+                  <Input
+                    id="nom"
+                    value={newTypeGarde.nom}
+                    onChange={(e) => setNewTypeGarde({...newTypeGarde, nom: e.target.value})}
+                    placeholder="Ex: Garde Interne AM"
+                    data-testid="type-nom-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label htmlFor="heure-debut">Heure de début</Label>
+                    <Input
+                      id="heure-debut"
+                      type="time"
+                      value={newTypeGarde.heure_debut}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, heure_debut: e.target.value})}
+                      data-testid="type-heure-debut-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="heure-fin">Heure de fin</Label>
+                    <Input
+                      id="heure-fin"
+                      type="time"
+                      value={newTypeGarde.heure_fin}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, heure_fin: e.target.value})}
+                      data-testid="type-heure-fin-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label htmlFor="personnel-requis">Personnel requis</Label>
+                    <Input
+                      id="personnel-requis"
+                      type="number"
+                      min="1"
+                      value={newTypeGarde.personnel_requis}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, personnel_requis: parseInt(e.target.value)})}
+                      data-testid="type-personnel-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label htmlFor="couleur">Couleur</Label>
+                    <Input
+                      id="couleur"
+                      type="color"
+                      value={newTypeGarde.couleur}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, couleur: e.target.value})}
+                      data-testid="type-couleur-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Jours d'application</Label>
+                  <div className="days-selection">
+                    {joursOptions.map(jour => (
+                      <label key={jour.value} className="day-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={newTypeGarde.jours_application.includes(jour.value)}
+                          onChange={() => handleJourChange(jour.value)}
+                        />
+                        <span>{jour.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="setting-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={newTypeGarde.officier_obligatoire}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, officier_obligatoire: e.target.checked})}
+                    />
+                    <span>Officier obligatoire pour cette garde</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCreateTypeModal(false)}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleCreateTypeGarde}
+                  data-testid="submit-type-garde-btn"
+                >
+                  Créer le type de garde
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 const Remplacements = () => {
   const { user } = useAuth();
   const [demandes, setDemandes] = useState([]);
