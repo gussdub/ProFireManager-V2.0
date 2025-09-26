@@ -594,6 +594,37 @@ async def init_demo_data():
         type_garde_obj = TypeGarde(**type_garde_data)
         await db.types_garde.insert_one(type_garde_obj.dict())
     
+    # Create demo disponibilités for part-time employee (Claire Garcia)
+    claire_user = await db.users.find_one({"email": "partiel@firemanager.ca"})
+    if claire_user:
+        demo_disponibilites = [
+            {
+                "user_id": claire_user["id"],
+                "jour_semaine": "monday",
+                "heure_debut": "08:00",
+                "heure_fin": "16:00",
+                "statut": "disponible"
+            },
+            {
+                "user_id": claire_user["id"],
+                "jour_semaine": "wednesday",
+                "heure_debut": "08:00",
+                "heure_fin": "16:00",
+                "statut": "disponible"
+            },
+            {
+                "user_id": claire_user["id"],
+                "jour_semaine": "friday",
+                "heure_debut": "08:00",
+                "heure_fin": "16:00",
+                "statut": "disponible"
+            }
+        ]
+        
+        for dispo_data in demo_disponibilites:
+            dispo_obj = Disponibilite(**dispo_data)
+            await db.disponibilites.insert_one(dispo_obj.dict())
+    
     return {"message": "Données de démonstration créées avec succès"}
 
 # Include the router in the main app
