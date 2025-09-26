@@ -536,36 +536,54 @@ const Personnel = () => {
   };
 
   const handleUpdateUser = async () => {
+    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.grade || !newUser.type_emploi) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      // For demo purposes, we'll just show success
+      await axios.put(`${API}/users/${selectedUser.id}`, newUser);
       toast({
         title: "Pompier mis à jour",
         description: "Les informations ont été mises à jour avec succès",
         variant: "success"
       });
       setShowEditModal(false);
+      
+      // Reload users list
+      const response = await axios.get(`${API}/users`);
+      setUsers(response.data);
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour le pompier",
+        description: error.response?.data?.detail || "Impossible de mettre à jour le pompier",
         variant: "destructive"
       });
     }
   };
 
   const handleDeleteUser = async (userId) => {
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce pompier ?")) return;
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce pompier ? Cette action est irréversible.")) return;
 
     try {
+      await axios.delete(`${API}/users/${userId}`);
       toast({
         title: "Pompier supprimé",
         description: "Le pompier a été supprimé avec succès",
         variant: "success"
       });
+      
+      // Reload users list
+      const response = await axios.get(`${API}/users`);
+      setUsers(response.data);
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer le pompier",
+        description: error.response?.data?.detail || "Impossible de supprimer le pompier",
         variant: "destructive"
       });
     }
