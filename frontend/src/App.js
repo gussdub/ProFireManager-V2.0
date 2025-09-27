@@ -2193,30 +2193,41 @@ const MesDisponibilites = () => {
         </Button>
       </div>
 
-      {/* Résumé des disponibilités */}
-      <div className="availability-overview">
-        <div className="overview-stats">
-          <div className="overview-stat">
-            <span className="stat-number">{userDisponibilites.length}</span>
-            <span className="stat-label">Jours configurés</span>
+      {/* Résumé des disponibilités - Design amélioré */}
+      <div className="availability-overview-enhanced">
+        <div className="overview-cards">
+          <div className="overview-card">
+            <div className="card-icon">📅</div>
+            <div className="card-content">
+              <span className="card-number">{userDisponibilites.length}</span>
+              <span className="card-label">Jours configurés</span>
+            </div>
           </div>
-          <div className="overview-stat">
-            <span className="stat-number">
-              {userDisponibilites.reduce((total, dispo) => {
-                if (dispo.statut === 'disponible') {
-                  const start = new Date(`1970-01-01T${dispo.heure_debut}`);
-                  const end = new Date(`1970-01-01T${dispo.heure_fin}`);
-                  const hours = (end - start) / (1000 * 60 * 60);
-                  return total + hours;
-                }
-                return total;
-              }, 0)}h
-            </span>
-            <span className="stat-label">Heures totales/mois</span>
+          
+          <div className="overview-card">
+            <div className="card-icon">⏱️</div>
+            <div className="card-content">
+              <span className="card-number">
+                {userDisponibilites.reduce((total, dispo) => {
+                  if (dispo.statut === 'disponible') {
+                    const start = new Date(`1970-01-01T${dispo.heure_debut}`);
+                    const end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                    const hours = (end - start) / (1000 * 60 * 60);
+                    return total + hours;
+                  }
+                  return total;
+                }, 0)}h
+              </span>
+              <span className="card-label">Heures/mois</span>
+            </div>
           </div>
-          <div className="overview-stat">
-            <span className="stat-number">{[...new Set(userDisponibilites.map(d => d.type_garde_id).filter(Boolean))].length}</span>
-            <span className="stat-label">Types de garde</span>
+          
+          <div className="overview-card">
+            <div className="card-icon">🚒</div>
+            <div className="card-content">
+              <span className="card-number">{[...new Set(userDisponibilites.map(d => d.type_garde_id).filter(Boolean))].length}</span>
+              <span className="card-label">Types de garde</span>
+            </div>
           </div>
         </div>
       </div>
