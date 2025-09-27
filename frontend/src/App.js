@@ -2218,15 +2218,13 @@ const MonProfil = () => {
           <div className="profile-section">
             <div className="section-header">
               <h2>Informations personnelles</h2>
-              {user.role !== 'employe' && (
-                <Button
-                  onClick={() => setIsEditing(!isEditing)}
-                  variant={isEditing ? "secondary" : "default"}
-                  data-testid="edit-profile-btn"
-                >
-                  {isEditing ? 'Annuler' : 'Modifier'}
-                </Button>
-              )}
+              <Button
+                onClick={() => setIsEditing(!isEditing)}
+                variant={isEditing ? "secondary" : "default"}
+                data-testid="edit-profile-btn"
+              >
+                {isEditing ? 'Annuler' : 'Modifier'}
+              </Button>
             </div>
 
             <div className="profile-form">
