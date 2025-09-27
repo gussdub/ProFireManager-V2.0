@@ -6101,25 +6101,70 @@ body {
 .calendar-section-large {
   background: white;
   border-radius: 12px;
-  padding: 3rem;
+  padding: 2rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-height: 600px;
+}
+
+.calendar-section-large h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .availability-calendar-large {
-  border: 2px solid #e2e8f0;
-  border-radius: 12px;
-  padding: 2rem;
-  margin-bottom: 1.5rem;
-  transform: scale(1.4);
-  transform-origin: center;
-  min-height: 400px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: white;
 }
 
 .availability-calendar-large .rdp {
-  --rdp-cell-size: 50px;
+  --rdp-cell-size: 40px;
   --rdp-accent-color: #dc2626;
-  margin: 2rem 0;
+  margin: 0;
+}
+
+.availability-calendar-large .rdp-day {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.calendar-legend-modern {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.legend-item-modern {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid;
+}
+
+.legend-dot.available {
+  background-color: #dcfce7;
+  border-color: #bbf7d0;
+}
+
+.legend-dot.unavailable {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
 }
 
 .availability-details-enhanced {
