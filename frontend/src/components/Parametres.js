@@ -170,6 +170,7 @@ const Parametres = ({ user }) => {
       heure_debut: type.heure_debut,
       heure_fin: type.heure_fin,
       personnel_requis: type.personnel_requis,
+      duree_heures: type.duree_heures,
       couleur: type.couleur,
       jours_application: type.jours_application || [],
       officier_obligatoire: type.officier_obligatoire || false
