@@ -518,6 +518,63 @@ async def delete_user(user_id: str, current_user: User = Depends(get_current_use
     await db.demandes_remplacement.delete_many({"demandeur_id": user_id})
     
     return {"message": "Utilisateur supprimé avec succès"}
+
+@api_router.put("/users/{user_id}/access", response_model=User)
+async def update_user_access(user_id: str, role: str, statut: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Validation des valeurs
+    valid_roles = ["admin", "superviseur", "employe"]
+    valid_statuts = ["Actif", "Inactif"]
+    
+    if role not in valid_roles:
+        raise HTTPException(status_code=400, detail="Rôle invalide")
+    if statut not in valid_statuts:
+        raise HTTPException(status_code=400, detail="Statut invalide")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Update user access
+    result = await db.users.update_one(
+        {"id": user_id}, 
+        {"$set": {"role": role, "statut": statut}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de mettre à jour l'accès")
+    
+    updated_user = await db.users.find_one({"id": user_id})
+    updated_user = clean_mongo_doc(updated_user)
+    return User(**updated_user)
+
+@api_router.delete("/users/{user_id}/revoke")
+async def revoke_user_completely(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Prevent admin from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Impossible de supprimer votre propre compte")
+    
+    # Delete user and all related data
+    await db.users.delete_one({"id": user_id})
+    await db.disponibilites.delete_many({"user_id": user_id})
+    await db.assignations.delete_many({"user_id": user_id})
+    await db.demandes_remplacement.delete_many({"demandeur_id": user_id})
+    await db.demandes_remplacement.delete_many({"remplacant_id": user_id})
+    
+    return {"message": f"Utilisateur et toutes ses données ont été supprimés définitivement"}
+
+# Types de garde routes
 @api_router.post("/types-garde", response_model=TypeGarde)
 async def create_type_garde(type_garde: TypeGardeCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
