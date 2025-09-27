@@ -800,6 +800,77 @@ class InscriptionFormation(BaseModel):
     date_inscription: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     statut: str = "inscrit"  # inscrit, present, absent, annule
 
+# Sessions de formation routes
+@api_router.post("/sessions-formation", response_model=SessionFormation)
+async def create_session_formation(session: SessionFormationCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    session_obj = SessionFormation(**session.dict())
+    await db.sessions_formation.insert_one(session_obj.dict())
+    return session_obj
+
+@api_router.get("/sessions-formation", response_model=List[SessionFormation])
+async def get_sessions_formation(current_user: User = Depends(get_current_user)):
+    sessions = await db.sessions_formation.find().to_list(1000)
+    cleaned_sessions = [clean_mongo_doc(session) for session in sessions]
+    return [SessionFormation(**session) for session in cleaned_sessions]
+
+@api_router.post("/sessions-formation/{session_id}/inscription")
+async def inscrire_formation(session_id: str, current_user: User = Depends(get_current_user)):
+    # Vérifier que la session existe
+    session = await db.sessions_formation.find_one({"id": session_id})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session de formation non trouvée")
+    
+    # Vérifier si déjà inscrit
+    if current_user.id in session.get("participants", []):
+        raise HTTPException(status_code=400, detail="Vous êtes déjà inscrit à cette formation")
+    
+    # Vérifier les places disponibles
+    if len(session.get("participants", [])) >= session.get("places_max", 20):
+        raise HTTPException(status_code=400, detail="Formation complète - Plus de places disponibles")
+    
+    # Ajouter l'utilisateur aux participants
+    await db.sessions_formation.update_one(
+        {"id": session_id},
+        {"$push": {"participants": current_user.id}}
+    )
+    
+    # Créer l'inscription
+    inscription_obj = InscriptionFormation(
+        session_id=session_id,
+        user_id=current_user.id
+    )
+    await db.inscriptions_formation.insert_one(inscription_obj.dict())
+    
+    return {"message": "Inscription réussie", "session_id": session_id}
+
+@api_router.delete("/sessions-formation/{session_id}/desinscription")
+async def desinscrire_formation(session_id: str, current_user: User = Depends(get_current_user)):
+    # Vérifier que la session existe
+    session = await db.sessions_formation.find_one({"id": session_id})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session de formation non trouvée")
+    
+    # Vérifier si inscrit
+    if current_user.id not in session.get("participants", []):
+        raise HTTPException(status_code=400, detail="Vous n'êtes pas inscrit à cette formation")
+    
+    # Retirer l'utilisateur des participants
+    await db.sessions_formation.update_one(
+        {"id": session_id},
+        {"$pull": {"participants": current_user.id}}
+    )
+    
+    # Supprimer l'inscription
+    await db.inscriptions_formation.delete_one({
+        "session_id": session_id,
+        "user_id": current_user.id
+    })
+    
+    return {"message": "Désinscription réussie", "session_id": session_id}
+
 # Disponibilités routes
 @api_router.post("/disponibilites", response_model=Disponibilite)
 async def create_disponibilite(disponibilite: DisponibiliteCreate, current_user: User = Depends(get_current_user)):
