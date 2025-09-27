@@ -6118,8 +6118,9 @@ body {
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 1.5rem;
-  transform: scale(1.25);
+  transform: scale(1.2);
   transform-origin: center;
+  overflow: visible;
 }
 
 .calendar-legend-modern {
