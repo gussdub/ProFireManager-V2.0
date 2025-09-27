@@ -2109,7 +2109,8 @@ const MonProfil = () => {
           prenom: userResponse.data.prenom,
           email: userResponse.data.email,
           telephone: userResponse.data.telephone,
-          contact_urgence: userResponse.data.contact_urgence || ''
+          contact_urgence: userResponse.data.contact_urgence || '',
+          heures_max_semaine: userResponse.data.heures_max_semaine || 25
         });
 
         // Load disponibilités if part-time employee
