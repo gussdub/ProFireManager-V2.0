@@ -435,9 +435,19 @@ const Parametres = ({ user }) => {
         {activeTab === 'comptes' && (
           <div className="comptes-tab">
             <div className="tab-header">
-              <h2>Comptes d'Accès</h2>
-              <p>Gestion des utilisateurs et permissions</p>
+              <div>
+                <h2>Comptes d'Accès</h2>
+                <p>Gestion des utilisateurs et permissions</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateUserModal(true)}
+                data-testid="create-user-account-btn"
+              >
+                + Nouveau Compte
+              </Button>
             </div>
+            
             <div className="accounts-stats">
               <div className="account-stat">
                 <span className="stat-number">{users.filter(u => u.role === 'admin').length}</span>
@@ -450,6 +460,43 @@ const Parametres = ({ user }) => {
               <div className="account-stat">
                 <span className="stat-number">{users.filter(u => u.role === 'employe').length}</span>
                 <span className="stat-label">Employés</span>
+              </div>
+            </div>
+
+            {/* Liste des utilisateurs existants */}
+            <div className="existing-users-section">
+              <h3>Utilisateurs existants</h3>
+              <div className="users-list">
+                {users.map(user => (
+                  <div key={user.id} className="user-access-card" data-testid={`user-access-${user.id}`}>
+                    <div className="user-access-info">
+                      <div className="user-avatar">
+                        <span className="avatar-icon">👤</span>
+                      </div>
+                      <div className="user-details">
+                        <h4>{user.prenom} {user.nom}</h4>
+                        <p className="user-email">{user.email}</p>
+                        <div className="user-badges">
+                          <span className={`role-badge ${user.role}`}>
+                            {user.role === 'admin' ? '👑 Administrateur' : 
+                             user.role === 'superviseur' ? '🎖️ Superviseur' : 
+                             '👤 Employé'}
+                          </span>
+                          <span className="grade-badge">{user.grade}</span>
+                          <span className="employment-badge">{user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="user-access-actions">
+                      <Button variant="ghost" size="sm" data-testid={`modify-access-${user.id}`}>
+                        ✏️ Modifier accès
+                      </Button>
+                      <Button variant="ghost" size="sm" className="danger" data-testid={`revoke-access-${user.id}`}>
+                        🚫 Révoquer
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
