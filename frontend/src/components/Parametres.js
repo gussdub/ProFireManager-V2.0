@@ -547,42 +547,89 @@ const Parametres = ({ user }) => {
         {activeTab === 'remplacements' && (
           <div className="remplacements-tab">
             <div className="tab-header">
-              <h2>Paramètres Remplacements</h2>
-              <p>Configuration des règles de validation</p>
+              <div>
+                <h2>Paramètres des Remplacements</h2>
+                <p>Configuration des règles de validation et délais</p>
+              </div>
+              <Button variant="outline" data-testid="save-replacement-settings-btn">
+                💾 Sauvegarder les paramètres
+              </Button>
             </div>
+            
             <div className="replacement-settings">
               <div className="setting-group">
                 <h3>Délais et limites</h3>
                 <div className="setting-inputs">
                   <label>
                     <span>Délai de réponse (heures)</span>
-                    <Input
-                      type="number"
-                      value={systemSettings.delai_reponse}
-                      onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
-                    />
+                    <div className="input-with-actions">
+                      <Input
+                        type="number"
+                        value={systemSettings.delai_reponse}
+                        onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
+                        data-testid="delai-reponse-input"
+                      />
+                      <Button variant="ghost" size="sm" data-testid="reset-delai-btn">🔄</Button>
+                    </div>
+                    <small>Actuellement: {systemSettings.delai_reponse} heures</small>
                   </label>
+                  
                   <label>
                     <span>Max personnes à contacter</span>
-                    <Input
-                      type="number"
-                      value={systemSettings.max_personnes_contact}
-                      onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
-                    />
+                    <div className="input-with-actions">
+                      <Input
+                        type="number"
+                        value={systemSettings.max_personnes_contact}
+                        onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
+                        data-testid="max-contact-input"
+                      />
+                      <Button variant="ghost" size="sm" data-testid="reset-contact-btn">🔄</Button>
+                    </div>
+                    <small>Actuellement: {systemSettings.max_personnes_contact} personnes</small>
                   </label>
                 </div>
               </div>
               
               <div className="setting-group">
                 <h3>Règles de validation</h3>
-                <label className="setting-toggle">
-                  <span>Grade équivalent obligatoire</span>
-                  <input
-                    type="checkbox"
-                    checked={systemSettings.grade_equivalent}
-                    onChange={(e) => handleSettingChange('grade_equivalent', e.target.checked)}
-                  />
-                </label>
+                <div className="rules-settings">
+                  <label className="setting-toggle">
+                    <div className="toggle-info">
+                      <span>Grade équivalent obligatoire</span>
+                      <small>Accepter uniquement les remplacements de grade équivalent ou supérieur</small>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.grade_equivalent}
+                      onChange={(e) => handleSettingChange('grade_equivalent', e.target.checked)}
+                      data-testid="grade-equivalent-toggle"
+                    />
+                  </label>
+                  
+                  <div className="validation-actions">
+                    <Button variant="outline" size="sm" data-testid="test-validation-btn">
+                      🧪 Tester les règles
+                    </Button>
+                    <Button variant="outline" size="sm" data-testid="reset-rules-btn">
+                      🔄 Réinitialiser par défaut
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="setting-group">
+                <h3>Actions avancées</h3>
+                <div className="advanced-actions">
+                  <Button variant="outline" data-testid="export-replacement-config-btn">
+                    📊 Exporter configuration
+                  </Button>
+                  <Button variant="outline" data-testid="import-replacement-config-btn">
+                    📥 Importer configuration
+                  </Button>
+                  <Button variant="outline" data-testid="backup-settings-btn">
+                    💾 Sauvegarder paramètres
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
