@@ -2010,7 +2010,7 @@ const AppLayout = () => {
       case 'rapports':
         return <Rapports />;
       case 'parametres':
-        return <Parametres />;
+        return <Parametres user={user} />;
       case 'monprofil':
         return <MonProfil />;
       default:
