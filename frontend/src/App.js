@@ -1461,7 +1461,7 @@ const MonProfil = () => {
             </div>
           </div>
 
-          {/* Section disponibilités avec calendrier mensuel (uniquement pour temps partiel) */}
+          {/* Section disponibilités avec calendrier mensuel interactif */}
           {userProfile?.type_emploi === 'temps_partiel' && (
             <div className="profile-section">
               <div className="section-header">
@@ -1471,11 +1471,11 @@ const MonProfil = () => {
                   onClick={() => setShowDispoModal(true)}
                   data-testid="edit-availability-btn"
                 >
-                  ✏️ Modifier le calendrier
+                  ✏️ Modifier mes disponibilités
                 </Button>
               </div>
               <p className="section-description">
-                En tant qu'employé à temps partiel, définissez vos créneaux de disponibilité sur le calendrier.
+                Sélectionnez vos jours de disponibilité sur le calendrier mensuel.
               </p>
               
               <div className="availability-calendar-section">
@@ -1484,30 +1484,12 @@ const MonProfil = () => {
                   
                   <Calendar
                     mode="multiple"
+                    selected={getAvailableDates()}
+                    onSelect={handleDateSelect}
                     className="availability-calendar"
+                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
                     modifiers={{
-                      available: userDisponibilites.map(d => {
-                        // Create dates for each day where user is available
-                        const today = new Date();
-                        const daysOfWeek = {
-                          'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4,
-                          'friday': 5, 'saturday': 6, 'sunday': 0
-                        };
-                        
-                        // Get all dates in current month for this day of week
-                        const availableDates = [];
-                        const year = today.getFullYear();
-                        const month = today.getMonth();
-                        const firstDay = new Date(year, month, 1);
-                        const lastDay = new Date(year, month + 1, 0);
-                        
-                        for (let date = new Date(firstDay); date <= lastDay; date.setDate(date.getDate() + 1)) {
-                          if (date.getDay() === daysOfWeek[d.jour_semaine]) {
-                            availableDates.push(new Date(date));
-                          }
-                        }
-                        return availableDates;
-                      }).flat()
+                      available: getAvailableDates()
                     }}
                     modifiersStyles={{
                       available: { 
@@ -1521,11 +1503,11 @@ const MonProfil = () => {
                   <div className="calendar-legend">
                     <div className="legend-item">
                       <span className="legend-color available"></span>
-                      Jours disponibles configurés
+                      Jours disponibles (cliquez pour modifier)
                     </div>
                     <div className="legend-item">
                       <span className="legend-color unavailable"></span>
-                      Jours non configurés
+                      Jours non disponibles
                     </div>
                   </div>
                 </div>
@@ -1535,7 +1517,7 @@ const MonProfil = () => {
                   <div className="summary-stats">
                     <div className="summary-stat">
                       <span className="stat-number">{userDisponibilites.filter(d => d.statut === 'disponible').length}</span>
-                      <span className="stat-label">Jours/semaine</span>
+                      <span className="stat-label">Jours configurés</span>
                     </div>
                     <div className="summary-stat">
                       <span className="stat-number">
@@ -1549,25 +1531,38 @@ const MonProfil = () => {
                           return total;
                         }, 0)}h
                       </span>
-                      <span className="stat-label">Par semaine</span>
+                      <span className="stat-label">Total configuré</span>
                     </div>
                   </div>
                   
                   <div className="current-availability">
-                    <h5>Créneaux actuels :</h5>
+                    <h5>Disponibilités configurées :</h5>
                     {userDisponibilites.length > 0 ? (
-                      <ul className="availability-list">
-                        {userDisponibilites.map(dispo => (
-                          <li key={dispo.id} className="availability-item">
-                            <span className="day-name">{translateDay(dispo.jour_semaine)}</span>
-                            <span className="time-range">{dispo.heure_debut} - {dispo.heure_fin}</span>
-                            <span className={`availability-status ${dispo.statut}`}>
-                              {dispo.statut === 'disponible' ? '✅' : 
-                               dispo.statut === 'indisponible' ? '❌' : '⚡'}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
+                      <div className="availability-dates">
+                        <p className="date-range">
+                          <strong>Période :</strong> {formatDateRange(userDisponibilites)}
+                        </p>
+                        <div className="dates-list">
+                          {userDisponibilites.slice(0, 5).map(dispo => (
+                            <div key={dispo.id} className="date-item">
+                              <span className="date-value">
+                                {new Date(dispo.date).toLocaleDateString('fr-FR')}
+                              </span>
+                              <span className="time-value">
+                                {dispo.heure_debut}-{dispo.heure_fin}
+                              </span>
+                              <span className={`status-indicator ${dispo.statut}`}>
+                                {dispo.statut === 'disponible' ? '✅' : '❌'}
+                              </span>
+                            </div>
+                          ))}
+                          {userDisponibilites.length > 5 && (
+                            <div className="more-dates">
+                              +{userDisponibilites.length - 5} autres dates...
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     ) : (
                       <p className="no-availability">Aucune disponibilité configurée</p>
                     )}
