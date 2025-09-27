@@ -19,6 +19,7 @@ const Parametres = ({ user }) => {
     heure_fin: '',
     personnel_requis: 1,
     couleur: '#3B82F6',
+    jours_application: [],
     officier_obligatoire: false
   });
   const [activeTab, setActiveTab] = useState('types-garde');
