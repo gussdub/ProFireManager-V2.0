@@ -2225,6 +2225,99 @@ const MesDisponibilites = () => {
     }
   };
 
+  const handleAddConfiguration = () => {
+    if (selectedDates.length === 0) {
+      toast({
+        title: "Aucune date sélectionnée",
+        description: "Veuillez sélectionner au moins une date",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const selectedType = typesGarde.find(t => t.id === availabilityConfig.type_garde_id);
+    const newConfig = {
+      id: Date.now(),
+      type_garde_id: availabilityConfig.type_garde_id,
+      type_garde_name: selectedType ? selectedType.nom : 'Tous les types',
+      couleur: selectedType ? selectedType.couleur : '#10B981',
+      heure_debut: selectedType ? selectedType.heure_debut : availabilityConfig.heure_debut,
+      heure_fin: selectedType ? selectedType.heure_fin : availabilityConfig.heure_fin,
+      statut: availabilityConfig.statut,
+      dates: [...selectedDates]
+    };
+
+    setPendingConfigurations([...pendingConfigurations, newConfig]);
+    setSelectedDates([]);
+    
+    toast({
+      title: "Configuration ajoutée",
+      description: `${newConfig.dates.length} jour(s) pour ${newConfig.type_garde_name}`,
+      variant: "success"
+    });
+  };
+
+  const handleRemoveConfiguration = (configId) => {
+    setPendingConfigurations(prev => prev.filter(c => c.id !== configId));
+  };
+
+  const handleSaveAllConfigurations = async () => {
+    if (pendingConfigurations.length === 0) {
+      toast({
+        title: "Aucune configuration",
+        description: "Veuillez ajouter au moins une configuration",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Combiner avec les disponibilités existantes + nouvelles configurations
+      const existingDispos = userDisponibilites.map(d => ({
+        user_id: user.id,
+        date: d.date,
+        type_garde_id: d.type_garde_id || null,
+        heure_debut: d.heure_debut,
+        heure_fin: d.heure_fin,
+        statut: d.statut
+      }));
+
+      const newDispos = pendingConfigurations.flatMap(config => 
+        config.dates.map(date => ({
+          user_id: user.id,
+          date: date.toISOString().split('T')[0],
+          type_garde_id: config.type_garde_id || null,
+          heure_debut: config.heure_debut,
+          heure_fin: config.heure_fin,
+          statut: config.statut
+        }))
+      );
+
+      const allDisponibilites = [...existingDispos, ...newDispos];
+
+      await axios.put(`${API}/disponibilites/${user.id}`, allDisponibilites);
+      
+      toast({
+        title: "Toutes les disponibilités sauvegardées",
+        description: `${newDispos.length} nouvelles disponibilités ajoutées`,
+        variant: "success"
+      });
+      
+      setShowCalendarModal(false);
+      setPendingConfigurations([]);
+      
+      // Reload disponibilités
+      const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
+      setUserDisponibilites(dispoResponse.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSaveAvailability = async () => {
     if (selectedDates.length === 0) {
       toast({
