@@ -210,6 +210,7 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
     { id: 'personnel', label: 'Personnel', icon: '👥', roles: ['admin', 'superviseur'] },
     { id: 'planning', label: 'Planning', icon: '📅', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'remplacements', label: 'Remplacements', icon: '🔄', roles: ['admin', 'superviseur', 'employe'] },
+    { id: 'disponibilites', label: 'Mes disponibilités', icon: '📋', roles: ['employe'] },
     { id: 'formations', label: 'Formations', icon: '📚', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'rapports', label: 'Rapports', icon: '📈', roles: ['admin'] },
     { id: 'parametres', label: 'Paramètres', icon: '⚙️', roles: ['admin'] },
