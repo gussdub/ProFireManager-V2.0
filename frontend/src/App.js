@@ -845,14 +845,8 @@ const Parametres = () => {
     </div>
   );
 };
-  
-  // Modals states
-  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
-  const [showEditTypeModal, setShowEditTypeModal] = useState(false);
-  const [showCreateFormationModal, setShowCreateFormationModal] = useState(false);
-  const [showEditFormationModal, setShowEditFormationModal] = useState(false);
-  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
-  const [editingItem, setEditingItem] = useState(null);
+
+// Main Application Layout
   
   // Form states
   const [newTypeGarde, setNewTypeGarde] = useState({
