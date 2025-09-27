@@ -2370,7 +2370,13 @@ const MesDisponibilites = () => {
                 {userDisponibilites.reduce((total, dispo) => {
                   if (dispo.statut === 'disponible') {
                     const start = new Date(`1970-01-01T${dispo.heure_debut}`);
-                    const end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                    let end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                    
+                    // Corriger pour les horaires qui traversent minuit
+                    if (end < start) {
+                      end = new Date(`1970-01-02T${dispo.heure_fin}`); // Jour suivant
+                    }
+                    
                     const hours = (end - start) / (1000 * 60 * 60);
                     return total + hours;
                   }
