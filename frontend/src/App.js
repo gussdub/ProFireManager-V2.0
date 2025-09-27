@@ -1536,6 +1536,104 @@ const MonProfil = () => {
           )}
         </div>
       </div>
+
+      {/* Modal pour gérer les disponibilités */}
+      {showDispoModal && userProfile?.type_emploi === 'temps_partiel' && (
+        <div className="modal-overlay" onClick={() => setShowDispoModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-availability-modal">
+            <div className="modal-header">
+              <h3>Gérer mes disponibilités</h3>
+              <Button variant="ghost" onClick={() => setShowDispoModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="availability-manager">
+                <p className="manager-description">
+                  Sélectionnez vos créneaux de disponibilité pour chaque jour de la semaine.
+                </p>
+                
+                <div className="days-grid">
+                  {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
+                    const dayDispo = userDisponibilites.find(d => d.jour_semaine === day);
+                    return (
+                      <div key={day} className="day-availability-card">
+                        <div className="day-header">
+                          <h4>{translateDay(day)}</h4>
+                          <div className="day-status">
+                            {dayDispo ? '✅ Configuré' : '❌ Non configuré'}
+                          </div>
+                        </div>
+                        
+                        <div className="day-config">
+                          <div className="time-inputs">
+                            <div className="time-field">
+                              <Label>Début</Label>
+                              <Input 
+                                type="time" 
+                                defaultValue={dayDispo?.heure_debut || '08:00'}
+                                data-testid={`${day}-start-time`}
+                              />
+                            </div>
+                            <div className="time-field">
+                              <Label>Fin</Label>
+                              <Input 
+                                type="time" 
+                                defaultValue={dayDispo?.heure_fin || '16:00'}
+                                data-testid={`${day}-end-time`}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="status-selection">
+                            <select 
+                              defaultValue={dayDispo?.statut || 'disponible'}
+                              className="form-select"
+                              data-testid={`${day}-status-select`}
+                            >
+                              <option value="disponible">✅ Disponible</option>
+                              <option value="indisponible">❌ Indisponible</option>
+                              <option value="preference">⚡ Préférence</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="availability-summary">
+                  <div className="summary-item">
+                    <span className="summary-label">Jours disponibles:</span>
+                    <span className="summary-value">{userDisponibilites.filter(d => d.statut === 'disponible').length}</span>
+                  </div>
+                  <div className="summary-item">
+                    <span className="summary-label">Total heures/semaine:</span>
+                    <span className="summary-value">
+                      {userDisponibilites.reduce((total, dispo) => {
+                        if (dispo.statut === 'disponible') {
+                          const start = new Date(`1970-01-01T${dispo.heure_debut}`);
+                          const end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                          const hours = (end - start) / (1000 * 60 * 60);
+                          return total + hours;
+                        }
+                        return total;
+                      }, 0)}h
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowDispoModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" data-testid="save-availability-btn">
+                  Sauvegarder mes disponibilités
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
