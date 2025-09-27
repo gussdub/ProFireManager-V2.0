@@ -222,6 +222,58 @@ const Parametres = ({ user }) => {
     });
   };
 
+  const handleCreateUser = async () => {
+    if (!newUser.nom || !newUser.prenom || !newUser.email) {
+      toast({
+        title: "Champs requis",
+        description: "Nom, prénom et email sont obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const userToCreate = {
+        ...newUser,
+        numero_employe: newUser.numero_employe || `${newUser.role.toUpperCase()}${String(Date.now()).slice(-3)}`,
+        date_embauche: newUser.date_embauche || new Date().toLocaleDateString('fr-FR'),
+        formations: []
+      };
+
+      await axios.post(`${API}/users`, userToCreate);
+      toast({
+        title: "Compte créé",
+        description: "Le nouveau compte utilisateur a été créé avec succès",
+        variant: "success"
+      });
+      setShowCreateUserModal(false);
+      resetNewUser();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de créer le compte",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetNewUser = () => {
+    setNewUser({
+      nom: '',
+      prenom: '',
+      email: '',
+      telephone: '',
+      contact_urgence: '',
+      grade: 'Pompier',
+      type_emploi: 'temps_plein',
+      role: 'employe',
+      numero_employe: '',
+      date_embauche: '',
+      mot_de_passe: 'motdepasse123'
+    });
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
