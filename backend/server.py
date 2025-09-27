@@ -451,6 +451,41 @@ async def get_user_disponibilites(user_id: str, current_user: User = Depends(get
     cleaned_disponibilites = [clean_mongo_doc(dispo) for dispo in disponibilites]
     return [Disponibilite(**dispo) for dispo in cleaned_disponibilites]
 
+@api_router.put("/disponibilites/{user_id}")
+async def update_user_disponibilites(user_id: str, disponibilites: List[DisponibiliteCreate], current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Delete existing disponibilités for this user
+    await db.disponibilites.delete_many({"user_id": user_id})
+    
+    # Insert new disponibilités
+    if disponibilites:
+        dispo_docs = []
+        for dispo in disponibilites:
+            dispo_obj = Disponibilite(**dispo.dict())
+            dispo_docs.append(dispo_obj.dict())
+        
+        await db.disponibilites.insert_many(dispo_docs)
+    
+    return {"message": f"Disponibilités mises à jour avec succès ({len(disponibilites)} entrées)"}
+
+@api_router.delete("/disponibilites/{disponibilite_id}")
+async def delete_disponibilite(disponibilite_id: str, current_user: User = Depends(get_current_user)):
+    # Find the disponibilité to check ownership
+    disponibilite = await db.disponibilites.find_one({"id": disponibilite_id})
+    if not disponibilite:
+        raise HTTPException(status_code=404, detail="Disponibilité non trouvée")
+    
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != disponibilite["user_id"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    result = await db.disponibilites.delete_one({"id": disponibilite_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de supprimer la disponibilité")
+    
+    return {"message": "Disponibilité supprimée avec succès"}
+
 # Attribution automatique endpoint
 @api_router.post("/planning/attribution-auto")
 async def attribution_automatique(semaine_debut: str, current_user: User = Depends(get_current_user)):
