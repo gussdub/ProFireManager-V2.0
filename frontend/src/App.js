@@ -2679,30 +2679,111 @@ const MonProfil = () => {
         </div>
       </div>
 
-      {/* Modal de calendrier */}
+      {/* Modal de calendrier avec sélection type de garde */}
       {showCalendarModal && userProfile?.type_emploi === 'temps_partiel' && (
         <div className="modal-overlay" onClick={() => setShowCalendarModal(false)}>
-          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="calendar-modal">
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="calendar-modal">
             <div className="modal-header">
-              <h3>Sélectionner mes disponibilités</h3>
+              <h3>📅 Configurer mes disponibilités</h3>
               <Button variant="ghost" onClick={() => setShowCalendarModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
-              <div className="calendar-instructions">
-                <p>Cliquez sur les dates où vous êtes disponible pour travailler :</p>
-              </div>
-              
-              <Calendar
-                mode="multiple"
-                selected={selectedDates}
-                onSelect={setSelectedDates}
-                className="interactive-calendar"
-                disabled={(date) => date < new Date().setHours(0,0,0,0)}
-              />
-              
-              <div className="selection-summary">
-                <p><strong>Dates sélectionnées :</strong> {selectedDates?.length || 0} jour(s)</p>
-                <p><strong>Horaires par défaut :</strong> 08:00 - 16:00</p>
+              <div className="availability-config-advanced">
+                {/* Configuration du type de garde */}
+                <div className="config-section">
+                  <h4>🚒 Type de garde spécifique</h4>
+                  <div className="type-garde-selection">
+                    <Label>Pour quel type de garde êtes-vous disponible ?</Label>
+                    <select
+                      value={availabilityConfig.type_garde_id}
+                      onChange={(e) => setAvailabilityConfig({...availabilityConfig, type_garde_id: e.target.value})}
+                      className="form-select"
+                      data-testid="availability-type-garde-select"
+                    >
+                      <option value="">Tous les types de garde</option>
+                      {typesGarde.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.nom} ({type.heure_debut} - {type.heure_fin})
+                        </option>
+                      ))}
+                    </select>
+                    <small>
+                      Sélectionnez un type spécifique ou laissez "Tous les types" pour une disponibilité générale
+                    </small>
+                  </div>
+                </div>
+
+                {/* Configuration des horaires */}
+                <div className="config-section">
+                  <h4>⏰ Créneaux horaires</h4>
+                  <div className="time-config-row">
+                    <div className="time-field">
+                      <Label>Heure de début</Label>
+                      <Input 
+                        type="time" 
+                        value={availabilityConfig.heure_debut}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_debut: e.target.value})}
+                        data-testid="availability-start-time"
+                      />
+                    </div>
+                    <div className="time-field">
+                      <Label>Heure de fin</Label>
+                      <Input 
+                        type="time" 
+                        value={availabilityConfig.heure_fin}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_fin: e.target.value})}
+                        data-testid="availability-end-time"
+                      />
+                    </div>
+                    <div className="status-field">
+                      <Label>Statut</Label>
+                      <select 
+                        value={availabilityConfig.statut}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
+                        className="form-select"
+                        data-testid="availability-status-select"
+                      >
+                        <option value="disponible">✅ Disponible</option>
+                        <option value="preference">⚡ Préférence</option>
+                        <option value="indisponible">❌ Indisponible</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sélection des dates */}
+                <div className="config-section">
+                  <h4>📆 Sélection des dates</h4>
+                  <div className="calendar-instructions">
+                    <p>Cliquez sur les dates où vous êtes disponible pour le type de garde sélectionné :</p>
+                  </div>
+                  
+                  <Calendar
+                    mode="multiple"
+                    selected={selectedDates}
+                    onSelect={setSelectedDates}
+                    className="interactive-calendar"
+                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
+                  />
+                  
+                  <div className="selection-summary-advanced">
+                    <div className="summary-item">
+                      <strong>Type de garde :</strong> {getTypeGardeName(availabilityConfig.type_garde_id) || 'Tous les types'}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Dates sélectionnées :</strong> {selectedDates?.length || 0} jour(s)
+                    </div>
+                    <div className="summary-item">
+                      <strong>Horaires :</strong> {availabilityConfig.heure_debut} - {availabilityConfig.heure_fin}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Statut :</strong> {
+                        availabilityConfig.statut === 'disponible' ? '✅ Disponible' :
+                        availabilityConfig.statut === 'preference' ? '⚡ Préférence' : '❌ Indisponible'
+                      }
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-actions">
