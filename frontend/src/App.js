@@ -882,30 +882,130 @@ const Personnel = () => {
         </div>
       )}
 
-      {/* View User Modal */}
+      {/* View User Modal - Version modernisée */}
       {showViewModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="view-user-modal">
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="view-user-modal">
             <div className="modal-header">
-              <h3>Détails du pompier</h3>
+              <h3>👤 Profil de {selectedUser.prenom} {selectedUser.nom}</h3>
               <Button variant="ghost" onClick={() => setShowViewModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
-              <div className="user-details-view">
-                <div className="detail-item">
-                  <strong>Nom complet:</strong> {selectedUser.prenom} {selectedUser.nom}
+              <div className="user-profile-view">
+                {/* En-tête du profil */}
+                <div className="profile-summary">
+                  <div className="profile-avatar-large">
+                    <span className="avatar-icon-large">👤</span>
+                  </div>
+                  <div className="profile-info-summary">
+                    <h4>{selectedUser.prenom} {selectedUser.nom}</h4>
+                    <div className="profile-badges">
+                      <span className="grade-badge" style={{ backgroundColor: getGradeColor(selectedUser.grade) }}>
+                        {selectedUser.grade}
+                      </span>
+                      <span className="employment-badge">
+                        {selectedUser.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
+                      </span>
+                      <span className={`status-badge ${selectedUser.statut.toLowerCase()}`}>
+                        {selectedUser.statut}
+                      </span>
+                    </div>
+                    <p className="employee-id">#{selectedUser.numero_employe}</p>
+                  </div>
                 </div>
-                <div className="detail-item">
-                  <strong>Email:</strong> {selectedUser.email}
+
+                {/* Informations détaillées */}
+                <div className="profile-details-grid">
+                  <div className="detail-section">
+                    <h5>📞 Contact</h5>
+                    <div className="detail-list">
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Email</span>
+                        <span className="detail-value">{selectedUser.email}</span>
+                      </div>
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Téléphone</span>
+                        <span className="detail-value">{selectedUser.telephone || 'Non renseigné'}</span>
+                      </div>
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Contact d'urgence</span>
+                        <span className="detail-value emergency">{selectedUser.contact_urgence || 'Non renseigné'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <h5>🎖️ Professionnel</h5>
+                    <div className="detail-list">
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Date d'embauche</span>
+                        <span className="detail-value">{selectedUser.date_embauche}</span>
+                      </div>
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Ancienneté</span>
+                        <span className="detail-value">
+                          {(() => {
+                            const embauche = new Date(selectedUser.date_embauche.split('/').reverse().join('-'));
+                            const aujourdhui = new Date();
+                            const annees = Math.floor((aujourdhui - embauche) / (365.25 * 24 * 60 * 60 * 1000));
+                            return `${annees} an(s)`;
+                          })()}
+                        </span>
+                      </div>
+                      <div className="detail-item-modern">
+                        <span className="detail-label">Rôle système</span>
+                        <span className="detail-value">
+                          {selectedUser.role === 'admin' ? '👑 Administrateur' : 
+                           selectedUser.role === 'superviseur' ? '🎖️ Superviseur' : '👤 Employé'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="detail-item">
-                  <strong>Contact d'urgence:</strong> {selectedUser.contact_urgence || 'Non renseigné'}
+
+                {/* Compétences */}
+                <div className="detail-section">
+                  <h5>📜 Compétences et certifications</h5>
+                  {selectedUser.formations?.length > 0 ? (
+                    <div className="competences-view">
+                      {selectedUser.formations.map((formationId, index) => (
+                        <div key={index} className="competence-badge-view">
+                          <span className="competence-name">{getFormationName(formationId)}</span>
+                          <span className="competence-status">✅ Certifié</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="no-competences">
+                      <p>Aucune compétence enregistrée</p>
+                    </div>
+                  )}
                 </div>
-                <div className="detail-item">
-                  <strong>Grade:</strong> {selectedUser.grade}
-                </div>
-                <div className="detail-item">
-                  <strong>Type d'emploi:</strong> {selectedUser.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
+
+                {/* Actions rapides */}
+                <div className="profile-actions">
+                  <Button 
+                    variant="default" 
+                    onClick={() => {
+                      setShowViewModal(false);
+                      handleEditUser(selectedUser);
+                    }}
+                    data-testid="quick-edit-user-btn"
+                  >
+                    ✏️ Modifier ce profil
+                  </Button>
+                  {selectedUser.type_emploi === 'temps_partiel' && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowViewModal(false);
+                        handleViewDisponibilites(selectedUser);
+                      }}
+                      data-testid="quick-view-availability-btn"
+                    >
+                      📅 Voir disponibilités
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
