@@ -4125,7 +4125,45 @@ body {
   color: #dc2626;
 }
 
-/* User Access Cards */
+/* Planning Instructions */
+.planning-instructions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.instruction-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+}
+
+.instruction-icon {
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
+  background: #3B82F6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instruction-text {
+  color: #1e40af;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.instruction-text strong {
+  color: #1e293b;
+}
 .existing-users-section {
   margin: 2rem 0;
 }
