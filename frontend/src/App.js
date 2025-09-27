@@ -2222,6 +2222,8 @@ const MesDisponibilites = () => {
       });
     }
   };
+
+  const handleSaveAvailability = async () => {
     if (selectedDates.length === 0) {
       toast({
         title: "Aucune date sélectionnée",
@@ -2260,6 +2262,7 @@ const MesDisponibilites = () => {
         variant: "destructive"
       });
     }
+  };
   };
 
   const getTypeGardeName = (typeGardeId) => {
