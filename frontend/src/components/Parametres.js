@@ -933,54 +933,55 @@ const Parametres = ({ user }) => {
         </div>
       )}
 
-      {/* Modal d'édition formation */}
+      {/* Modal d'édition compétence */}
       {showEditFormationModal && editingItem && (
         <div className="modal-overlay" onClick={() => setShowEditFormationModal(false)}>
-          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-formation-modal">
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-competence-modal">
             <div className="modal-header">
-              <h3>Modifier: {editingItem.nom}</h3>
+              <h3>Modifier la compétence: {editingItem.nom}</h3>
               <Button variant="ghost" onClick={() => setShowEditFormationModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-field">
-                  <Label>Nom de la formation</Label>
+                  <Label>Nom de la compétence *</Label>
                   <Input
                     value={editFormation.nom}
                     onChange={(e) => setEditFormation({...editFormation, nom: e.target.value})}
-                    data-testid="edit-formation-nom"
+                    data-testid="edit-competence-nom"
                   />
                 </div>
 
                 <div className="form-field">
-                  <Label>Description</Label>
+                  <Label>Description de la compétence</Label>
                   <textarea
                     value={editFormation.description}
                     onChange={(e) => setEditFormation({...editFormation, description: e.target.value})}
                     className="form-textarea"
                     rows="3"
-                    data-testid="edit-formation-description"
+                    placeholder="Décrivez cette compétence et ses exigences..."
+                    data-testid="edit-competence-description"
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-field">
-                    <Label>Durée (heures)</Label>
+                    <Label>Durée de formation requise (heures)</Label>
                     <Input
                       type="number"
                       min="1"
                       value={editFormation.duree_heures}
                       onChange={(e) => setEditFormation({...editFormation, duree_heures: parseInt(e.target.value)})}
-                      data-testid="edit-formation-duree"
+                      data-testid="edit-competence-duree"
                     />
                   </div>
                   <div className="form-field">
-                    <Label>Validité</Label>
+                    <Label>Renouvellement de la compétence</Label>
                     <select
                       value={editFormation.validite_mois}
                       onChange={(e) => setEditFormation({...editFormation, validite_mois: parseInt(e.target.value)})}
                       className="form-select"
-                      data-testid="edit-formation-validite"
+                      data-testid="edit-competence-validite"
                     >
                       <option value="0">Pas de renouvellement</option>
                       <option value="6">6 mois</option>
@@ -999,15 +1000,15 @@ const Parametres = ({ user }) => {
                       checked={editFormation.obligatoire}
                       onChange={(e) => setEditFormation({...editFormation, obligatoire: e.target.checked})}
                     />
-                    <span>Formation obligatoire</span>
+                    <span>Compétence obligatoire pour tous les pompiers</span>
                   </label>
                 </div>
               </div>
 
               <div className="modal-actions">
                 <Button variant="outline" onClick={() => setShowEditFormationModal(false)}>Annuler</Button>
-                <Button variant="default" onClick={handleUpdateFormation} data-testid="save-formation-btn">
-                  Sauvegarder les modifications
+                <Button variant="default" onClick={handleUpdateFormation} data-testid="save-competence-btn">
+                  Sauvegarder la compétence
                 </Button>
               </div>
             </div>
