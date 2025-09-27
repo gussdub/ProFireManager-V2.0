@@ -464,7 +464,7 @@ const Personnel = () => {
       grade: '',
       type_emploi: '',
       numero_employe: '',
-      date_embauche: '',
+      date_embauche: new Date().toISOString().split('T')[0], // Date du jour par défaut
       formations: [],
       mot_de_passe: ''
     });
