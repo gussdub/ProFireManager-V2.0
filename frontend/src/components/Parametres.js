@@ -208,38 +208,6 @@ const Parametres = ({ user }) => {
     });
   };
 
-  const handleEditFormation = (formation) => {
-    setEditingItem(formation);
-    setNewFormation({
-      nom: formation.nom,
-      description: formation.description,
-      duree_heures: formation.duree_heures,
-      validite_mois: formation.validite_mois,
-      obligatoire: formation.obligatoire
-    });
-    setShowEditFormationModal(true);
-  };
-
-  const handleDeleteFormation = async (formationId) => {
-    if (!window.confirm("Supprimer cette formation ?")) return;
-    
-    try {
-      await axios.delete(`${API}/formations/${formationId}`);
-      toast({
-        title: "Formation supprimée",
-        description: "La formation a été supprimée avec succès",
-        variant: "success"
-      });
-      fetchData();
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la formation",
-        variant: "destructive"
-      });
-    }
-  };
-
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
