@@ -1047,6 +1047,14 @@ const Planning = () => {
           >
             ✨ Attribution auto
           </Button>
+          <Button 
+            variant="destructive" 
+            disabled={user.role === 'employe'}
+            onClick={() => alert('Sélectionnez une cellule vide dans le planning pour assigner manuellement')}
+            data-testid="manual-assign-btn"
+          >
+            👤 Assignation manuelle
+          </Button>
         </div>
       </div>
 
