@@ -2359,7 +2359,7 @@ const MesDisponibilites = () => {
             <div className="card-icon">📅</div>
             <div className="card-content">
               <span className="card-number">{userDisponibilites.length}</span>
-              <span className="card-label">Jours configurés</span>
+              <span className="card-label">Disponibilités enregistrées</span>
             </div>
           </div>
           
