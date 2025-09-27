@@ -6016,3 +6016,218 @@ body {
   font-weight: 600;
   margin-bottom: 0.25rem;
 }
+
+/* Mes Disponibilités Module Styles */
+.mes-disponibilites {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.disponibilites-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.disponibilites-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.disponibilites-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.availability-overview {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.overview-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.overview-stat {
+  text-align: center;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.overview-stat .stat-number {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 0.25rem;
+}
+
+.overview-stat .stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.availability-main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.calendar-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-section h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.availability-calendar-main {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.availability-details {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.availability-details h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.availability-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.availability-item-detailed {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.availability-date {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.date-value {
+  font-weight: 600;
+  color: #166534;
+}
+
+.date-day {
+  font-size: 0.75rem;
+  color: #15803d;
+  text-transform: capitalize;
+}
+
+.availability-type {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.type-name {
+  font-weight: 500;
+  color: #374151;
+  font-size: 0.875rem;
+}
+
+.time-range {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.availability-status {
+  text-align: center;
+}
+
+.status-indicator {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.status-indicator.disponible {
+  background-color: #10B981;
+}
+
+.status-indicator.preference {
+  background-color: #F59E0B;
+}
+
+.status-indicator.indisponible {
+  background-color: #EF4444;
+}
+
+.no-availability-configured {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+
+.no-availability-configured h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+/* Fonction supérieur in profile */
+.fonction-sup-profile {
+  color: #dc2626;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* Responsive disponibilités */
+@media (max-width: 1024px) {
+  .availability-main {
+    grid-template-columns: 1fr;
+  }
+  
+  .overview-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .availability-item-detailed {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
