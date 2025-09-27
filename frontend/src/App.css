@@ -6444,6 +6444,118 @@ body {
   font-size: 0.75rem;
 }
 
+/* Selected Date Details Display */
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.click-instruction {
+  color: #6b7280;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.selected-date-details {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 2px solid #3B82F6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.selected-date-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.selected-date-header h4 {
+  color: #1e40af;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.close-details {
+  color: #64748b;
+  padding: 0.25rem;
+}
+
+.selected-date-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detail-item-large {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-icon {
+  font-size: 1.5rem;
+  width: 40px;
+  text-align: center;
+}
+
+.detail-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.detail-title {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.detail-value {
+  font-size: 1rem;
+  color: #1e293b;
+  font-weight: 600;
+}
+
+.detail-status {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.detail-status.disponible {
+  color: #059669;
+}
+
+.detail-status.preference {
+  color: #D97706;
+}
+
+.detail-status.indisponible {
+  color: #DC2626;
+}
+
 /* Responsive disponibilités */
 @media (max-width: 1024px) {
   .availability-main {
