@@ -18,6 +18,7 @@ const Parametres = ({ user }) => {
   // Modals states
   const [showEditTypeModal, setShowEditTypeModal] = useState(false);
   const [showEditFormationModal, setShowEditFormationModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
   // Form states
