@@ -2267,30 +2267,33 @@ const MesDisponibilites = () => {
           </div>
         </div>
 
-        <div className="availability-details-modern">
+        <div className="availability-details-enhanced">
           <h3>📋 Détails des disponibilités</h3>
           {userDisponibilites.length > 0 ? (
-            <div className="availability-list-modern">
+            <div className="availability-list-enhanced">
               {userDisponibilites.map(dispo => (
-                <div key={dispo.id} className="availability-card-modern">
-                  <div className="availability-date-modern">
-                    <div className="date-circle">
-                      <span className="date-number">{new Date(dispo.date).getDate()}</span>
-                      <span className="date-month">{new Date(dispo.date).toLocaleDateString('fr-FR', { month: 'short' })}</span>
+                <div key={dispo.id} className="availability-item-enhanced">
+                  <div className="availability-date-info">
+                    <div className="date-badge">
+                      <span className="date-day-short">{new Date(dispo.date).getDate()}</span>
+                      <span className="date-month-short">{new Date(dispo.date).toLocaleDateString('fr-FR', { month: 'short' })}</span>
                     </div>
-                    <div className="date-info">
-                      <span className="date-full">{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
-                      <span className="date-day">{new Date(dispo.date).toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                    <div className="date-details">
+                      <span className="date-full-text">{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
+                      <span className="date-weekday">{new Date(dispo.date).toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
                     </div>
                   </div>
                   
-                  <div className="availability-type-modern">
-                    <span className="type-name-modern">{getTypeGardeName(dispo.type_garde_id)}</span>
-                    <span className="time-range-modern">⏰ {dispo.heure_debut} - {dispo.heure_fin}</span>
+                  <div className="availability-garde-info">
+                    <div className="garde-type">
+                      <span className="garde-name">{getTypeGardeName(dispo.type_garde_id)}</span>
+                      <span className="garde-icon">🚒</span>
+                    </div>
+                    <span className="garde-hours">{dispo.heure_debut} - {dispo.heure_fin}</span>
                   </div>
                   
-                  <div className="availability-status-modern">
-                    <span className={`status-badge-modern ${dispo.statut}`}>
+                  <div className="availability-status-final">
+                    <span className={`status-badge-final ${dispo.statut}`}>
                       {dispo.statut === 'disponible' ? 'Disponible' : 
                        dispo.statut === 'preference' ? 'Préférence' : 'Indisponible'}
                     </span>
@@ -2299,9 +2302,9 @@ const MesDisponibilites = () => {
               ))}
             </div>
           ) : (
-            <div className="no-availability-modern">
-              <div className="empty-state-modern">
-                <div className="empty-icon">📅</div>
+            <div className="no-availability-enhanced">
+              <div className="empty-state-enhanced">
+                <div className="empty-icon-large">📅</div>
                 <h4>Aucune disponibilité configurée</h4>
                 <p>Configurez vos créneaux pour faciliter la planification de vos gardes.</p>
                 <Button 
