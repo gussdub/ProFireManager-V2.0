@@ -4125,7 +4125,168 @@ body {
   color: #dc2626;
 }
 
-/* Responsive */
+/* User Access Cards */
+.existing-users-section {
+  margin: 2rem 0;
+}
+
+.existing-users-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.user-access-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.user-access-card:hover {
+  border-color: #3B82F6;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.user-access-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-access-info .user-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-details h4 {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.user-details .user-email {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.user-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.role-badge {
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.role-badge.admin {
+  background-color: #dc2626;
+}
+
+.role-badge.superviseur {
+  background-color: #3B82F6;
+}
+
+.role-badge.employe {
+  background-color: #10B981;
+}
+
+.grade-badge {
+  padding: 0.125rem 0.5rem;
+  background-color: #F59E0B;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.employment-badge {
+  padding: 0.125rem 0.5rem;
+  background-color: #6B7280;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.user-access-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Input with actions */
+.input-with-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.input-with-actions input {
+  flex: 1;
+}
+
+.setting-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.setting-inputs label small {
+  color: #64748b;
+  font-style: italic;
+}
+
+.rules-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.validation-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.advanced-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.toggle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toggle-info small {
+  color: #64748b;
+  font-size: 0.75rem;
+}
 @media (max-width: 1024px) {
   .types-garde-grid {
     grid-template-columns: 1fr;
