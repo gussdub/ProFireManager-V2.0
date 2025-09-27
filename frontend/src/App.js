@@ -2329,28 +2329,43 @@ const MesDisponibilites = () => {
       return;
     }
 
-    const nouvelles_disponibilites = selectedDates.map(date => ({
-      user_id: user.id,
-      date: date.toISOString().split('T')[0],
-      type_garde_id: availabilityConfig.type_garde_id || null,
-      heure_debut: availabilityConfig.heure_debut,
-      heure_fin: availabilityConfig.heure_fin,
-      statut: availabilityConfig.statut
-    }));
-
     try {
-      await axios.put(`${API}/disponibilites/${user.id}`, nouvelles_disponibilites);
+      // CORRECTION : Combiner avec les disponibilités existantes au lieu de remplacer
+      const existingDispos = userDisponibilites.map(d => ({
+        user_id: user.id,
+        date: d.date,
+        type_garde_id: d.type_garde_id || null,
+        heure_debut: d.heure_debut,
+        heure_fin: d.heure_fin,
+        statut: d.statut
+      }));
+
+      const nouvelles_disponibilites = selectedDates.map(date => ({
+        user_id: user.id,
+        date: date.toISOString().split('T')[0],
+        type_garde_id: availabilityConfig.type_garde_id || null,
+        heure_debut: availabilityConfig.heure_debut,
+        heure_fin: availabilityConfig.heure_fin,
+        statut: availabilityConfig.statut
+      }));
+
+      // Combiner existantes + nouvelles
+      const allDisponibilites = [...existingDispos, ...nouvelles_disponibilites];
+
+      await axios.put(`${API}/disponibilites/${user.id}`, allDisponibilites);
+      
       toast({
-        title: "Disponibilités sauvegardées",
-        description: `${selectedDates.length} jours configurés`,
+        title: "Disponibilités ajoutées",
+        description: `${nouvelles_disponibilites.length} nouveaux jours configurés (${allDisponibilites.length} total)`,
         variant: "success"
       });
-      setShowCalendarModal(false);
       
-      // Reload disponibilités
+      setShowCalendarModal(false);
+      setSelectedDates([]);
+      
+      // Reload
       const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
       setUserDisponibilites(dispoResponse.data);
-      setSelectedDates([]);
     } catch (error) {
       toast({
         title: "Erreur",
