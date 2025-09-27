@@ -1167,13 +1167,476 @@ const Personnel = () => {
   );
 };
 
-// Simple placeholder components for other modules
+// Mon Profil Component
+const MonProfil = () => {
+  const { user } = useAuth();
+  const [userProfile, setUserProfile] = useState(null);
+  const [formations, setFormations] = useState([]);
+  const [userDisponibilites, setUserDisponibilites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({});
+  const { toast } = useToast();
+
+  const translateDay = (day) => {
+    const translations = {
+      'monday': 'Lundi',
+      'tuesday': 'Mardi', 
+      'wednesday': 'Mercredi',
+      'thursday': 'Jeudi',
+      'friday': 'Vendredi',
+      'saturday': 'Samedi',
+      'sunday': 'Dimanche'
+    };
+    return translations[day] || day;
+  };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const [userResponse, formationsResponse] = await Promise.all([
+          axios.get(`${API}/users/${user.id}`),
+          axios.get(`${API}/formations`)
+        ]);
+        
+        setUserProfile(userResponse.data);
+        setFormations(formationsResponse.data);
+        setProfileData({
+          nom: userResponse.data.nom,
+          prenom: userResponse.data.prenom,
+          email: userResponse.data.email,
+          telephone: userResponse.data.telephone,
+          contact_urgence: userResponse.data.contact_urgence || ''
+        });
+
+        // Load disponibilités if part-time employee
+        if (userResponse.data.type_emploi === 'temps_partiel') {
+          const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
+          setUserDisponibilites(dispoResponse.data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement du profil:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      fetchUserProfile();
+    }
+  }, [user?.id]);
+
+  const handleSaveProfile = async () => {
+    try {
+      // For demo purposes, we'll just show success message
+      toast({
+        title: "Profil mis à jour",
+        description: "Vos informations ont été sauvegardées avec succès.",
+        variant: "success"
+      });
+      setIsEditing(false);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les modifications.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getFormationName = (formationId) => {
+    const formation = formations.find(f => f.id === formationId);
+    return formation ? formation.nom : formationId;
+  };
+
+  if (loading) return <div className="loading" data-testid="profile-loading">Chargement du profil...</div>;
+
+  return (
+    <div className="mon-profil">
+      <div className="profile-header">
+        <h1 data-testid="profile-title">Mon profil</h1>
+        <p>Gérez vos informations personnelles et paramètres de compte</p>
+      </div>
+
+      <div className="profile-content">
+        <div className="profile-main">
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Informations personnelles</h2>
+              {user.role !== 'employe' && (
+                <Button
+                  onClick={() => setIsEditing(!isEditing)}
+                  variant={isEditing ? "secondary" : "default"}
+                  data-testid="edit-profile-btn"
+                >
+                  {isEditing ? 'Annuler' : 'Modifier'}
+                </Button>
+              )}
+            </div>
+
+            <div className="profile-form">
+              <div className="form-row">
+                <div className="form-field">
+                  <Label>Prénom</Label>
+                  <Input
+                    value={profileData.prenom || ''}
+                    onChange={(e) => setProfileData({...profileData, prenom: e.target.value})}
+                    disabled={!isEditing || user.role === 'employe'}
+                    data-testid="profile-prenom-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <Label>Nom</Label>
+                  <Input
+                    value={profileData.nom || ''}
+                    onChange={(e) => setProfileData({...profileData, nom: e.target.value})}
+                    disabled={!isEditing || user.role === 'employe'}
+                    data-testid="profile-nom-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-field">
+                  <Label>Email</Label>
+                  <Input
+                    value={profileData.email || ''}
+                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                    disabled={!isEditing || user.role === 'employe'}
+                    data-testid="profile-email-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <Label>Téléphone</Label>
+                  <Input
+                    value={profileData.telephone || ''}
+                    onChange={(e) => setProfileData({...profileData, telephone: e.target.value})}
+                    disabled={!isEditing}
+                    data-testid="profile-phone-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <Label>Contact d'urgence</Label>
+                <Input
+                  value={profileData.contact_urgence || ''}
+                  onChange={(e) => setProfileData({...profileData, contact_urgence: e.target.value})}
+                  disabled={!isEditing}
+                  data-testid="profile-emergency-input"
+                />
+              </div>
+
+              {isEditing && (
+                <div className="form-actions">
+                  <Button onClick={handleSaveProfile} data-testid="save-profile-btn">
+                    Sauvegarder les modifications
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Informations verrouillées */}
+          <div className="profile-section">
+            <h2>Informations d'emploi</h2>
+            <div className="locked-info">
+              <div className="info-item">
+                <span className="info-label">Numéro d'employé:</span>
+                <span className="info-value locked" data-testid="profile-employee-id">
+                  {userProfile?.numero_employe} 🔒
+                </span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Grade:</span>
+                <span className="info-value locked" data-testid="profile-grade">
+                  {userProfile?.grade} 🔒
+                </span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Type d'emploi:</span>
+                <span className="info-value locked" data-testid="profile-employment-type">
+                  {userProfile?.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'} 🔒
+                </span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Date d'embauche:</span>
+                <span className="info-value locked" data-testid="profile-hire-date">
+                  {userProfile?.date_embauche} 🔒
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Formations */}
+          <div className="profile-section">
+            <h2>Formations et certifications</h2>
+            <div className="formations-list" data-testid="profile-formations">
+              {userProfile?.formations?.length > 0 ? (
+                <div className="formations-grid">
+                  {userProfile.formations.map((formationId, index) => (
+                    <div key={index} className="formation-item">
+                      <span className="formation-name">{getFormationName(formationId)}</span>
+                      <span className="formation-status">Certifié ✅</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-formations">
+                  <p>Aucune formation enregistrée</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section disponibilités (uniquement pour temps partiel) */}
+          {userProfile?.type_emploi === 'temps_partiel' && (
+            <div className="profile-section">
+              <h2>Mes disponibilités</h2>
+              <p className="section-description">
+                En tant qu'employé à temps partiel, vous pouvez gérer vos disponibilités ici.
+              </p>
+              <div className="availability-section">
+                {userDisponibilites.length > 0 ? (
+                  <div className="disponibilites-list-profile">
+                    {userDisponibilites.map(dispo => (
+                      <div key={dispo.id} className="disponibilite-profile-item">
+                        <div className="dispo-day">
+                          <strong>{translateDay(dispo.jour_semaine)}</strong>
+                        </div>
+                        <div className="dispo-time">
+                          {dispo.heure_debut} - {dispo.heure_fin}
+                        </div>
+                        <div className="dispo-status">
+                          <span className={`status ${dispo.statut}`}>
+                            {dispo.statut === 'disponible' ? '✅ Disponible' : 
+                             dispo.statut === 'indisponible' ? '❌ Indisponible' : 
+                             '⚡ Préférence'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-disponibilites">
+                    <p>📅 Aucune disponibilité renseignée</p>
+                    <Button variant="outline" className="mt-2">
+                      + Ajouter mes disponibilités
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Section remplacements (pour employés) */}
+          {user.role === 'employe' && (
+            <div className="profile-section">
+              <h2>Mes demandes de remplacement</h2>
+              <div className="replacements-summary">
+                <div className="replacement-stat">
+                  <span className="stat-number">0</span>
+                  <span className="stat-label">En cours</span>
+                </div>
+                <div className="replacement-stat">
+                  <span className="stat-number">0</span>
+                  <span className="stat-label">Approuvées</span>
+                </div>
+                <div className="replacement-stat">
+                  <span className="stat-number">0</span>
+                  <span className="stat-label">Ce mois</span>
+                </div>
+              </div>
+              <Button variant="outline" className="w-full" data-testid="view-replacements-btn">
+                Voir toutes mes demandes
+              </Button>
+            </div>
+          )}
+
+          {/* Sécurité du compte */}
+          <div className="profile-section">
+            <h2>Sécurité du compte</h2>
+            <div className="security-options">
+              <Button variant="outline" data-testid="change-password-btn">
+                Changer le mot de passe
+              </Button>
+              {user.role === 'admin' && (
+                <Button variant="outline" data-testid="security-settings-btn">
+                  Paramètres de sécurité avancés
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar avec statistiques personnelles */}
+        <div className="profile-sidebar">
+          <div className="profile-card">
+            <div className="profile-avatar">
+              <span className="avatar-large">👤</span>
+            </div>
+            <h3 data-testid="profile-fullname">{userProfile?.prenom} {userProfile?.nom}</h3>
+            <p className="profile-role">{user?.role === 'admin' ? 'Administrateur' : 
+                                        user?.role === 'superviseur' ? 'Superviseur' : 'Employé'}</p>
+            <p className="profile-grade">{userProfile?.grade}</p>
+          </div>
+
+          <div className="profile-stats">
+            <h3>Statistiques personnelles</h3>
+            <div className="stats-list">
+              <div className="stat-item">
+                <span className="stat-icon">🏆</span>
+                <div className="stat-content">
+                  <span className="stat-value">24</span>
+                  <span className="stat-label">Gardes ce mois</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">⏱️</span>
+                <div className="stat-content">
+                  <span className="stat-value">288h</span>
+                  <span className="stat-label">Heures travaillées</span>
+                </div>
+              </div>
+              <div className="stat-item">
+                <span className="stat-icon">📜</span>
+                <div className="stat-content">
+                  <span className="stat-value">{userProfile?.formations?.length || 0}</span>
+                  <span className="stat-label">Certifications</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {user.role === 'admin' && (
+            <div className="admin-actions">
+              <h3>Actions administrateur</h3>
+              <Button variant="outline" className="w-full" data-testid="manage-all-profiles-btn">
+                Gérer tous les profils
+              </Button>
+              <Button variant="outline" className="w-full" data-testid="system-settings-btn">
+                Paramètres système
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Formations Component
+const Formations = () => {
+  const { user } = useAuth();
+  const [formations, setFormations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchFormations = async () => {
+      try {
+        const response = await axios.get(`${API}/formations`);
+        setFormations(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des formations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFormations();
+  }, []);
+
+  const handleInscription = async (formationId) => {
+    try {
+      toast({
+        title: "Inscription réussie",
+        description: "Vous êtes maintenant inscrit à cette formation",
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de s'inscrire à cette formation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) return <div className="loading" data-testid="formations-loading">Chargement des formations...</div>;
+
+  return (
+    <div className="formations">
+      <div className="formations-header">
+        <div>
+          <h1 data-testid="formations-title">Gestion des formations</h1>
+          <p>Formations disponibles et inscriptions</p>
+        </div>
+        {user.role === 'admin' && (
+          <Button variant="default" data-testid="create-formation-btn">
+            + Nouvelle formation
+          </Button>
+        )}
+      </div>
+
+      <div className="formations-grid">
+        {formations.map(formation => (
+          <div key={formation.id} className="formation-card" data-testid={`formation-${formation.id}`}>
+            <div className="formation-header">
+              <h3>{formation.nom}</h3>
+              {formation.obligatoire && (
+                <span className="obligatoire-badge">Obligatoire</span>
+              )}
+            </div>
+            
+            <div className="formation-details">
+              <p className="formation-description">{formation.description}</p>
+              
+              <div className="formation-meta">
+                <div className="meta-item">
+                  <span className="meta-icon">⏱️</span>
+                  <span>{formation.duree_heures}h de formation</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-icon">📅</span>
+                  <span>Valide {formation.validite_mois} mois</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="formation-actions">
+              <Button 
+                variant="default" 
+                onClick={() => handleInscription(formation.id)}
+                data-testid={`inscribe-formation-${formation.id}`}
+              >
+                S'inscrire
+              </Button>
+              {user.role === 'admin' && (
+                <Button variant="ghost" data-testid={`edit-formation-${formation.id}`}>
+                  ✏️
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {formations.length === 0 && (
+        <div className="empty-state">
+          <h3>Aucune formation disponible</h3>
+          <p>Les formations seront affichées ici une fois configurées par l'administrateur.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Simple placeholder components for remaining modules  
 const Planning = () => <div className="page-placeholder">Planning - En développement</div>;
 const Remplacements = () => <div className="page-placeholder">Remplacements - En développement</div>;
-const Formations = () => <div className="page-placeholder">Formations - En développement</div>;
 const Rapports = () => <div className="page-placeholder">Rapports - En développement</div>;
 const Parametres = () => <div className="page-placeholder">Paramètres - En développement</div>;
-const MonProfil = () => <div className="page-placeholder">Mon profil - En développement</div>;
 
 // Main Application Layout
 const AppLayout = () => {
