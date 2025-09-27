@@ -522,40 +522,45 @@ const Parametres = ({ user }) => {
           </div>
         )}
 
-        {activeTab === 'formations' && (
-          <div className="formations-tab">
+        {activeTab === 'competences' && (
+          <div className="competences-tab">
             <div className="tab-header">
               <div>
-                <h2>Gestion des formations</h2>
-                <p>Configurez les formations obligatoires et optionnelles</p>
+                <h2>Gestion des compétences</h2>
+                <p>Définissez les compétences et certifications requises pour évaluer le niveau des employés</p>
               </div>
               <Button 
                 variant="default" 
                 onClick={() => setShowCreateFormationModal(true)}
-                data-testid="create-formation-btn"
+                data-testid="create-competence-btn"
               >
-                + Nouvelle Formation
+                + Nouvelle Compétence
               </Button>
             </div>
 
-            <div className="formations-grid">
+            <div className="competences-grid">
               {formations.map(formation => (
-                <div key={formation.id} className="formation-card" data-testid={`formation-admin-${formation.id}`}>
-                  <div className="formation-header">
-                    <div className="formation-info">
+                <div key={formation.id} className="competence-card" data-testid={`competence-${formation.id}`}>
+                  <div className="competence-header">
+                    <div className="competence-info">
                       <h3>{formation.nom}</h3>
-                      <p>{formation.description}</p>
-                      <div className="formation-details">
-                        <span>⏱️ {formation.duree_heures}h</span>
-                        <span>📅 Validité: {formation.validite_mois === 0 ? 'Pas de renouvellement' : `${formation.validite_mois} mois`}</span>
-                        {formation.obligatoire && <span className="obligatoire">⚠️ OBLIGATOIRE</span>}
+                      <p className="competence-description">{formation.description}</p>
+                      <div className="competence-details">
+                        <span className="detail-item">⏱️ {formation.duree_heures}h de formation</span>
+                        <span className="detail-item">
+                          📅 Validité: {formation.validite_mois === 0 ? 'Pas de renouvellement' : `${formation.validite_mois} mois`}
+                        </span>
+                        {formation.obligatoire && (
+                          <span className="detail-item obligatoire-indicator">⚠️ COMPÉTENCE OBLIGATOIRE</span>
+                        )}
                       </div>
                     </div>
-                    <div className="formation-actions">
+                    <div className="competence-actions">
                       <Button 
                         variant="ghost" 
                         onClick={() => handleEditFormation(formation)}
-                        data-testid={`edit-formation-${formation.id}`}
+                        data-testid={`edit-competence-${formation.id}`}
+                        title="Modifier cette compétence"
                       >
                         ✏️ Modifier
                       </Button>
@@ -563,7 +568,8 @@ const Parametres = ({ user }) => {
                         variant="ghost" 
                         className="danger" 
                         onClick={() => handleDeleteFormation(formation.id)}
-                        data-testid={`delete-formation-${formation.id}`}
+                        data-testid={`delete-competence-${formation.id}`}
+                        title="Supprimer cette compétence"
                       >
                         🗑️ Supprimer
                       </Button>
