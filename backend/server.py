@@ -764,6 +764,43 @@ async def delete_formation(formation_id: str, current_user: User = Depends(get_c
     )
     
     return {"message": "Formation supprimée avec succès"}
+
+class SessionFormation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    titre: str
+    competence_id: str  # Lien vers Formation (compétence)
+    duree_heures: int
+    date_debut: str  # YYYY-MM-DD
+    heure_debut: str  # HH:MM
+    lieu: str
+    formateur: str
+    descriptif: str
+    plan_cours: str = ""
+    places_max: int = 20
+    participants: List[str] = []  # IDs des utilisateurs inscrits
+    statut: str = "planifie"  # planifie, en_cours, termine, annule
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SessionFormationCreate(BaseModel):
+    titre: str
+    competence_id: str
+    duree_heures: int
+    date_debut: str
+    heure_debut: str
+    lieu: str
+    formateur: str
+    descriptif: str
+    plan_cours: str = ""
+    places_max: int = 20
+
+class InscriptionFormation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    user_id: str
+    date_inscription: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    statut: str = "inscrit"  # inscrit, present, absent, annule
+
+# Disponibilités routes
 @api_router.post("/disponibilites", response_model=Disponibilite)
 async def create_disponibilite(disponibilite: DisponibiliteCreate, current_user: User = Depends(get_current_user)):
     disponibilite_obj = Disponibilite(**disponibilite.dict())
