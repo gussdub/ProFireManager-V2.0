@@ -2435,34 +2435,46 @@ const MesDisponibilites = () => {
             }}
           />
           
-          <div className="calendar-legend-modern">
-            <div className="legend-item-modern">
-              <span className="legend-dot available"></span>
-              <span>Jours disponibles configurés</span>
-            </div>
-            <div className="legend-item-modern">
-              <span className="legend-dot unavailable"></span>
-              <span>Jours non configurés</span>
+          <div className="calendar-legend-enhanced">
+            <div className="legend-section">
+              <h4>📍 Légende du calendrier</h4>
+              <div className="legend-items-enhanced">
+                <div className="legend-item-enhanced available">
+                  <div className="legend-indicator available"></div>
+                  <span>Jours disponibles configurés</span>
+                </div>
+                <div className="legend-item-enhanced unavailable">
+                  <div className="legend-indicator unavailable"></div>
+                  <span>Jours non configurés</span>
+                </div>
+              </div>
             </div>
           </div>
           
-          {/* Légende des couleurs par type de garde */}
+          {/* Code couleur modernisé par type de garde */}
           {typesGarde.length > 0 && (
-            <div className="type-garde-legend">
-              <h4>Code couleur par type de garde :</h4>
-              <div className="type-legend-items">
+            <div className="type-garde-legend-enhanced">
+              <h4>🎨 Code couleur par type de garde</h4>
+              <div className="type-legend-grid">
                 {typesGarde.map(type => (
-                  <div key={type.id} className="type-legend-item">
-                    <span 
-                      className="type-color-dot" 
-                      style={{ backgroundColor: type.couleur }}
-                    ></span>
-                    <span>{type.nom}</span>
+                  <div key={type.id} className="type-legend-card">
+                    <div className="type-color-indicator" style={{ backgroundColor: type.couleur }}>
+                      <span className="type-initial">{type.nom.charAt(0)}</span>
+                    </div>
+                    <div className="type-info">
+                      <span className="type-name">{type.nom}</span>
+                      <span className="type-hours">{type.heure_debut} - {type.heure_fin}</span>
+                    </div>
                   </div>
                 ))}
-                <div className="type-legend-item">
-                  <span className="type-color-dot" style={{ backgroundColor: '#10B981' }}></span>
-                  <span>Tous types (général)</span>
+                <div className="type-legend-card">
+                  <div className="type-color-indicator general">
+                    <span className="type-initial">T</span>
+                  </div>
+                  <div className="type-info">
+                    <span className="type-name">Tous types (général)</span>
+                    <span className="type-hours">Horaires variables</span>
+                  </div>
                 </div>
               </div>
             </div>
