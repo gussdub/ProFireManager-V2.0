@@ -2221,15 +2221,15 @@ const MesDisponibilites = () => {
         </div>
       </div>
 
-      {/* Calendrier des disponibilités */}
-      <div className="availability-main">
-        <div className="calendar-section">
+      {/* Calendrier et détails des disponibilités */}
+      <div className="availability-main-enhanced">
+        <div className="calendar-section-large">
           <h2>Calendrier de disponibilités - {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h2>
           
           <Calendar
             mode="multiple"
             selected={getAvailableDates()}
-            className="availability-calendar-main"
+            className="availability-calendar-large"
             disabled={(date) => date < new Date().setHours(0,0,0,0)}
             modifiers={{
               available: getAvailableDates()
@@ -2238,54 +2238,69 @@ const MesDisponibilites = () => {
               available: { 
                 backgroundColor: '#dcfce7', 
                 color: '#166534',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
+                fontSize: '1rem'
               }
             }}
           />
           
-          <div className="calendar-legend">
-            <div className="legend-item">
-              <span className="legend-color available"></span>
-              Jours disponibles configurés
+          <div className="calendar-legend-modern">
+            <div className="legend-item-modern">
+              <span className="legend-dot available"></span>
+              <span>Jours disponibles configurés</span>
+            </div>
+            <div className="legend-item-modern">
+              <span className="legend-dot unavailable"></span>
+              <span>Jours non configurés</span>
             </div>
           </div>
         </div>
 
-        <div className="availability-details">
-          <h3>Détails des disponibilités</h3>
+        <div className="availability-details-modern">
+          <h3>📋 Détails des disponibilités</h3>
           {userDisponibilites.length > 0 ? (
-            <div className="availability-list">
+            <div className="availability-list-modern">
               {userDisponibilites.map(dispo => (
-                <div key={dispo.id} className="availability-item-detailed">
-                  <div className="availability-date">
-                    <span className="date-value">{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
-                    <span className="date-day">{new Date(dispo.date).toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                <div key={dispo.id} className="availability-card-modern">
+                  <div className="availability-date-modern">
+                    <div className="date-circle">
+                      <span className="date-number">{new Date(dispo.date).getDate()}</span>
+                      <span className="date-month">{new Date(dispo.date).toLocaleDateString('fr-FR', { month: 'short' })}</span>
+                    </div>
+                    <div className="date-info">
+                      <span className="date-full">{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
+                      <span className="date-day">{new Date(dispo.date).toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                    </div>
                   </div>
-                  <div className="availability-type">
-                    <span className="type-name">{getTypeGardeName(dispo.type_garde_id)}</span>
-                    <span className="time-range">{dispo.heure_debut} - {dispo.heure_fin}</span>
+                  
+                  <div className="availability-type-modern">
+                    <span className="type-name-modern">{getTypeGardeName(dispo.type_garde_id)}</span>
+                    <span className="time-range-modern">⏰ {dispo.heure_debut} - {dispo.heure_fin}</span>
                   </div>
-                  <div className="availability-status">
-                    <span className={`status-indicator ${dispo.statut}`}>
-                      {dispo.statut === 'disponible' ? '✅ Disponible' : 
-                       dispo.statut === 'preference' ? '⚡ Préférence' : '❌ Indisponible'}
+                  
+                  <div className="availability-status-modern">
+                    <span className={`status-badge-modern ${dispo.statut}`}>
+                      {dispo.statut === 'disponible' ? 'Disponible' : 
+                       dispo.statut === 'preference' ? 'Préférence' : 'Indisponible'}
                     </span>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="no-availability-configured">
-              <div className="empty-state-icon">📅</div>
-              <h3>Aucune disponibilité configurée</h3>
-              <p>Configurez vos créneaux de disponibilité pour que l'équipe puisse planifier vos gardes.</p>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowCalendarModal(true)}
-                data-testid="start-configuration-btn"
-              >
-                Commencer la configuration
-              </Button>
+            <div className="no-availability-modern">
+              <div className="empty-state-modern">
+                <div className="empty-icon">📅</div>
+                <h4>Aucune disponibilité configurée</h4>
+                <p>Configurez vos créneaux pour faciliter la planification de vos gardes.</p>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCalendarModal(true)}
+                  data-testid="start-configuration-btn"
+                >
+                  Commencer la configuration
+                </Button>
+              </div>
             </div>
           )}
         </div>
