@@ -2088,7 +2088,26 @@ const MonProfil = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showReplacementModal, setShowReplacementModal] = useState(false);
   const [selectedDates, setSelectedDates] = useState([]);
+  const [availabilityConfig, setAvailabilityConfig] = useState({
+    type_garde_id: '',
+    heure_debut: '08:00',
+    heure_fin: '16:00',
+    statut: 'disponible'
+  });
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [passwordData, setPasswordData] = useState({
+    current_password: '',
+    new_password: '',
+    confirm_password: ''
+  });
+  const [newReplacement, setNewReplacement] = useState({
+    type_garde_id: '',
+    date: '',
+    raison: ''
+  });
   const [profileData, setProfileData] = useState({});
   const { toast } = useToast();
 
