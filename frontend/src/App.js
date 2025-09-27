@@ -1175,6 +1175,7 @@ const MonProfil = () => {
   const [userDisponibilites, setUserDisponibilites] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [showDispoModal, setShowDispoModal] = useState(false);
   const [profileData, setProfileData] = useState({});
   const { toast } = useToast();
 
