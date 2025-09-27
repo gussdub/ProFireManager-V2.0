@@ -1665,87 +1665,84 @@ const MonProfil = () => {
         </div>
       </div>
 
-      {/* Modal pour gérer les disponibilités */}
+      {/* Modal pour gérer les disponibilités avec calendrier interactif */}
       {showDispoModal && userProfile?.type_emploi === 'temps_partiel' && (
         <div className="modal-overlay" onClick={() => setShowDispoModal(false)}>
-          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-availability-modal">
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-availability-modal">
             <div className="modal-header">
-              <h3>Gérer mes disponibilités</h3>
+              <h3>Configurer mes disponibilités</h3>
               <Button variant="ghost" onClick={() => setShowDispoModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
-              <div className="availability-manager">
-                <p className="manager-description">
-                  Sélectionnez vos créneaux de disponibilité pour chaque jour de la semaine.
-                </p>
-                
-                <div className="days-grid">
-                  {['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].map(day => {
-                    const dayDispo = userDisponibilites.find(d => d.jour_semaine === day);
-                    return (
-                      <div key={day} className="day-availability-card">
-                        <div className="day-header">
-                          <h4>{translateDay(day)}</h4>
-                          <div className="day-status">
-                            {dayDispo ? '✅ Configuré' : '❌ Non configuré'}
-                          </div>
-                        </div>
-                        
-                        <div className="day-config">
-                          <div className="time-inputs">
-                            <div className="time-field">
-                              <Label>Début</Label>
-                              <Input 
-                                type="time" 
-                                defaultValue={dayDispo?.heure_debut || '08:00'}
-                                data-testid={`${day}-start-time`}
-                              />
-                            </div>
-                            <div className="time-field">
-                              <Label>Fin</Label>
-                              <Input 
-                                type="time" 
-                                defaultValue={dayDispo?.heure_fin || '16:00'}
-                                data-testid={`${day}-end-time`}
-                              />
-                            </div>
-                          </div>
-                          
-                          <div className="status-selection">
-                            <select 
-                              defaultValue={dayDispo?.statut || 'disponible'}
-                              className="form-select"
-                              data-testid={`${day}-status-select`}
-                            >
-                              <option value="disponible">✅ Disponible</option>
-                              <option value="indisponible">❌ Indisponible</option>
-                              <option value="preference">⚡ Préférence</option>
-                            </select>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+              <div className="availability-config">
+                <div className="config-instructions">
+                  <h4>Instructions :</h4>
+                  <ol>
+                    <li>Sélectionnez vos jours de disponibilité sur le calendrier</li>
+                    <li>Définissez vos horaires de travail préférés</li>
+                    <li>Cliquez "Sauvegarder" pour confirmer</li>
+                  </ol>
                 </div>
-                
-                <div className="availability-summary">
-                  <div className="summary-item">
-                    <span className="summary-label">Jours disponibles:</span>
-                    <span className="summary-value">{userDisponibilites.filter(d => d.statut === 'disponible').length}</span>
+
+                <div className="time-config">
+                  <h4>Créneaux horaires par défaut :</h4>
+                  <div className="time-inputs-modal">
+                    <div className="time-field">
+                      <Label>Heure de début</Label>
+                      <Input 
+                        type="time" 
+                        value={defaultTimeSlot.heure_debut}
+                        onChange={(e) => setDefaultTimeSlot({...defaultTimeSlot, heure_debut: e.target.value})}
+                        data-testid="default-start-time"
+                      />
+                    </div>
+                    <div className="time-field">
+                      <Label>Heure de fin</Label>
+                      <Input 
+                        type="time" 
+                        value={defaultTimeSlot.heure_fin}
+                        onChange={(e) => setDefaultTimeSlot({...defaultTimeSlot, heure_fin: e.target.value})}
+                        data-testid="default-end-time"
+                      />
+                    </div>
+                    <div className="status-field">
+                      <Label>Statut</Label>
+                      <select 
+                        value={defaultTimeSlot.statut}
+                        onChange={(e) => setDefaultTimeSlot({...defaultTimeSlot, statut: e.target.value})}
+                        className="form-select"
+                        data-testid="default-status-select"
+                      >
+                        <option value="disponible">✅ Disponible</option>
+                        <option value="indisponible">❌ Indisponible</option>
+                        <option value="preference">⚡ Préférence</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="summary-item">
-                    <span className="summary-label">Total heures/semaine:</span>
-                    <span className="summary-value">
-                      {userDisponibilites.reduce((total, dispo) => {
-                        if (dispo.statut === 'disponible') {
-                          const start = new Date(`1970-01-01T${dispo.heure_debut}`);
-                          const end = new Date(`1970-01-01T${dispo.heure_fin}`);
-                          const hours = (end - start) / (1000 * 60 * 60);
-                          return total + hours;
-                        }
-                        return total;
-                      }, 0)}h
-                    </span>
+                </div>
+
+                <div className="calendar-selection">
+                  <h4>Sélectionnez vos dates de disponibilité :</h4>
+                  <Calendar
+                    mode="multiple"
+                    selected={selectedDates}
+                    onSelect={handleDateSelect}
+                    className="interactive-calendar"
+                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
+                    modifiersStyles={{
+                      selected: { 
+                        backgroundColor: '#dc2626', 
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }
+                    }}
+                  />
+                  
+                  <div className="selection-summary">
+                    <p><strong>Dates sélectionnées :</strong> {selectedDates.length} jour(s)</p>
+                    {selectedDates.length > 0 && (
+                      <p><strong>Horaires :</strong> {defaultTimeSlot.heure_debut} - {defaultTimeSlot.heure_fin}</p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1754,8 +1751,13 @@ const MonProfil = () => {
                 <Button variant="outline" onClick={() => setShowDispoModal(false)}>
                   Annuler
                 </Button>
-                <Button variant="default" data-testid="save-availability-btn">
-                  Sauvegarder mes disponibilités
+                <Button 
+                  variant="default" 
+                  onClick={handleSaveDisponibilites}
+                  data-testid="save-availability-btn"
+                  disabled={selectedDates.length === 0}
+                >
+                  Sauvegarder mes disponibilités ({selectedDates.length} jour(s))
                 </Button>
               </div>
             </div>
