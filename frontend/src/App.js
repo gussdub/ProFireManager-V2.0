@@ -2255,7 +2255,7 @@ const MonProfil = () => {
                   <Input
                     value={profileData.email || ''}
                     onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                    disabled={!isEditing || user.role === 'employe'}
+                    disabled={!isEditing}
                     data-testid="profile-email-input"
                   />
                 </div>
