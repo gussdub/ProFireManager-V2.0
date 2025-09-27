@@ -493,20 +493,39 @@ const Personnel = () => {
   };
 
   const handleUpdateUser = async () => {
+    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.grade || !newUser.type_emploi) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      await axios.put(`${API}/users/${selectedUser.id}`, newUser);
+      const userToUpdate = {
+        ...newUser,
+        role: selectedUser.role, // Préserver le rôle existant
+        statut: selectedUser.statut, // Préserver le statut existant
+        mot_de_passe: newUser.mot_de_passe || 'unchanged' // Mot de passe optionnel
+      };
+
+      await axios.put(`${API}/users/${selectedUser.id}`, userToUpdate);
       toast({
         title: "Pompier mis à jour",
         description: "Les informations ont été mises à jour avec succès",
         variant: "success"
       });
       setShowEditModal(false);
+      
+      // Reload users list
       const response = await axios.get(`${API}/users`);
       setUsers(response.data);
     } catch (error) {
+      console.error('Error updating user:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le pompier",
+        title: "Erreur de modification",
+        description: error.response?.data?.detail || "Impossible de mettre à jour le pompier",
         variant: "destructive"
       });
     }
