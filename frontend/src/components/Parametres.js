@@ -1224,56 +1224,56 @@ const Parametres = ({ user }) => {
         </div>
       )}
 
-      {/* Modal de création de formation */}
+      {/* Modal de création de compétence */}
       {showCreateFormationModal && (
         <div className="modal-overlay" onClick={() => setShowCreateFormationModal(false)}>
-          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-formation-modal">
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-competence-modal">
             <div className="modal-header">
-              <h3>Nouvelle formation</h3>
+              <h3>Nouvelle compétence</h3>
               <Button variant="ghost" onClick={() => setShowCreateFormationModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
               <div className="form-grid">
                 <div className="form-field">
-                  <Label>Nom de la formation *</Label>
+                  <Label>Nom de la compétence *</Label>
                   <Input
                     value={newFormation.nom}
                     onChange={(e) => setNewFormation({...newFormation, nom: e.target.value})}
-                    placeholder="Ex: Formation Échelles"
-                    data-testid="create-formation-nom"
+                    placeholder="Ex: Conduite d'échelle, Sauvetage aquatique"
+                    data-testid="create-competence-nom"
                   />
                 </div>
 
                 <div className="form-field">
-                  <Label>Description</Label>
+                  <Label>Description de la compétence</Label>
                   <textarea
                     value={newFormation.description}
                     onChange={(e) => setNewFormation({...newFormation, description: e.target.value})}
-                    placeholder="Description détaillée de la formation..."
+                    placeholder="Décrivez cette compétence, les exigences et les critères d'évaluation..."
                     rows="3"
                     className="form-textarea"
-                    data-testid="create-formation-description"
+                    data-testid="create-competence-description"
                   />
                 </div>
 
                 <div className="form-row">
                   <div className="form-field">
-                    <Label>Durée (heures)</Label>
+                    <Label>Durée de formation requise (heures)</Label>
                     <Input
                       type="number"
                       min="1"
                       value={newFormation.duree_heures}
                       onChange={(e) => setNewFormation({...newFormation, duree_heures: parseInt(e.target.value)})}
-                      data-testid="create-formation-duree"
+                      data-testid="create-competence-duree"
                     />
                   </div>
                   <div className="form-field">
-                    <Label>Validité</Label>
+                    <Label>Renouvellement de la compétence</Label>
                     <select
                       value={newFormation.validite_mois}
                       onChange={(e) => setNewFormation({...newFormation, validite_mois: parseInt(e.target.value)})}
                       className="form-select"
-                      data-testid="create-formation-validite"
+                      data-testid="create-competence-validite"
                     >
                       <option value="0">Pas de renouvellement</option>
                       <option value="6">6 mois</option>
@@ -1292,15 +1292,15 @@ const Parametres = ({ user }) => {
                       checked={newFormation.obligatoire}
                       onChange={(e) => setNewFormation({...newFormation, obligatoire: e.target.checked})}
                     />
-                    <span>Formation obligatoire</span>
+                    <span>Compétence obligatoire pour tous les pompiers</span>
                   </label>
                 </div>
               </div>
 
               <div className="modal-actions">
                 <Button variant="outline" onClick={() => setShowCreateFormationModal(false)}>Annuler</Button>
-                <Button variant="default" onClick={handleCreateFormation} data-testid="create-formation-submit-btn">
-                  Créer la formation
+                <Button variant="default" onClick={handleCreateFormation} data-testid="create-competence-submit-btn">
+                  Créer la compétence
                 </Button>
               </div>
             </div>
