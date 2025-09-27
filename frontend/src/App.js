@@ -2538,10 +2538,12 @@ const MesDisponibilites = () => {
             </div>
           )}
 
-          {/* Liste des disponibilités */}
+          {/* Liste des disponibilités triée par date */}
           {userDisponibilites.length > 0 ? (
             <div className="availability-list-enhanced">
-              {userDisponibilites.map(dispo => (
+              {userDisponibilites
+                .sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map(dispo => (
                 <div key={dispo.id} className="availability-item-enhanced">
                   <div className="availability-date-info">
                     <div className="date-badge">
