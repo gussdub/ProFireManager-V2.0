@@ -101,7 +101,7 @@ const Parametres = ({ user }) => {
   };
 
   const handleEdit = (type) => {
-    setEditingType(type);
+    setEditingItem(type);
     setEditForm({
       nom: type.nom,
       heure_debut: type.heure_debut,
@@ -111,7 +111,7 @@ const Parametres = ({ user }) => {
       jours_application: type.jours_application || [],
       officier_obligatoire: type.officier_obligatoire || false
     });
-    setShowEditModal(true);
+    setShowEditTypeModal(true);
   };
 
   const handleUpdate = async () => {
