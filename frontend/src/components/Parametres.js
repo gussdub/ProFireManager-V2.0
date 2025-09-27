@@ -149,7 +149,7 @@ const Parametres = ({ user }) => {
         description: "Les modifications ont été sauvegardées",
         variant: "success"
       });
-      setShowEditModal(false);
+      setShowEditTypeModal(false);
       fetchData();
     } catch (error) {
       console.error('Update error:', error);
