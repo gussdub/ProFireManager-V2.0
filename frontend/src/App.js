@@ -835,56 +835,37 @@ const Personnel = () => {
                   </div>
                 </div>
 
-                {/* Section 3: Compétences et formations */}
+                {/* Section 3: Compétences et formations - Version compacte */}
                 <div className="form-section">
                   <h4 className="section-title">📜 Compétences et certifications</h4>
-                  <div className="formations-selection-enhanced">
+                  <div className="formations-compact-grid">
                     {formations.map(formation => (
-                      <div key={formation.id} className="formation-card-selection">
-                        <div className="formation-checkbox-enhanced">
-                          <input
-                            type="checkbox"
-                            id={`formation-${formation.id}`}
-                            checked={newUser.formations.includes(formation.id)}
-                            onChange={() => handleFormationToggle(formation.id)}
-                            data-testid={`formation-${formation.id}`}
-                          />
-                          <label htmlFor={`formation-${formation.id}`} className="formation-label-enhanced">
-                            <div className="formation-header">
-                              <span className="formation-name">{formation.nom}</span>
-                              {formation.obligatoire && (
-                                <span className="obligatoire-badge">OBLIGATOIRE</span>
-                              )}
-                            </div>
-                            <div className="formation-details">
-                              <span className="formation-description">{formation.description}</span>
-                              <div className="formation-meta">
-                                <span>⏱️ {formation.duree_heures}h</span>
-                                <span>📅 {formation.validite_mois === 0 ? 'Pas de renouvellement' : `${formation.validite_mois} mois`}</span>
-                              </div>
-                            </div>
-                          </label>
+                      <label key={formation.id} className="formation-compact-item">
+                        <input
+                          type="checkbox"
+                          checked={newUser.formations.includes(formation.id)}
+                          onChange={() => handleFormationToggle(formation.id)}
+                          data-testid={`formation-${formation.id}`}
+                        />
+                        <div className="formation-compact-content">
+                          <div className="formation-compact-header">
+                            <span className="formation-compact-name">{formation.nom}</span>
+                            {formation.obligatoire && (
+                              <span className="compact-obligatoire">OBL</span>
+                            )}
+                          </div>
+                          <div className="formation-compact-meta">
+                            <span>{formation.duree_heures}h</span>
+                            <span>{formation.validite_mois === 0 ? 'Permanent' : `${formation.validite_mois}m`}</span>
+                          </div>
                         </div>
-                      </div>
+                      </label>
                     ))}
                   </div>
-                </div>
-
-                {/* Section 4: Sécurité */}
-                <div className="form-section">
-                  <h4 className="section-title">🔒 Sécurité et accès</h4>
-                  <div className="form-field">
-                    <Label>Mot de passe temporaire *</Label>
-                    <Input
-                      type="password"
-                      value={newUser.mot_de_passe}
-                      onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
-                      placeholder="Minimum 8 caractères complexes"
-                      data-testid="user-password-input"
-                    />
-                    <small className="password-hint">
-                      Le mot de passe doit contenir : 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial (!@#$%^&*+-?())
-                    </small>
+                  <div className="formations-summary">
+                    <span className="summary-text">
+                      {newUser.formations.length} compétence(s) sélectionnée(s)
+                    </span>
                   </div>
                 </div>
               </div>
