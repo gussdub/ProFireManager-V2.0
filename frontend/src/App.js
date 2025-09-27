@@ -1196,24 +1196,6 @@ const Parametres = () => {
       });
     }
   };
-    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce type de garde ?")) return;
-    
-    try {
-      // For demo - just show success
-      toast({
-        title: "Type supprimé",
-        description: "Le type de garde a été supprimé",
-        variant: "success"
-      });
-      fetchData();
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le type de garde",
-        variant: "destructive"
-      });
-    }
-  };
 
   if (user?.role !== 'admin') {
     return (
