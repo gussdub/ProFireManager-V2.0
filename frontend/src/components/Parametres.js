@@ -366,7 +366,7 @@ const Parametres = ({ user }) => {
                 </label>
               </div>
               <div className="modal-actions">
-                <Button variant="outline" onClick={() => setShowEditModal(false)}>Annuler</Button>
+                <Button variant="outline" onClick={() => setShowEditTypeModal(false)}>Annuler</Button>
                 <Button variant="default" onClick={handleUpdate} data-testid="save-changes-btn">Sauvegarder</Button>
               </div>
             </div>
