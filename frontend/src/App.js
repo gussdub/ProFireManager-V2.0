@@ -1305,8 +1305,38 @@ const Parametres = () => {
                       </div>
                     </div>
                     <div className="type-actions">
-                      <Button variant="ghost" data-testid={`edit-type-${type.id}`}>✏️</Button>
-                      <Button variant="ghost" className="danger" onClick={() => handleDeleteType(type.id)} data-testid={`delete-type-${type.id}`}>🗑️</Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => {
+                          setEditingItem(type);
+                          setNewTypeGarde({
+                            nom: type.nom,
+                            heure_debut: type.heure_debut,
+                            heure_fin: type.heure_fin,
+                            personnel_requis: type.personnel_requis,
+                            duree_heures: type.duree_heures,
+                            couleur: type.couleur,
+                            jours_application: type.jours_application || [],
+                            officier_obligatoire: type.officier_obligatoire || false
+                          });
+                          setShowEditTypeModal(true);
+                        }}
+                        data-testid={`edit-type-${type.id}`}
+                      >
+                        ✏️
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="danger" 
+                        onClick={() => {
+                          if (window.confirm("Supprimer ce type de garde ?")) {
+                            handleDeleteType(type.id);
+                          }
+                        }}
+                        data-testid={`delete-type-${type.id}`}
+                      >
+                        🗑️
+                      </Button>
                     </div>
                   </div>
 
