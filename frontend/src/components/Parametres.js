@@ -9,7 +9,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const Parametres = ({ user }) => {
-  const [typesGarde, setTypesGarde] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('types-garde');
   const [typesGarde, setTypesGarde] = useState([]);
