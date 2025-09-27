@@ -2113,6 +2113,26 @@ const MesDisponibilites = () => {
     }
   }, [user?.id]);
 
+  const handleTypeGardeChange = (typeGardeId) => {
+    const selectedType = typesGarde.find(t => t.id === typeGardeId);
+    
+    if (selectedType) {
+      // Auto-remplir les horaires du type de garde
+      setAvailabilityConfig({
+        ...availabilityConfig,
+        type_garde_id: typeGardeId,
+        heure_debut: selectedType.heure_debut,
+        heure_fin: selectedType.heure_fin
+      });
+    } else {
+      // "Tous les types" - garder les horaires personnalisés
+      setAvailabilityConfig({
+        ...availabilityConfig,
+        type_garde_id: typeGardeId
+      });
+    }
+  };
+
   const handleSaveAvailability = async () => {
     if (selectedDates.length === 0) {
       toast({
