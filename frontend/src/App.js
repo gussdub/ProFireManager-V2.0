@@ -1144,7 +1144,7 @@ const Planning = () => {
                       <div className="vacant-label">Garde vacante</div>
                       <div className="personnel-needed">{typeGarde.personnel_requis} personnel requis</div>
                       {user.role !== 'employe' && (
-                        <div className="click-hint">Cliquer pour assigner</div>
+                        <div className="click-hint">👆 Cliquer pour assigner manuellement</div>
                       )}
                     </div>
                   )}
