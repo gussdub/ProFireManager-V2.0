@@ -16,17 +16,31 @@ const Parametres = ({ user }) => {
   const [users, setUsers] = useState([]);
   
   // Modals states
+  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
   const [showEditTypeModal, setShowEditTypeModal] = useState(false);
+  const [showCreateFormationModal, setShowCreateFormationModal] = useState(false);
   const [showEditFormationModal, setShowEditFormationModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
-  // Form states
+  // Edit form state for types garde
   const [editForm, setEditForm] = useState({
     nom: '',
     heure_debut: '',
     heure_fin: '',
     personnel_requis: 1,
+    couleur: '#3B82F6',
+    jours_application: [],
+    officier_obligatoire: false
+  });
+
+  // Create form state for new types garde
+  const [createForm, setCreateForm] = useState({
+    nom: '',
+    heure_debut: '08:00',
+    heure_fin: '16:00',
+    personnel_requis: 1,
+    duree_heures: 8,
     couleur: '#3B82F6',
     jours_application: [],
     officier_obligatoire: false
