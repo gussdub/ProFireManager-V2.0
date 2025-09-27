@@ -2283,18 +2283,39 @@ const MesDisponibilites = () => {
           <Calendar
             mode="multiple"
             selected={getAvailableDates()}
+            onDayClick={handleDateClick}
             className="availability-calendar-large"
             disabled={(date) => date < new Date().setHours(0,0,0,0)}
             modifiers={{
-              available: getAvailableDates()
+              available: getAvailableDates(),
+              ...userDisponibilites.reduce((acc, dispo) => {
+                const date = new Date(dispo.date);
+                const typeGardeName = getTypeGardeName(dispo.type_garde_id).toLowerCase().replace(/\s+/g, '-');
+                if (!acc[typeGardeName]) acc[typeGardeName] = [];
+                acc[typeGardeName].push(date);
+                return acc;
+              }, {})
             }}
             modifiersStyles={{
               available: { 
                 backgroundColor: '#dcfce7', 
                 color: '#166534',
                 fontWeight: 'bold',
-                fontSize: '1rem'
-              }
+                cursor: 'pointer'
+              },
+              ...userDisponibilites.reduce((acc, dispo) => {
+                const typeGardeName = getTypeGardeName(dispo.type_garde_id).toLowerCase().replace(/\s+/g, '-');
+                const color = getColorByTypeGarde(dispo.type_garde_id);
+                acc[typeGardeName] = {
+                  backgroundColor: color + '20',
+                  borderColor: color,
+                  borderWidth: '2px',
+                  color: color,
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                };
+                return acc;
+              }, {})
             }}
           />
           
