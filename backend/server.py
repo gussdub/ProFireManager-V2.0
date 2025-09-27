@@ -751,32 +751,28 @@ async def init_demo_data():
         type_garde_obj = TypeGarde(**type_garde_data)
         await db.types_garde.insert_one(type_garde_obj.dict())
     
-    # Create demo disponibilités for part-time employee (Claire Garcia)
+    # Create demo disponibilités for part-time employee (Claire Garcia) with specific dates
     claire_user = await db.users.find_one({"email": "partiel@firemanager.ca"})
     if claire_user:
-        demo_disponibilites = [
-            {
-                "user_id": claire_user["id"],
-                "jour_semaine": "monday",
-                "heure_debut": "08:00",
-                "heure_fin": "16:00",
-                "statut": "disponible"
-            },
-            {
-                "user_id": claire_user["id"],
-                "jour_semaine": "wednesday",
-                "heure_debut": "08:00",
-                "heure_fin": "16:00",
-                "statut": "disponible"
-            },
-            {
-                "user_id": claire_user["id"],
-                "jour_semaine": "friday",
-                "heure_debut": "08:00",
-                "heure_fin": "16:00",
-                "statut": "disponible"
-            }
-        ]
+        # Create availabilities for next 2 weeks
+        today = datetime.now(timezone.utc).date()
+        demo_disponibilites = []
+        
+        # Generate availabilities for specific dates
+        for week_offset in range(4):  # Next 4 weeks
+            week_start = today + timedelta(weeks=week_offset)
+            week_start = week_start - timedelta(days=week_start.weekday())  # Get Monday
+            
+            # Claire is available Monday, Wednesday, Friday
+            for day_offset in [0, 2, 4]:  # Monday, Wednesday, Friday
+                date_available = week_start + timedelta(days=day_offset)
+                demo_disponibilites.append({
+                    "user_id": claire_user["id"],
+                    "date": date_available.strftime("%Y-%m-%d"),
+                    "heure_debut": "08:00",
+                    "heure_fin": "16:00",
+                    "statut": "disponible"
+                })
         
         for dispo_data in demo_disponibilites:
             dispo_obj = Disponibilite(**dispo_data)
