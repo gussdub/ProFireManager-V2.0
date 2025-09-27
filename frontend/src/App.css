@@ -3476,7 +3476,136 @@ body {
   font-style: italic;
 }
 
-/* Competences Styles - Fixed Layout */
+/* Password Requirements Styles */
+.password-requirements {
+  margin-top: 0.5rem;
+}
+
+.requirement-title {
+  display: block;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.requirements-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.requirement {
+  font-size: 0.75rem;
+  padding: 0.25rem;
+}
+
+.requirement.valid {
+  color: #059669;
+}
+
+.requirement.invalid {
+  color: #dc2626;
+}
+
+/* Edit Access Modal Styles */
+.current-user-info {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.user-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-summary .user-avatar {
+  width: 48px;
+  height: 48px;
+  background-color: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-summary .user-details h4 {
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.user-summary .user-details p {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-bottom: 0.125rem;
+}
+
+.access-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field-description {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+
+.permissions-preview {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+}
+
+.permissions-preview h4 {
+  color: #1e40af;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.permission-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.permission-title {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.permission-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.permission-group li {
+  color: #374151;
+  font-size: 0.75rem;
+  padding: 0.125rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.permission-group li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #10b981;
+  font-weight: bold;
+}
+
+/* Competences Enhanced Styles */
 .competences-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
