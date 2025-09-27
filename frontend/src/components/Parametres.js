@@ -1169,6 +1169,90 @@ const Parametres = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de création de formation */}
+      {showCreateFormationModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateFormationModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-formation-modal">
+            <div className="modal-header">
+              <h3>Nouvelle formation</h3>
+              <Button variant="ghost" onClick={() => setShowCreateFormationModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label>Nom de la formation *</Label>
+                  <Input
+                    value={newFormation.nom}
+                    onChange={(e) => setNewFormation({...newFormation, nom: e.target.value})}
+                    placeholder="Ex: Formation Échelles"
+                    data-testid="create-formation-nom"
+                  />
+                </div>
+
+                <div className="form-field">
+                  <Label>Description</Label>
+                  <textarea
+                    value={newFormation.description}
+                    onChange={(e) => setNewFormation({...newFormation, description: e.target.value})}
+                    placeholder="Description détaillée de la formation..."
+                    rows="3"
+                    className="form-textarea"
+                    data-testid="create-formation-description"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Durée (heures)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={newFormation.duree_heures}
+                      onChange={(e) => setNewFormation({...newFormation, duree_heures: parseInt(e.target.value)})}
+                      data-testid="create-formation-duree"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Validité</Label>
+                    <select
+                      value={newFormation.validite_mois}
+                      onChange={(e) => setNewFormation({...newFormation, validite_mois: parseInt(e.target.value)})}
+                      className="form-select"
+                      data-testid="create-formation-validite"
+                    >
+                      <option value="0">Pas de renouvellement</option>
+                      <option value="6">6 mois</option>
+                      <option value="12">12 mois</option>
+                      <option value="24">24 mois</option>
+                      <option value="36">36 mois</option>
+                      <option value="60">60 mois</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="setting-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={newFormation.obligatoire}
+                      onChange={(e) => setNewFormation({...newFormation, obligatoire: e.target.checked})}
+                    />
+                    <span>Formation obligatoire</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateFormationModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleCreateFormation} data-testid="create-formation-submit-btn">
+                  Créer la formation
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
