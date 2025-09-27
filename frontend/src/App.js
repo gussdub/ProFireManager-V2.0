@@ -2186,6 +2186,29 @@ const MesDisponibilites = () => {
       .map(d => new Date(d.date));
   };
 
+  const getColorByTypeGarde = (typeGardeId) => {
+    if (!typeGardeId) return '#10B981'; // Vert par défaut pour "Tous types"
+    const typeGarde = typesGarde.find(t => t.id === typeGardeId);
+    return typeGarde ? typeGarde.couleur : '#10B981';
+  };
+
+  const getDisponibiliteForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    return userDisponibilites.find(d => d.date === dateStr);
+  };
+
+  const handleDateClick = (date) => {
+    const dispo = getDisponibiliteForDate(date);
+    if (dispo) {
+      const typeGardeName = getTypeGardeName(dispo.type_garde_id);
+      toast({
+        title: `📅 ${date.toLocaleDateString('fr-FR')}`,
+        description: `${typeGardeName} | ${dispo.heure_debut} - ${dispo.heure_fin} | ${dispo.statut === 'disponible' ? '✅ Disponible' : '⚡ Préférence'}`,
+        variant: "default"
+      });
+    }
+  };
+
   if (user?.type_emploi !== 'temps_partiel') {
     return (
       <div className="access-denied">
