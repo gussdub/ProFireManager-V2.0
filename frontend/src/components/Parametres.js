@@ -29,6 +29,7 @@ const Parametres = ({ user }) => {
     heure_debut: '',
     heure_fin: '',
     personnel_requis: 1,
+    duree_heures: 8,
     couleur: '#3B82F6',
     jours_application: [],
     officier_obligatoire: false
