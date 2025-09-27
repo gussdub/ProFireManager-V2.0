@@ -2263,7 +2263,6 @@ const MesDisponibilites = () => {
       });
     }
   };
-  };
 
   const getTypeGardeName = (typeGardeId) => {
     if (!typeGardeId) return 'Tous types';
