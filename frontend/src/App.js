@@ -483,6 +483,7 @@ const Personnel = () => {
       telephone: user.telephone,
       contact_urgence: user.contact_urgence || '',
       grade: user.grade,
+      fonction_superieur: user.fonction_superieur || false,
       type_emploi: user.type_emploi,
       numero_employe: user.numero_employe,
       date_embauche: user.date_embauche,
