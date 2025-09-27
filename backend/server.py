@@ -1025,6 +1025,25 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
         remplacements_effectues=remplacements_count
     )
 
+# Fix admin password endpoint
+@api_router.post("/fix-admin-password")
+async def fix_admin_password():
+    try:
+        # Find admin user
+        admin_user = await db.users.find_one({"email": "admin@firemanager.ca"})
+        if admin_user:
+            # Update password hash
+            new_password_hash = get_password_hash("admin123")
+            await db.users.update_one(
+                {"email": "admin@firemanager.ca"},
+                {"$set": {"mot_de_passe_hash": new_password_hash}}
+            )
+            return {"message": "Mot de passe admin réparé"}
+        else:
+            return {"message": "Compte admin non trouvé"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+
 # Clean up endpoint
 @api_router.post("/cleanup-duplicates")
 async def cleanup_duplicates(current_user: User = Depends(get_current_user)):
