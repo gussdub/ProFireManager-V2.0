@@ -143,7 +143,7 @@ const Parametres = ({ user }) => {
         jours_application: [] // Add default empty array
       };
       
-      await axios.put(`${API}/types-garde/${editingType.id}`, updateData);
+      await axios.put(`${API}/types-garde/${editingItem.id}`, updateData);
       toast({
         title: "Type mis à jour",
         description: "Les modifications ont été sauvegardées",
