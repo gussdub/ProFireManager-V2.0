@@ -21,7 +21,13 @@ const Parametres = ({ user }) => {
   const [showCreateFormationModal, setShowCreateFormationModal] = useState(false);
   const [showEditFormationModal, setShowEditFormationModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [showEditAccessModal, setShowEditAccessModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userAccess, setUserAccess] = useState({
+    role: '',
+    statut: ''
+  });
   
   // Edit form state for types garde
   const [editForm, setEditForm] = useState({
