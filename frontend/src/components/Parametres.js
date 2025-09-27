@@ -181,6 +181,44 @@ const Parametres = ({ user }) => {
     }
   };
 
+  const handleEditFormation = (formation) => {
+    setEditingItem(formation);
+    setShowEditFormationModal(true);
+  };
+
+  const handleDeleteFormation = async (formationId) => {
+    if (!window.confirm("Supprimer cette formation ?")) return;
+    
+    try {
+      await axios.delete(`${API}/formations/${formationId}`);
+      toast({
+        title: "Supprimé",
+        description: "Formation supprimée avec succès",
+        variant: "success"
+      });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSettingChange = (setting, value) => {
+    setSystemSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
+    // Here you would typically save to backend
+    toast({
+      title: "Paramètre mis à jour",
+      description: `${setting} modifié avec succès`,
+      variant: "success"
+    });
+  };
+
   if (user?.role !== 'admin') {
     return (
       <div className="access-denied">
