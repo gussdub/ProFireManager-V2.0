@@ -1695,6 +1695,11 @@ const MonProfil = () => {
   const [formations, setFormations] = useState([]);
   const [userDisponibilites, setUserDisponibilites] = useState([]);
   const [userRemplacements, setUserRemplacements] = useState([]);
+  const [monthlyStats, setMonthlyStats] = useState({
+    gardes_ce_mois: 0,
+    heures_travaillees: 0,
+    certifications: 0
+  });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
