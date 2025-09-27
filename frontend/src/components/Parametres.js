@@ -84,28 +84,18 @@ const Parametres = ({ user }) => {
   }, [user]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      // Fetch types garde
-      const typesResponse = await axios.get(`${API}/types-garde`);
+      const [typesResponse, formationsResponse, usersResponse] = await Promise.all([
+        axios.get(`${API}/types-garde`),
+        axios.get(`${API}/formations`),
+        axios.get(`${API}/users`)
+      ]);
       setTypesGarde(typesResponse.data);
-      
-      // Fetch formations
-      const formationsResponse = await axios.get(`${API}/formations`);
       setFormations(formationsResponse.data);
-      
-      // Fetch users
-      const usersResponse = await axios.get(`${API}/users`);
       setUsers(usersResponse.data);
-      
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les données",
-        variant: "destructive"
-      });
+      console.error('Erreur lors du chargement des paramètres:', error);
     } finally {
       setLoading(false);
     }
