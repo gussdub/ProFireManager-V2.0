@@ -584,48 +584,122 @@ const Parametres = ({ user }) => {
         {activeTab === 'attribution' && (
           <div className="attribution-tab">
             <div className="tab-header">
-              <h2>Attribution Automatique</h2>
-              <p>Paramètres d'attribution intelligente</p>
+              <div>
+                <h2>Attribution Automatique Intelligente</h2>
+                <p>Configurez l'algorithme d'assignation automatique en 5 niveaux de priorité</p>
+              </div>
+              <Button variant="outline" data-testid="test-attribution-btn">
+                🧪 Tester l'algorithme
+              </Button>
             </div>
+            
             <div className="attribution-content">
-              <h3>Ordre de priorité (système)</h3>
-              <div className="priority-list">
-                <div className="priority-item">
-                  <span className="priority-number">1</span>
-                  <span>Assignations manuelles privilégiées ✅</span>
+              <div className="priority-section">
+                <h3>Algorithme d'assignation automatique (5 niveaux)</h3>
+                <div className="priority-list">
+                  <div className="priority-item">
+                    <span className="priority-number">1</span>
+                    <div className="priority-content">
+                      <span className="priority-text">Assignations manuelles privilégiées</span>
+                      <span className="priority-description">Les assignations manuelles ne sont jamais écrasées</span>
+                    </div>
+                    <span className="priority-status active">✅ Actif</span>
+                  </div>
+                  
+                  <div className="priority-item">
+                    <span className="priority-number">2</span>
+                    <div className="priority-content">
+                      <span className="priority-text">Respecter les disponibilités des employés</span>
+                      <span className="priority-description">Vérification des créneaux de disponibilité (temps partiel uniquement)</span>
+                    </div>
+                    <span className="priority-status active">✅ Actif</span>
+                  </div>
+                  
+                  <div className="priority-item">
+                    <span className="priority-number">3</span>
+                    <div className="priority-content">
+                      <span className="priority-text">Respecter les grades requis</span>
+                      <span className="priority-description">Assignation d'un officier si configuré pour le type de garde</span>
+                    </div>
+                    <span className="priority-status active">✅ Actif</span>
+                  </div>
+                  
+                  <div className="priority-item">
+                    <span className="priority-number">4</span>
+                    <div className="priority-content">
+                      <span className="priority-text">Rotation équitable du personnel</span>
+                      <span className="priority-description">Favorise les employés avec moins d'heures dans le mois</span>
+                    </div>
+                    <span className="priority-status active">✅ Actif - Nouvelle version</span>
+                  </div>
+                  
+                  <div className="priority-item">
+                    <span className="priority-number">5</span>
+                    <div className="priority-content">
+                      <span className="priority-text">Ancienneté des employés</span>
+                      <span className="priority-description">En cas d'égalité d'heures, privilégier l'ancienneté (date d'embauche)</span>
+                    </div>
+                    <span className="priority-status active">✅ Actif - Nouveau niveau</span>
+                  </div>
                 </div>
-                <div className="priority-item">
-                  <span className="priority-number">2</span>
-                  <span>Respecter les disponibilités ✅</span>
-                </div>
-                <div className="priority-item">
-                  <span className="priority-number">3</span>
-                  <span>Respecter les grades ✅</span>
-                </div>
-                <div className="priority-item">
-                  <span className="priority-number">4</span>
-                  <span>Rotation équitable ⚙️ En développement</span>
+              </div>
+
+              <div className="algorithm-details">
+                <h3>Détails de l'algorithme</h3>
+                <div className="details-grid">
+                  <div className="detail-card">
+                    <h4>🎯 Cible</h4>
+                    <p>Employés temps partiel uniquement</p>
+                    <small>Les temps plein ont un planning fixe manuel</small>
+                  </div>
+                  
+                  <div className="detail-card">
+                    <h4>📊 Calcul équitable</h4>
+                    <p>Cumul mensuel des heures</p>
+                    <small>Favorise ceux avec moins d'heures assignées</small>
+                  </div>
+                  
+                  <div className="detail-card">
+                    <h4>📅 Ancienneté</h4>
+                    <p>Basée sur la date d'embauche</p>
+                    <small>Plus ancien = priorité en cas d'égalité</small>
+                  </div>
+                  
+                  <div className="detail-card">
+                    <h4>⚙️ Déclenchement</h4>
+                    <p>Bouton "Attribution auto" dans Planning</p>
+                    <small>Processus sur demande pour préserver le manuel</small>
+                  </div>
                 </div>
               </div>
 
               <div className="settings-toggles">
                 <h3>Paramètres généraux</h3>
-                <label className="setting-toggle">
-                  <span>Attribution automatique activée</span>
-                  <input
-                    type="checkbox"
-                    checked={systemSettings.attribution_auto}
-                    onChange={(e) => handleSettingChange('attribution_auto', e.target.checked)}
-                  />
-                </label>
-                <label className="setting-toggle">
-                  <span>Notification par email</span>
-                  <input
-                    type="checkbox"
-                    checked={systemSettings.notification_email}
-                    onChange={(e) => handleSettingChange('notification_email', e.target.checked)}
-                  />
-                </label>
+                <div className="toggle-list">
+                  <label className="setting-toggle">
+                    <div className="toggle-info">
+                      <span>Attribution automatique activée</span>
+                      <small>Active l'algorithme intelligent à 5 niveaux</small>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.attribution_auto}
+                      onChange={(e) => handleSettingChange('attribution_auto', e.target.checked)}
+                    />
+                  </label>
+                  
+                  <label className="setting-toggle">
+                    <div className="toggle-info">
+                      <span>Notification par email</span>
+                      <small>Envoie un email pour chaque nouvelle assignation</small>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.notification_email}
+                      onChange={(e) => handleSettingChange('notification_email', e.target.checked)}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           </div>
