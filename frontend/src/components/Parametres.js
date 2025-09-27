@@ -806,14 +806,25 @@ const Parametres = ({ user }) => {
                     />
                   </div>
                   <div className="form-field">
-                    <Label>Couleur</Label>
+                    <Label>Durée (heures)</Label>
                     <Input
-                      type="color"
-                      value={editForm.couleur}
-                      onChange={(e) => setEditForm({...editForm, couleur: e.target.value})}
-                      data-testid="edit-couleur-input"
+                      type="number"
+                      min="1"
+                      value={editForm.duree_heures}
+                      onChange={(e) => setEditForm({...editForm, duree_heures: parseInt(e.target.value)})}
+                      data-testid="edit-duree-input"
                     />
                   </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Couleur</Label>
+                  <Input
+                    type="color"
+                    value={editForm.couleur}
+                    onChange={(e) => setEditForm({...editForm, couleur: e.target.value})}
+                    data-testid="edit-couleur-input"
+                  />
                 </div>
 
                 <div className="form-field">
