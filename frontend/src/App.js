@@ -9,6 +9,7 @@ import { Calendar } from "./components/ui/calendar";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
 import Parametres from "./components/Parametres";
+import MesDisponibilites from "./components/MesDisponibilites";
 import "./App.css";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
