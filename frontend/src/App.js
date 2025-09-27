@@ -2848,6 +2848,8 @@ const AppLayout = () => {
         return <Planning />;
       case 'remplacements':
         return <Remplacements />;
+      case 'disponibilites':
+        return <MesDisponibilites />;
       case 'formations':
         return <Formations />;
       case 'rapports':
