@@ -705,6 +705,63 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
         remplacements_effectues=remplacements_count
     )
 
+# Clean up endpoint
+@api_router.post("/cleanup-duplicates")
+async def cleanup_duplicates(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Clean formations duplicates - keep only unique ones by name
+        formations = await db.formations.find().to_list(1000)
+        unique_formations = {}
+        
+        for formation in formations:
+            name = formation['nom']
+            if name not in unique_formations:
+                unique_formations[name] = formation
+        
+        # Delete all formations and re-insert unique ones
+        await db.formations.delete_many({})
+        
+        if unique_formations:
+            formations_to_insert = []
+            for formation in unique_formations.values():
+                formation.pop('_id', None)  # Remove MongoDB _id
+                formations_to_insert.append(formation)
+            
+            await db.formations.insert_many(formations_to_insert)
+        
+        # Clean types garde duplicates
+        types_garde = await db.types_garde.find().to_list(1000)
+        unique_types = {}
+        
+        for type_garde in types_garde:
+            key = f"{type_garde['nom']}_{type_garde['heure_debut']}_{type_garde['heure_fin']}"
+            if key not in unique_types:
+                unique_types[key] = type_garde
+        
+        # Delete all types garde and re-insert unique ones
+        await db.types_garde.delete_many({})
+        
+        if unique_types:
+            types_to_insert = []
+            for type_garde in unique_types.values():
+                type_garde.pop('_id', None)  # Remove MongoDB _id
+                types_to_insert.append(type_garde)
+            
+            await db.types_garde.insert_many(types_to_insert)
+        
+        formations_count = len(unique_formations)
+        types_count = len(unique_types)
+        
+        return {
+            "message": f"Nettoyage terminé: {formations_count} formations uniques, {types_count} types de garde uniques"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors du nettoyage: {str(e)}")
+
 # Initialize demo data
 @api_router.post("/init-demo-data")
 async def init_demo_data():
