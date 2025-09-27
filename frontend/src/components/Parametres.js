@@ -484,7 +484,7 @@ const Parametres = ({ user }) => {
               </div>
               <Button 
                 variant="default" 
-                onClick={() => alert('Création formation en développement')}
+                onClick={() => setShowCreateFormationModal(true)}
                 data-testid="create-formation-btn"
               >
                 + Nouvelle Formation
