@@ -2417,6 +2417,28 @@ const MesDisponibilites = () => {
               <span>Jours non configurés</span>
             </div>
           </div>
+          
+          {/* Légende des couleurs par type de garde */}
+          {typesGarde.length > 0 && (
+            <div className="type-garde-legend">
+              <h4>Code couleur par type de garde :</h4>
+              <div className="type-legend-items">
+                {typesGarde.map(type => (
+                  <div key={type.id} className="type-legend-item">
+                    <span 
+                      className="type-color-dot" 
+                      style={{ backgroundColor: type.couleur }}
+                    ></span>
+                    <span>{type.nom}</span>
+                  </div>
+                ))}
+                <div className="type-legend-item">
+                  <span className="type-color-dot" style={{ backgroundColor: '#10B981' }}></span>
+                  <span>Tous types (général)</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="availability-details-enhanced">
