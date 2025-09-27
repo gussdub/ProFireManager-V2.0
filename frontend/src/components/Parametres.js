@@ -263,45 +263,199 @@ const Parametres = ({ user }) => {
         >
           🔄 Paramètres Remplacements
         </button>
-      </div>
-      
-      <div className="types-garde-grid">
-        {typesGarde.map(type => (
-          <div key={type.id} className="type-garde-card">
-            <div className="type-garde-header">
-              <div className="type-info">
-                <h3>{type.nom}</h3>
-                <div className="type-schedule">
-                  <span>⏰ {type.heure_debut} - {type.heure_fin}</span>
-                  <span>👥 {type.personnel_requis} personnel</span>
-                  {type.officier_obligatoire && <span>🎖️ Officier requis</span>}
-                </div>
+      {/* Contenu conditionnel des onglets */}
+      <div className="tab-content">
+        {activeTab === 'types-garde' && (
+          <div className="types-garde-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramétrage des gardes</h2>
+                <p>Créez et modifiez les types de gardes disponibles</p>
               </div>
-              <div className="type-actions">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleEdit(type)}
-                  data-testid={`edit-type-${type.id}`}
-                >
-                  ✏️ Modifier
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  className="danger" 
-                  onClick={() => handleDelete(type.id)}
-                  data-testid={`delete-type-${type.id}`}
-                >
-                  🗑️ Supprimer
-                </Button>
-              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateTypeModal(true)}
+                data-testid="create-type-garde-btn"
+              >
+                + Nouveau Type de Garde
+              </Button>
             </div>
-            <div className="type-details">
-              <span className="color-preview" style={{ backgroundColor: type.couleur }}></span>
-              <span>Couleur: {type.couleur}</span>
+
+            <div className="types-garde-grid">
+              {typesGarde.map(type => (
+                <div key={type.id} className="type-garde-card">
+                  <div className="type-garde-header">
+                    <div className="type-info">
+                      <h3>{type.nom}</h3>
+                      <div className="type-schedule">
+                        <span>⏰ {type.heure_debut} - {type.heure_fin}</span>
+                        <span>👥 {type.personnel_requis} personnel</span>
+                        {type.officier_obligatoire && <span>🎖️ Officier requis</span>}
+                      </div>
+                    </div>
+                    <div className="type-actions">
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => handleEdit(type)}
+                        data-testid={`edit-type-${type.id}`}
+                      >
+                        ✏️ Modifier
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="danger" 
+                        onClick={() => handleDelete(type.id)}
+                        data-testid={`delete-type-${type.id}`}
+                      >
+                        🗑️ Supprimer
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="type-details">
+                    <span className="color-preview" style={{ backgroundColor: type.couleur }}></span>
+                    <span>Couleur: {type.couleur}</span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        ))}
+        )}
+
+        {activeTab === 'formations' && (
+          <div className="formations-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Gestion des formations</h2>
+                <p>Configurez les formations obligatoires et optionnelles</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateFormationModal(true)}
+                data-testid="create-formation-btn"
+              >
+                + Nouvelle Formation
+              </Button>
+            </div>
+
+            <div className="formations-grid">
+              {formations.map(formation => (
+                <div key={formation.id} className="formation-card">
+                  <div className="formation-header">
+                    <div className="formation-info">
+                      <h3>{formation.nom}</h3>
+                      <p>{formation.description}</p>
+                      <div className="formation-details">
+                        <span>⏱️ {formation.duree_heures}h</span>
+                        <span>📅 Validité: {formation.validite_mois} mois</span>
+                        {formation.obligatoire && <span className="obligatoire">⚠️ Obligatoire</span>}
+                      </div>
+                    </div>
+                    <div className="formation-actions">
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => handleEditFormation(formation)}
+                        data-testid={`edit-formation-${formation.id}`}
+                      >
+                        ✏️ Modifier
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="danger" 
+                        onClick={() => handleDeleteFormation(formation.id)}
+                        data-testid={`delete-formation-${formation.id}`}
+                      >
+                        🗑️ Supprimer
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'attribution' && (
+          <div className="attribution-tab">
+            <div className="tab-header">
+              <h2>Attribution Automatique</h2>
+              <p>Paramètres d'attribution intelligente</p>
+            </div>
+            <div className="attribution-content">
+              <h3>Ordre de priorité (système)</h3>
+              <div className="priority-list">
+                <div className="priority-item">
+                  <span className="priority-number">1</span>
+                  <span>Assignations manuelles privilégiées ✅</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">2</span>
+                  <span>Respecter les disponibilités ✅</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">3</span>
+                  <span>Respecter les grades ✅</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">4</span>
+                  <span>Rotation équitable ⚙️</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'comptes' && (
+          <div className="comptes-tab">
+            <div className="tab-header">
+              <h2>Comptes d'Accès</h2>
+              <p>Gestion des utilisateurs et permissions</p>
+            </div>
+            <div className="accounts-stats">
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'admin').length}</span>
+                <span className="stat-label">Administrateurs</span>
+              </div>
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'superviseur').length}</span>
+                <span className="stat-label">Superviseurs</span>
+              </div>
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'employe').length}</span>
+                <span className="stat-label">Employés</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'remplacements' && (
+          <div className="remplacements-tab">
+            <div className="tab-header">
+              <h2>Paramètres Remplacements</h2>
+              <p>Configuration des règles de validation</p>
+            </div>
+            <div className="replacement-settings">
+              <div className="setting-item">
+                <label>Délai de réponse (heures)</label>
+                <Input
+                  type="number"
+                  value={systemSettings.delai_reponse}
+                  onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
+                />
+              </div>
+              <div className="setting-item">
+                <label>Max personnes à contacter</label>
+                <Input
+                  type="number"
+                  value={systemSettings.max_personnes_contact}
+                  onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+      
+      {/* SUPPRESSION DE LA GRILLE QUI S'AFFICHAIT TOUJOURS */}
 
       {/* Tab content sections */}
       {activeTab === 'types-garde' && (
