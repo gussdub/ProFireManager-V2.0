@@ -11,20 +11,50 @@ const API = `${BACKEND_URL}/api`;
 const Parametres = ({ user }) => {
   const [typesGarde, setTypesGarde] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingType, setEditingType] = useState(null);
-  const [editForm, setEditForm] = useState({
-    nom: '',
-    heure_debut: '',
-    heure_fin: '',
-    personnel_requis: 1,
-    couleur: '#3B82F6',
-    jours_application: [],
-    officier_obligatoire: false
-  });
   const [activeTab, setActiveTab] = useState('types-garde');
+  const [typesGarde, setTypesGarde] = useState([]);
   const [formations, setFormations] = useState([]);
   const [users, setUsers] = useState([]);
+  
+  // Modals states
+  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
+  const [showEditTypeModal, setShowEditTypeModal] = useState(false);
+  const [showCreateFormationModal, setShowCreateFormationModal] = useState(false);
+  const [showEditFormationModal, setShowEditFormationModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [editingItem, setEditingItem] = useState(null);
+  
+  // Form states
+  const [newFormation, setNewFormation] = useState({
+    nom: '',
+    description: '',
+    duree_heures: 8,
+    validite_mois: 12,
+    obligatoire: false
+  });
+  
+  const [newUser, setNewUser] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    contact_urgence: '',
+    grade: 'Pompier',
+    type_emploi: 'temps_plein',
+    role: 'employe',
+    numero_employe: '',
+    date_embauche: '',
+    mot_de_passe: 'motdepasse123'
+  });
+
+  const [systemSettings, setSystemSettings] = useState({
+    attribution_auto: true,
+    notification_email: true,
+    assignations_doublon: false,
+    delai_reponse: 48,
+    max_personnes_contact: 5,
+    grade_equivalent: true
+  });
   const { toast } = useToast();
 
   const joursOptions = [
