@@ -2234,7 +2234,7 @@ const MonProfil = () => {
                   <Input
                     value={profileData.prenom || ''}
                     onChange={(e) => setProfileData({...profileData, prenom: e.target.value})}
-                    disabled={!isEditing || user.role === 'employe'}
+                    disabled={!isEditing}
                     data-testid="profile-prenom-input"
                   />
                 </div>
