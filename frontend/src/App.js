@@ -2357,7 +2357,7 @@ const MesDisponibilites = () => {
                     <Label>Pour quel type de garde êtes-vous disponible ?</Label>
                     <select
                       value={availabilityConfig.type_garde_id}
-                      onChange={(e) => setAvailabilityConfig({...availabilityConfig, type_garde_id: e.target.value})}
+                      onChange={(e) => handleTypeGardeChange(e.target.value)}
                       className="form-select"
                       data-testid="availability-type-garde-select"
                     >
