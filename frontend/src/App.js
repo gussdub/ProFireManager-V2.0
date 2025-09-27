@@ -2451,7 +2451,67 @@ const MesDisponibilites = () => {
         </div>
 
         <div className="availability-details-enhanced">
-          <h3>📋 Détails des disponibilités</h3>
+          <div className="details-header">
+            <h3>📋 Détails des disponibilités</h3>
+            <p className="click-instruction">💡 Cliquez sur une date du calendrier pour voir les détails</p>
+          </div>
+
+          {/* Affichage des détails de la date cliquée */}
+          {selectedDateDetails && (
+            <div className="selected-date-details">
+              <div className="selected-date-header">
+                <h4>📅 {selectedDateDetails.date.toLocaleDateString('fr-FR', { 
+                  weekday: 'long', 
+                  year: 'numeric', 
+                  month: 'long', 
+                  day: 'numeric' 
+                })}</h4>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setSelectedDateDetails(null)}
+                  className="close-details"
+                >
+                  ✕
+                </Button>
+              </div>
+              
+              <div className="selected-date-content">
+                <div className="detail-item-large">
+                  <span className="detail-icon">🚒</span>
+                  <div className="detail-info">
+                    <span className="detail-title">Type de garde</span>
+                    <span className="detail-value" style={{ color: selectedDateDetails.couleur }}>
+                      {selectedDateDetails.typeGardeName}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="detail-item-large">
+                  <span className="detail-icon">⏰</span>
+                  <div className="detail-info">
+                    <span className="detail-title">Horaires</span>
+                    <span className="detail-value">
+                      {selectedDateDetails.disponibilite.heure_debut} - {selectedDateDetails.disponibilite.heure_fin}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="detail-item-large">
+                  <span className="detail-icon">📊</span>
+                  <div className="detail-info">
+                    <span className="detail-title">Statut</span>
+                    <span className={`detail-status ${selectedDateDetails.disponibilite.statut}`}>
+                      {selectedDateDetails.disponibilite.statut === 'disponible' ? '✅ Disponible' : 
+                       selectedDateDetails.disponibilite.statut === 'preference' ? '⚡ Préférence' : '❌ Indisponible'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Liste des disponibilités */}
           {userDisponibilites.length > 0 ? (
             <div className="availability-list-enhanced">
               {userDisponibilites.map(dispo => (
@@ -2469,7 +2529,12 @@ const MesDisponibilites = () => {
                   
                   <div className="availability-garde-info">
                     <div className="garde-type">
-                      <span className="garde-name">{getTypeGardeName(dispo.type_garde_id)}</span>
+                      <span 
+                        className="garde-name" 
+                        style={{ color: getColorByTypeGarde(dispo.type_garde_id) }}
+                      >
+                        {getTypeGardeName(dispo.type_garde_id)}
+                      </span>
                       <span className="garde-icon">🚒</span>
                     </div>
                     <span className="garde-hours">{dispo.heure_debut} - {dispo.heure_fin}</span>
