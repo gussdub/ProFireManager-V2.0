@@ -390,6 +390,109 @@ const Parametres = ({ user }) => {
     }
   };
 
+  const validatePassword = (password) => {
+    if (password.length < 8) return false;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasDigit = /\d/.test(password);
+    const hasSpecial = /[!@#$%^&*+\-?()]/.test(password);
+    return hasUppercase && hasDigit && hasSpecial;
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.mot_de_passe) {
+      toast({
+        title: "Champs requis",
+        description: "Nom, prénom, email et mot de passe sont obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!validatePassword(newUser.mot_de_passe)) {
+      toast({
+        title: "Mot de passe invalide",
+        description: "Le mot de passe doit contenir 8 caractères, une majuscule, un chiffre et un caractère spécial (!@#$%^&*+-?())",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const userToCreate = {
+        ...newUser,
+        numero_employe: newUser.numero_employe || `${newUser.role.toUpperCase()}${String(Date.now()).slice(-3)}`,
+        date_embauche: newUser.date_embauche || new Date().toLocaleDateString('fr-FR'),
+        formations: []
+      };
+
+      await axios.post(`${API}/users`, userToCreate);
+      toast({
+        title: "Compte créé avec succès",
+        description: "Un email de bienvenue a été envoyé avec les informations de connexion",
+        variant: "success"
+      });
+      setShowCreateUserModal(false);
+      resetNewUser();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de créer le compte",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditAccess = (user) => {
+    setEditingUser(user);
+    setUserAccess({
+      role: user.role,
+      statut: user.statut
+    });
+    setShowEditAccessModal(true);
+  };
+
+  const handleUpdateAccess = async () => {
+    try {
+      await axios.put(`${API}/users/${editingUser.id}/access?role=${userAccess.role}&statut=${userAccess.statut}`);
+      toast({
+        title: "Accès modifié",
+        description: "Les permissions de l'utilisateur ont été mises à jour",
+        variant: "success"
+      });
+      setShowEditAccessModal(false);
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier l'accès",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleRevokeUser = async (userId, userName) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir révoquer définitivement le compte de ${userName} ?\n\nCette action supprimera :\n- Le compte utilisateur\n- Toutes ses disponibilités\n- Ses assignations\n- Ses demandes de remplacement\n\nCette action est IRRÉVERSIBLE.`)) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/users/${userId}/revoke`);
+      toast({
+        title: "Compte révoqué",
+        description: "Le compte et toutes les données associées ont été supprimés définitivement",
+        variant: "success"
+      });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de révoquer le compte",
+        variant: "destructive"
+      });
+    }
+  };
+
   const resetNewUser = () => {
     setNewUser({
       nom: '',
