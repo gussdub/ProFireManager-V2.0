@@ -212,6 +212,7 @@ class User(BaseModel):
     grade: str  # Capitaine, Directeur, Pompier, Lieutenant
     fonction_superieur: bool = False  # Pour pompiers pouvant agir comme lieutenant
     type_emploi: str  # temps_plein, temps_partiel
+    heures_max_semaine: int = 40  # Heures max par semaine (pour temps partiel)
     role: str  # admin, superviseur, employe
     statut: str = "Actif"  # Actif, Inactif
     numero_employe: str
@@ -229,6 +230,7 @@ class UserCreate(BaseModel):
     grade: str
     fonction_superieur: bool = False
     type_emploi: str
+    heures_max_semaine: int = 40
     role: str
     numero_employe: str
     date_embauche: str
