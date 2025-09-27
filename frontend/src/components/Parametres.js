@@ -158,6 +158,45 @@ const Parametres = ({ user }) => {
         <h1 data-testid="parametres-title">Paramètres du système</h1>
         <p>Configuration des types de gardes</p>
       </div>
+
+      {/* Navigation par onglets complète */}
+      <div className="settings-tabs">
+        <button
+          className={`tab-button ${activeTab === 'types-garde' ? 'active' : ''}`}
+          onClick={() => setActiveTab('types-garde')}
+          data-testid="tab-types-garde"
+        >
+          🚒 Types de Gardes
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'formations' ? 'active' : ''}`}
+          onClick={() => setActiveTab('formations')}
+          data-testid="tab-formations"
+        >
+          📚 Formations
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'attribution' ? 'active' : ''}`}
+          onClick={() => setActiveTab('attribution')}
+          data-testid="tab-attribution"
+        >
+          ⚙️ Attribution Auto
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'comptes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('comptes')}
+          data-testid="tab-comptes"
+        >
+          👥 Comptes d'Accès
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'remplacements' ? 'active' : ''}`}
+          onClick={() => setActiveTab('remplacements')}
+          data-testid="tab-remplacements-settings"
+        >
+          🔄 Paramètres Remplacements
+        </button>
+      </div>
       
       <div className="types-garde-grid">
         {typesGarde.map(type => (
