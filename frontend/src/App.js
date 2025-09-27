@@ -652,8 +652,12 @@ const Personnel = () => {
             <div className="grade-cell">
               <span className="grade" style={{ backgroundColor: getGradeColor(user.grade) }}>
                 {user.grade}
+                {user.fonction_superieur && <span className="fonction-sup">+</span>}
               </span>
               <p className="employee-id">#{user.numero_employe}</p>
+              {user.fonction_superieur && (
+                <p className="fonction-superieur-indicator">🎖️ Fonction supérieur</p>
+              )}
             </div>
 
             <div className="contact-cell">
