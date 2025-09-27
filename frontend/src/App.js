@@ -2106,21 +2106,21 @@ const MonProfil = () => {
               <div className="stat-item">
                 <span className="stat-icon">🏆</span>
                 <div className="stat-content">
-                  <span className="stat-value">24</span>
+                  <span className="stat-value">{monthlyStats.gardes_ce_mois}</span>
                   <span className="stat-label">Gardes ce mois</span>
                 </div>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">⏱️</span>
                 <div className="stat-content">
-                  <span className="stat-value">288h</span>
+                  <span className="stat-value">{monthlyStats.heures_travaillees}h</span>
                   <span className="stat-label">Heures travaillées</span>
                 </div>
               </div>
               <div className="stat-item">
                 <span className="stat-icon">📜</span>
                 <div className="stat-content">
-                  <span className="stat-value">{userProfile?.formations?.length || 0}</span>
+                  <span className="stat-value">{monthlyStats.certifications}</span>
                   <span className="stat-label">Certifications</span>
                 </div>
               </div>
