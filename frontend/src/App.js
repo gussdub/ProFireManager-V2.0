@@ -462,9 +462,10 @@ const Personnel = () => {
       telephone: '',
       contact_urgence: '',
       grade: '',
+      fonction_superieur: false,
       type_emploi: '',
       numero_employe: '',
-      date_embauche: new Date().toISOString().split('T')[0], // Date du jour par défaut
+      date_embauche: new Date().toISOString().split('T')[0],
       formations: [],
       mot_de_passe: ''
     });
