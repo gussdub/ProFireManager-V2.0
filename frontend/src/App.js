@@ -1710,13 +1710,15 @@ const MonProfil = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const [userResponse, formationsResponse] = await Promise.all([
+        const [userResponse, formationsResponse, statsResponse] = await Promise.all([
           axios.get(`${API}/users/${user.id}`),
-          axios.get(`${API}/formations`)
+          axios.get(`${API}/formations`),
+          axios.get(`${API}/users/${user.id}/stats-mensuelles`)
         ]);
         
         setUserProfile(userResponse.data);
         setFormations(formationsResponse.data);
+        setMonthlyStats(statsResponse.data);
         setProfileData({
           nom: userResponse.data.nom,
           prenom: userResponse.data.prenom,
