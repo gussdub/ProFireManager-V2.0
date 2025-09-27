@@ -40,6 +40,20 @@ const Parametres = ({ user }) => {
     obligatoire: false
   });
 
+  const [newUser, setNewUser] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    contact_urgence: '',
+    grade: 'Pompier',
+    type_emploi: 'temps_plein',
+    role: 'employe',
+    numero_employe: '',
+    date_embauche: '',
+    mot_de_passe: 'motdepasse123'
+  });
+
   const [systemSettings, setSystemSettings] = useState({
     attribution_auto: true,
     notification_email: true,
