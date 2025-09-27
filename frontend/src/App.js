@@ -1173,7 +1173,6 @@ const MonProfil = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [formations, setFormations] = useState([]);
   const [userDisponibilites, setUserDisponibilites] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showDispoModal, setShowDispoModal] = useState(false);
   const [profileData, setProfileData] = useState({});
