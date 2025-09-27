@@ -1123,6 +1123,7 @@ async def init_demo_data():
             "contact_urgence": "514-999-1111",
             "grade": "Directeur",
             "type_emploi": "temps_plein",
+            "heures_max_semaine": 40,  # Temps plein standard
             "role": "admin",
             "numero_employe": "ADM001",
             "date_embauche": "14/01/2020",
@@ -1137,6 +1138,7 @@ async def init_demo_data():
             "contact_urgence": "514-888-2222",
             "grade": "Directeur",
             "type_emploi": "temps_plein",
+            "heures_max_semaine": 40,  # Temps plein standard
             "role": "superviseur",
             "numero_employe": "POM001",
             "date_embauche": "07/01/2022",
@@ -1151,6 +1153,7 @@ async def init_demo_data():
             "contact_urgence": "418-777-3333",
             "grade": "Capitaine",
             "type_emploi": "temps_plein",
+            "heures_max_semaine": 40,  # Temps plein standard
             "role": "employe",
             "numero_employe": "POM002",
             "date_embauche": "21/09/2019",
