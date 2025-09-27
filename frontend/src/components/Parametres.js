@@ -865,6 +865,111 @@ const Parametres = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de création d'utilisateur */}
+      {showCreateUserModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateUserModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-user-modal">
+            <div className="modal-header">
+              <h3>Nouveau compte d'accès</h3>
+              <Button variant="ghost" onClick={() => setShowCreateUserModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Prénom *</Label>
+                    <Input
+                      value={newUser.prenom}
+                      onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
+                      data-testid="new-user-prenom"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Nom *</Label>
+                    <Input
+                      value={newUser.nom}
+                      onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
+                      data-testid="new-user-nom"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Email *</Label>
+                  <Input
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                    data-testid="new-user-email"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Grade</Label>
+                    <select
+                      value={newUser.grade}
+                      onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
+                      className="form-select"
+                      data-testid="new-user-grade"
+                    >
+                      <option value="Pompier">Pompier</option>
+                      <option value="Lieutenant">Lieutenant</option>
+                      <option value="Capitaine">Capitaine</option>
+                      <option value="Directeur">Directeur</option>
+                    </select>
+                  </div>
+                  <div className="form-field">
+                    <Label>Rôle *</Label>
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                      className="form-select"
+                      data-testid="new-user-role"
+                    >
+                      <option value="employe">👤 Employé</option>
+                      <option value="superviseur">🎖️ Superviseur</option>
+                      <option value="admin">👑 Administrateur</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Type d'emploi</Label>
+                    <select
+                      value={newUser.type_emploi}
+                      onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
+                      className="form-select"
+                      data-testid="new-user-employment"
+                    >
+                      <option value="temps_plein">Temps plein</option>
+                      <option value="temps_partiel">Temps partiel</option>
+                    </select>
+                  </div>
+                  <div className="form-field">
+                    <Label>Mot de passe temporaire</Label>
+                    <Input
+                      type="password"
+                      value={newUser.mot_de_passe}
+                      onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
+                      data-testid="new-user-password"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateUserModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleCreateUser} data-testid="create-account-btn">
+                  Créer le compte
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
