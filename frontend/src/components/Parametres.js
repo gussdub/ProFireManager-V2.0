@@ -55,6 +55,14 @@ const Parametres = ({ user }) => {
     obligatoire: false
   });
 
+  const [newFormation, setNewFormation] = useState({
+    nom: '',
+    description: '',
+    duree_heures: 8,
+    validite_mois: 12,
+    obligatoire: false
+  });
+
   const [newUser, setNewUser] = useState({
     nom: '',
     prenom: '',
