@@ -276,12 +276,12 @@ const Parametres = ({ user }) => {
         ))}
       </div>
 
-      {showEditModal && editingType && (
-        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+      {showEditTypeModal && editingItem && (
+        <div className="modal-overlay" onClick={() => setShowEditTypeModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="edit-type-modal">
             <div className="modal-header">
-              <h3>Modifier: {editingType.nom}</h3>
-              <Button variant="ghost" onClick={() => setShowEditModal(false)}>✕</Button>
+              <h3>Modifier: {editingItem.nom}</h3>
+              <Button variant="ghost" onClick={() => setShowEditTypeModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
               <div className="form-field">
