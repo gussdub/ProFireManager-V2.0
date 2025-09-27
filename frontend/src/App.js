@@ -2543,15 +2543,25 @@ const MonProfil = () => {
           {/* Section remplacements personnels (pour employés) */}
           {user.role === 'employe' && (
             <div className="profile-section">
-              <h2>Mes demandes de remplacement</h2>
+              <div className="section-header">
+                <h2>Mes demandes de remplacement</h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowReplacementModal(true)}
+                  data-testid="create-replacement-profile-btn"
+                >
+                  + Nouvelle demande
+                </Button>
+              </div>
               <div className="personal-replacements">
                 {userRemplacements.length > 0 ? (
                   <div className="replacements-personal-list">
                     {userRemplacements.map(remplacement => (
                       <div key={remplacement.id} className="replacement-personal-item">
                         <div className="replacement-info">
-                          <h4>{new Date(remplacement.date).toLocaleDateString('fr-FR')}</h4>
-                          <p>{remplacement.raison}</p>
+                          <h4>{getTypeGardeName(remplacement.type_garde_id)}</h4>
+                          <p>{new Date(remplacement.date).toLocaleDateString('fr-FR')}</p>
+                          <p className="replacement-reason">{remplacement.raison}</p>
                           <small>Demandé le {new Date(remplacement.created_at).toLocaleDateString('fr-FR')}</small>
                         </div>
                         <div className="replacement-status">
@@ -2572,8 +2582,12 @@ const MonProfil = () => {
                 ) : (
                   <div className="no-replacements">
                     <p>Aucune demande de remplacement</p>
-                    <Button variant="outline" onClick={() => window.location.hash = '#remplacements'}>
-                      Créer une demande
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowReplacementModal(true)}
+                      data-testid="first-replacement-btn"
+                    >
+                      Créer ma première demande
                     </Button>
                   </div>
                 )}
