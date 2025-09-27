@@ -161,7 +161,7 @@ class FormationCreate(BaseModel):
 class Disponibilite(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
-    jour_semaine: str  # monday, tuesday, etc.
+    date: str  # Date exacte YYYY-MM-DD
     heure_debut: str
     heure_fin: str
     statut: str = "disponible"  # disponible, indisponible, preference
@@ -169,7 +169,7 @@ class Disponibilite(BaseModel):
 
 class DisponibiliteCreate(BaseModel):
     user_id: str
-    jour_semaine: str
+    date: str  # Date exacte YYYY-MM-DD
     heure_debut: str
     heure_fin: str
     statut: str = "disponible"
