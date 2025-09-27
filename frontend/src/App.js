@@ -2803,6 +2803,127 @@ const MonProfil = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de changement de mot de passe */}
+      {showPasswordModal && (
+        <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="change-password-modal">
+            <div className="modal-header">
+              <h3>🔒 Changer le mot de passe</h3>
+              <Button variant="ghost" onClick={() => setShowPasswordModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="password-form">
+                <div className="form-field">
+                  <Label>Mot de passe actuel *</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.current_password}
+                    onChange={(e) => setPasswordData({...passwordData, current_password: e.target.value})}
+                    data-testid="current-password-input"
+                  />
+                </div>
+
+                <div className="form-field">
+                  <Label>Nouveau mot de passe *</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.new_password}
+                    onChange={(e) => setPasswordData({...passwordData, new_password: e.target.value})}
+                    data-testid="new-password-input"
+                  />
+                  <small className="password-requirements">
+                    8 caractères minimum, 1 majuscule, 1 chiffre, 1 caractère spécial (!@#$%^&*+-?())
+                  </small>
+                </div>
+
+                <div className="form-field">
+                  <Label>Confirmer le nouveau mot de passe *</Label>
+                  <Input
+                    type="password"
+                    value={passwordData.confirm_password}
+                    onChange={(e) => setPasswordData({...passwordData, confirm_password: e.target.value})}
+                    data-testid="confirm-password-input"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowPasswordModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleChangePassword} data-testid="save-password-btn">
+                  Modifier le mot de passe
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de demande de remplacement */}
+      {showReplacementModal && (
+        <div className="modal-overlay" onClick={() => setShowReplacementModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="replacement-request-modal">
+            <div className="modal-header">
+              <h3>🔄 Nouvelle demande de remplacement</h3>
+              <Button variant="ghost" onClick={() => setShowReplacementModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="replacement-form">
+                <div className="form-field">
+                  <Label>Type de garde *</Label>
+                  <select
+                    value={newReplacement.type_garde_id}
+                    onChange={(e) => setNewReplacement({...newReplacement, type_garde_id: e.target.value})}
+                    className="form-select"
+                    data-testid="replacement-type-garde-select"
+                  >
+                    <option value="">Sélectionner un type de garde</option>
+                    {typesGarde.map(type => (
+                      <option key={type.id} value={type.id}>
+                        {type.nom} ({type.heure_debut} - {type.heure_fin})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-field">
+                  <Label>Date de la garde *</Label>
+                  <Input
+                    type="date"
+                    value={newReplacement.date}
+                    onChange={(e) => setNewReplacement({...newReplacement, date: e.target.value})}
+                    min={new Date().toISOString().split('T')[0]}
+                    data-testid="replacement-date-input"
+                  />
+                </div>
+
+                <div className="form-field">
+                  <Label>Raison du remplacement *</Label>
+                  <textarea
+                    value={newReplacement.raison}
+                    onChange={(e) => setNewReplacement({...newReplacement, raison: e.target.value})}
+                    placeholder="Expliquez la raison de votre demande (maladie, congé personnel, urgence familiale...)"
+                    rows="4"
+                    className="form-textarea"
+                    data-testid="replacement-reason-input"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowReplacementModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleCreateReplacement} data-testid="submit-replacement-request-btn">
+                  Créer la demande
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
