@@ -1049,6 +1049,168 @@ const Personnel = () => {
           </div>
         </div>
       )}
+
+      {/* Edit User Modal - Complet et fonctionnel */}
+      {showEditModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-user-modal">
+            <div className="modal-header">
+              <h3>✏️ Modifier {selectedUser.prenom} {selectedUser.nom}</h3>
+              <Button variant="ghost" onClick={() => setShowEditModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="personnel-form-grid">
+                {/* Section 1: Informations personnelles */}
+                <div className="form-section">
+                  <h4 className="section-title">👤 Informations personnelles</h4>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Prénom *</Label>
+                      <Input
+                        value={newUser.prenom}
+                        onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
+                        data-testid="edit-user-prenom-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Nom *</Label>
+                      <Input
+                        value={newUser.nom}
+                        onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
+                        data-testid="edit-user-nom-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Email *</Label>
+                    <Input
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      data-testid="edit-user-email-input"
+                    />
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Téléphone</Label>
+                      <Input
+                        value={newUser.telephone}
+                        onChange={(e) => setNewUser({...newUser, telephone: e.target.value})}
+                        data-testid="edit-user-phone-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Contact d'urgence</Label>
+                      <Input
+                        value={newUser.contact_urgence}
+                        onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
+                        data-testid="edit-user-emergency-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 2: Informations professionnelles */}
+                <div className="form-section">
+                  <h4 className="section-title">🎖️ Informations professionnelles</h4>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Grade *</Label>
+                      <select
+                        value={newUser.grade}
+                        onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
+                        className="form-select"
+                        data-testid="edit-user-grade-select"
+                      >
+                        {grades.map(grade => (
+                          <option key={grade} value={grade}>{grade}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-field">
+                      <Label>Type d'emploi *</Label>
+                      <select
+                        value={newUser.type_emploi}
+                        onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
+                        className="form-select"
+                        data-testid="edit-user-employment-select"
+                      >
+                        <option value="temps_plein">Temps plein</option>
+                        <option value="temps_partiel">Temps partiel</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Numéro d'employé</Label>
+                      <Input
+                        value={newUser.numero_employe}
+                        onChange={(e) => setNewUser({...newUser, numero_employe: e.target.value})}
+                        data-testid="edit-user-number-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Date d'embauche *</Label>
+                      <Input
+                        type="date"
+                        value={newUser.date_embauche}
+                        onChange={(e) => setNewUser({...newUser, date_embauche: e.target.value})}
+                        data-testid="edit-user-hire-date-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 3: Compétences */}
+                <div className="form-section">
+                  <h4 className="section-title">📜 Compétences et certifications</h4>
+                  <div className="formations-compact-grid">
+                    {formations.map(formation => (
+                      <label key={formation.id} className="formation-compact-item">
+                        <input
+                          type="checkbox"
+                          checked={newUser.formations.includes(formation.id)}
+                          onChange={() => handleFormationToggle(formation.id)}
+                          data-testid={`edit-formation-${formation.id}`}
+                        />
+                        <div className="formation-compact-content">
+                          <div className="formation-compact-header">
+                            <span className="formation-compact-name">{formation.nom}</span>
+                            {formation.obligatoire && (
+                              <span className="compact-obligatoire">OBL</span>
+                            )}
+                          </div>
+                          <div className="formation-compact-meta">
+                            <span>{formation.duree_heures}h</span>
+                            <span>{formation.validite_mois === 0 ? 'Permanent' : `${formation.validite_mois}m`}</span>
+                          </div>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="formations-summary">
+                    <span className="summary-text">
+                      {newUser.formations.length} compétence(s) sélectionnée(s)
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleUpdateUser} data-testid="update-user-btn">
+                  💾 Sauvegarder les modifications
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
