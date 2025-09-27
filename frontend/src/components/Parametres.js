@@ -86,9 +86,13 @@ const Parametres = ({ user }) => {
   const [systemSettings, setSystemSettings] = useState({
     attribution_auto: true,
     notification_email: true,
-    delai_reponse: 48,
+    delai_reponse_minutes: 2880, // 48h = 2880 minutes
     max_personnes_contact: 5,
-    grade_equivalent: true
+    grade_equivalent: true,
+    // Nouvelles règles de validation pour remplacements
+    privilegier_disponibles: true,
+    grade_egal: true,
+    competences_egales: true
   });
 
   const { toast } = useToast();
