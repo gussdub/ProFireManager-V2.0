@@ -2289,14 +2289,20 @@ const MesDisponibilites = () => {
   };
 
   const handleDateClick = (date) => {
-    const dispo = getDisponibiliteForDate(date);
+    const dateStr = date.toISOString().split('T')[0];
+    const dispo = userDisponibilites.find(d => d.date === dateStr);
+    
     if (dispo) {
-      const typeGardeName = getTypeGardeName(dispo.type_garde_id);
-      toast({
-        title: `📅 ${date.toLocaleDateString('fr-FR')}`,
-        description: `${typeGardeName} | ${dispo.heure_debut} - ${dispo.heure_fin} | ${dispo.statut === 'disponible' ? '✅ Disponible' : '⚡ Préférence'}`,
-        variant: "default"
+      // Afficher les détails à l'écran
+      setSelectedDateDetails({
+        date: date,
+        disponibilite: dispo,
+        typeGardeName: getTypeGardeName(dispo.type_garde_id),
+        couleur: getColorByTypeGarde(dispo.type_garde_id)
       });
+    } else {
+      // Aucune disponibilité pour cette date - ne rien afficher
+      setSelectedDateDetails(null);
     }
   };
 
