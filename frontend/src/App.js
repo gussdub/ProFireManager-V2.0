@@ -2074,7 +2074,346 @@ const Formations = () => {
   );
 };
 
-// Mon Profil Component complet
+// Mes Disponibilités Component - Module dédié
+const MesDisponibilites = () => {
+  const { user } = useAuth();
+  const [userDisponibilites, setUserDisponibilites] = useState([]);
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [availabilityConfig, setAvailabilityConfig] = useState({
+    type_garde_id: '',
+    heure_debut: '08:00',
+    heure_fin: '16:00',
+    statut: 'disponible'
+  });
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchDisponibilites = async () => {
+      try {
+        const [dispoResponse, typesResponse] = await Promise.all([
+          axios.get(`${API}/disponibilites/${user.id}`),
+          axios.get(`${API}/types-garde`)
+        ]);
+        setUserDisponibilites(dispoResponse.data);
+        setTypesGarde(typesResponse.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des disponibilités:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user?.id && user?.type_emploi === 'temps_partiel') {
+      fetchDisponibilites();
+    } else {
+      setLoading(false);
+    }
+  }, [user?.id]);
+
+  const handleSaveAvailability = async () => {
+    if (selectedDates.length === 0) {
+      toast({
+        title: "Aucune date sélectionnée",
+        description: "Veuillez sélectionner au moins une date",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const nouvelles_disponibilites = selectedDates.map(date => ({
+      user_id: user.id,
+      date: date.toISOString().split('T')[0],
+      type_garde_id: availabilityConfig.type_garde_id || null,
+      heure_debut: availabilityConfig.heure_debut,
+      heure_fin: availabilityConfig.heure_fin,
+      statut: availabilityConfig.statut
+    }));
+
+    try {
+      await axios.put(`${API}/disponibilites/${user.id}`, nouvelles_disponibilites);
+      toast({
+        title: "Disponibilités sauvegardées",
+        description: `${selectedDates.length} jours configurés`,
+        variant: "success"
+      });
+      setShowCalendarModal(false);
+      
+      // Reload disponibilités
+      const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
+      setUserDisponibilites(dispoResponse.data);
+      setSelectedDates([]);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getTypeGardeName = (typeGardeId) => {
+    if (!typeGardeId) return 'Tous types';
+    const typeGarde = typesGarde.find(t => t.id === typeGardeId);
+    return typeGarde ? typeGarde.nom : 'Type non spécifié';
+  };
+
+  const getAvailableDates = () => {
+    return userDisponibilites
+      .filter(d => d.statut === 'disponible')
+      .map(d => new Date(d.date));
+  };
+
+  if (user?.type_emploi !== 'temps_partiel') {
+    return (
+      <div className="access-denied">
+        <h1>Module réservé aux employés temps partiel</h1>
+        <p>Ce module permet aux employés à temps partiel de gérer leurs disponibilités.</p>
+      </div>
+    );
+  }
+
+  if (loading) return <div className="loading" data-testid="disponibilites-loading">Chargement...</div>;
+
+  return (
+    <div className="mes-disponibilites">
+      <div className="disponibilites-header">
+        <div>
+          <h1 data-testid="disponibilites-title">Mes disponibilités</h1>
+          <p>Gérez vos créneaux de disponibilité pour les différents types de garde</p>
+        </div>
+        <Button 
+          variant="default" 
+          onClick={() => setShowCalendarModal(true)}
+          data-testid="configure-availability-btn"
+        >
+          📅 Configurer mes disponibilités
+        </Button>
+      </div>
+
+      {/* Résumé des disponibilités */}
+      <div className="availability-overview">
+        <div className="overview-stats">
+          <div className="overview-stat">
+            <span className="stat-number">{userDisponibilites.length}</span>
+            <span className="stat-label">Jours configurés</span>
+          </div>
+          <div className="overview-stat">
+            <span className="stat-number">
+              {userDisponibilites.reduce((total, dispo) => {
+                if (dispo.statut === 'disponible') {
+                  const start = new Date(`1970-01-01T${dispo.heure_debut}`);
+                  const end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                  const hours = (end - start) / (1000 * 60 * 60);
+                  return total + hours;
+                }
+                return total;
+              }, 0)}h
+            </span>
+            <span className="stat-label">Heures totales/mois</span>
+          </div>
+          <div className="overview-stat">
+            <span className="stat-number">{[...new Set(userDisponibilites.map(d => d.type_garde_id).filter(Boolean))].length}</span>
+            <span className="stat-label">Types de garde</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Calendrier des disponibilités */}
+      <div className="availability-main">
+        <div className="calendar-section">
+          <h2>Calendrier de disponibilités - {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h2>
+          
+          <Calendar
+            mode="multiple"
+            selected={getAvailableDates()}
+            className="availability-calendar-main"
+            disabled={(date) => date < new Date().setHours(0,0,0,0)}
+            modifiers={{
+              available: getAvailableDates()
+            }}
+            modifiersStyles={{
+              available: { 
+                backgroundColor: '#dcfce7', 
+                color: '#166534',
+                fontWeight: 'bold'
+              }
+            }}
+          />
+          
+          <div className="calendar-legend">
+            <div className="legend-item">
+              <span className="legend-color available"></span>
+              Jours disponibles configurés
+            </div>
+          </div>
+        </div>
+
+        <div className="availability-details">
+          <h3>Détails des disponibilités</h3>
+          {userDisponibilites.length > 0 ? (
+            <div className="availability-list">
+              {userDisponibilites.map(dispo => (
+                <div key={dispo.id} className="availability-item-detailed">
+                  <div className="availability-date">
+                    <span className="date-value">{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
+                    <span className="date-day">{new Date(dispo.date).toLocaleDateString('fr-FR', { weekday: 'long' })}</span>
+                  </div>
+                  <div className="availability-type">
+                    <span className="type-name">{getTypeGardeName(dispo.type_garde_id)}</span>
+                    <span className="time-range">{dispo.heure_debut} - {dispo.heure_fin}</span>
+                  </div>
+                  <div className="availability-status">
+                    <span className={`status-indicator ${dispo.statut}`}>
+                      {dispo.statut === 'disponible' ? '✅ Disponible' : 
+                       dispo.statut === 'preference' ? '⚡ Préférence' : '❌ Indisponible'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-availability-configured">
+              <div className="empty-state-icon">📅</div>
+              <h3>Aucune disponibilité configurée</h3>
+              <p>Configurez vos créneaux de disponibilité pour que l'équipe puisse planifier vos gardes.</p>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCalendarModal(true)}
+                data-testid="start-configuration-btn"
+              >
+                Commencer la configuration
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Modal de configuration avancée */}
+      {showCalendarModal && (
+        <div className="modal-overlay" onClick={() => setShowCalendarModal(false)}>
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="availability-config-modal">
+            <div className="modal-header">
+              <h3>📅 Configurer mes disponibilités</h3>
+              <Button variant="ghost" onClick={() => setShowCalendarModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="availability-config-advanced">
+                {/* Configuration du type de garde */}
+                <div className="config-section">
+                  <h4>🚒 Type de garde spécifique</h4>
+                  <div className="type-garde-selection">
+                    <Label>Pour quel type de garde êtes-vous disponible ?</Label>
+                    <select
+                      value={availabilityConfig.type_garde_id}
+                      onChange={(e) => setAvailabilityConfig({...availabilityConfig, type_garde_id: e.target.value})}
+                      className="form-select"
+                      data-testid="availability-type-garde-select"
+                    >
+                      <option value="">Tous les types de garde</option>
+                      {typesGarde.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.nom} ({type.heure_debut} - {type.heure_fin})
+                        </option>
+                      ))}
+                    </select>
+                    <small>
+                      Sélectionnez un type spécifique ou laissez "Tous les types" pour une disponibilité générale
+                    </small>
+                  </div>
+                </div>
+
+                {/* Configuration des horaires */}
+                <div className="config-section">
+                  <h4>⏰ Créneaux horaires</h4>
+                  <div className="time-config-row">
+                    <div className="time-field">
+                      <Label>Heure de début</Label>
+                      <Input 
+                        type="time" 
+                        value={availabilityConfig.heure_debut}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_debut: e.target.value})}
+                        data-testid="availability-start-time"
+                      />
+                    </div>
+                    <div className="time-field">
+                      <Label>Heure de fin</Label>
+                      <Input 
+                        type="time" 
+                        value={availabilityConfig.heure_fin}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_fin: e.target.value})}
+                        data-testid="availability-end-time"
+                      />
+                    </div>
+                    <div className="status-field">
+                      <Label>Statut</Label>
+                      <select 
+                        value={availabilityConfig.statut}
+                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
+                        className="form-select"
+                        data-testid="availability-status-select"
+                      >
+                        <option value="disponible">✅ Disponible</option>
+                        <option value="preference">⚡ Préférence</option>
+                        <option value="indisponible">❌ Indisponible</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sélection des dates */}
+                <div className="config-section">
+                  <h4>📆 Sélection des dates</h4>
+                  <div className="calendar-instructions">
+                    <p>Cliquez sur les dates où vous êtes disponible :</p>
+                  </div>
+                  
+                  <Calendar
+                    mode="multiple"
+                    selected={selectedDates}
+                    onSelect={setSelectedDates}
+                    className="interactive-calendar"
+                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
+                  />
+                  
+                  <div className="selection-summary-advanced">
+                    <div className="summary-item">
+                      <strong>Type de garde :</strong> {getTypeGardeName(availabilityConfig.type_garde_id)}
+                    </div>
+                    <div className="summary-item">
+                      <strong>Dates sélectionnées :</strong> {selectedDates?.length || 0} jour(s)
+                    </div>
+                    <div className="summary-item">
+                      <strong>Horaires :</strong> {availabilityConfig.heure_debut} - {availabilityConfig.heure_fin}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCalendarModal(false)}>
+                  Annuler
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleSaveAvailability}
+                  data-testid="save-availability-btn"
+                  disabled={!selectedDates || selectedDates.length === 0}
+                >
+                  Sauvegarder ({selectedDates?.length || 0} jour(s))
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Mon Profil Component épuré - sans disponibilités et remplacements
 const MonProfil = () => {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState(null);
