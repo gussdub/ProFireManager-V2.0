@@ -27,6 +27,16 @@ const Parametres = ({ user }) => {
   const [users, setUsers] = useState([]);
   const { toast } = useToast();
 
+  const joursOptions = [
+    { value: 'monday', label: 'Lundi' },
+    { value: 'tuesday', label: 'Mardi' },
+    { value: 'wednesday', label: 'Mercredi' },
+    { value: 'thursday', label: 'Jeudi' },
+    { value: 'friday', label: 'Vendredi' },
+    { value: 'saturday', label: 'Samedi' },
+    { value: 'sunday', label: 'Dimanche' }
+  ];
+
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchData();
