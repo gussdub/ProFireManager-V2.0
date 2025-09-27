@@ -2354,43 +2354,75 @@ const MesDisponibilites = () => {
                   </div>
                 </div>
 
-                {/* Configuration des horaires */}
-                <div className="config-section">
-                  <h4>⏰ Créneaux horaires</h4>
-                  <div className="time-config-row">
-                    <div className="time-field">
-                      <Label>Heure de début</Label>
-                      <Input 
-                        type="time" 
-                        value={availabilityConfig.heure_debut}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_debut: e.target.value})}
-                        data-testid="availability-start-time"
-                      />
-                    </div>
-                    <div className="time-field">
-                      <Label>Heure de fin</Label>
-                      <Input 
-                        type="time" 
-                        value={availabilityConfig.heure_fin}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_fin: e.target.value})}
-                        data-testid="availability-end-time"
-                      />
-                    </div>
-                    <div className="status-field">
-                      <Label>Statut</Label>
-                      <select 
-                        value={availabilityConfig.statut}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
-                        className="form-select"
-                        data-testid="availability-status-select"
-                      >
-                        <option value="disponible">✅ Disponible</option>
-                        <option value="preference">⚡ Préférence</option>
-                        <option value="indisponible">❌ Indisponible</option>
-                      </select>
+                {/* Configuration des horaires - Seulement si "Tous les types" */}
+                {!availabilityConfig.type_garde_id && (
+                  <div className="config-section">
+                    <h4>⏰ Créneaux horaires personnalisés</h4>
+                    <p className="section-note">Définissez vos horaires de disponibilité générale</p>
+                    <div className="time-config-row">
+                      <div className="time-field">
+                        <Label>Heure de début</Label>
+                        <Input 
+                          type="time" 
+                          value={availabilityConfig.heure_debut}
+                          onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_debut: e.target.value})}
+                          data-testid="availability-start-time"
+                        />
+                      </div>
+                      <div className="time-field">
+                        <Label>Heure de fin</Label>
+                        <Input 
+                          type="time" 
+                          value={availabilityConfig.heure_fin}
+                          onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_fin: e.target.value})}
+                          data-testid="availability-end-time"
+                        />
+                      </div>
+                      <div className="status-field">
+                        <Label>Statut</Label>
+                        <select 
+                          value={availabilityConfig.statut}
+                          onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
+                          className="form-select"
+                          data-testid="availability-status-select"
+                        >
+                          <option value="disponible">✅ Disponible</option>
+                          <option value="preference">⚡ Préférence</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
+
+                {/* Horaires automatiques si type spécifique sélectionné */}
+                {availabilityConfig.type_garde_id && (
+                  <div className="config-section">
+                    <h4>⏰ Horaires du type de garde</h4>
+                    <div className="automatic-hours">
+                      <div className="hours-display">
+                        <span className="hours-label">Horaires automatiques :</span>
+                        <span className="hours-value">
+                          {(() => {
+                            const selectedType = typesGarde.find(t => t.id === availabilityConfig.type_garde_id);
+                            return selectedType ? `${selectedType.heure_debut} - ${selectedType.heure_fin}` : 'Non défini';
+                          })()}
+                        </span>
+                      </div>
+                      <div className="status-selection-simple">
+                        <Label>Statut de disponibilité</Label>
+                        <select 
+                          value={availabilityConfig.statut}
+                          onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
+                          className="form-select"
+                          data-testid="availability-status-select"
+                        >
+                          <option value="disponible">✅ Disponible</option>
+                          <option value="preference">⚡ Préférence</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Sélection des dates */}
                 <div className="config-section">
