@@ -1071,6 +1071,24 @@ const Planning = () => {
         </Button>
       </div>
 
+      {/* Instructions for manual assignment */}
+      {user.role !== 'employe' && (
+        <div className="planning-instructions">
+          <div className="instruction-card">
+            <span className="instruction-icon">👆</span>
+            <div className="instruction-text">
+              <strong>Assignation manuelle :</strong> Cliquez sur une cellule vide (garde vacante) pour assigner un pompier manuellement
+            </div>
+          </div>
+          <div className="instruction-card">
+            <span className="instruction-icon">🤖</span>
+            <div className="instruction-text">
+              <strong>Attribution automatique :</strong> Utilise l'intelligence artificielle selon les priorités configurées
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Planning Grid */}
       <div className="planning-grid">
         <div className="grid-header">
