@@ -1,3 +1,18 @@
+/* Hide Emergent badge */
+#emergent-badge {
+  display: none !important;
+}
+
+/* Hide any badge with "Made with" text */
+a[href*="emergent.sh"] {
+  display: none !important;
+}
+
+/* Hide badges in bottom right corner */
+div[style*="position: fixed"][style*="bottom: 20px"][style*="right: 20px"] {
+  display: none !important;
+}
+
 /* Import FontAwesome */
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
