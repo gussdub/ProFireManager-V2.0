@@ -3253,7 +3253,7 @@ const AppLayout = () => {
       case 'remplacements':
         return <Remplacements />;
       case 'disponibilites':
-        return <MesDisponibilites />;
+        return <MesDisponibilites user={user} />;
       case 'formations':
         return <Formations />;
       case 'rapports':
