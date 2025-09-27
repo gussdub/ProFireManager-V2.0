@@ -179,8 +179,20 @@ const Parametres = ({ user }) => {
   };
 
   const handleUpdateType = async () => {
+    if (!editForm.nom || !editForm.heure_debut || !editForm.heure_fin) {
+      toast({
+        title: "Champs requis",
+        description: "Nom, heure de début et heure de fin sont obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      await axios.put(`${API}/types-garde/${editingItem.id}`, editForm);
+      console.log('Updating type with data:', editForm);
+      const response = await axios.put(`${API}/types-garde/${editingItem.id}`, editForm);
+      console.log('Update response:', response.data);
+      
       toast({
         title: "Type mis à jour",
         description: "Les modifications ont été sauvegardées",
@@ -189,9 +201,10 @@ const Parametres = ({ user }) => {
       setShowEditTypeModal(false);
       fetchData();
     } catch (error) {
+      console.error('Update error:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour",
+        title: "Erreur de modification",
+        description: error.response?.data?.detail || "Impossible de mettre à jour le type de garde",
         variant: "destructive"
       });
     }
