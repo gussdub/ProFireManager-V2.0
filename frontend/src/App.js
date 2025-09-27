@@ -1967,18 +1967,36 @@ const Remplacements = () => {
   );
 };
 
-// Formations Component complet avec données dynamiques
+// Formations Component complet - Planning de formations
 const Formations = () => {
   const { user } = useAuth();
-  const [formations, setFormations] = useState([]);
+  const [sessions, setSessions] = useState([]);
+  const [competences, setCompetences] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newSession, setNewSession] = useState({
+    titre: '',
+    competence_id: '',
+    duree_heures: 8,
+    date_debut: '',
+    heure_debut: '09:00',
+    lieu: '',
+    formateur: '',
+    descriptif: '',
+    plan_cours: '',
+    places_max: 20
+  });
   const { toast } = useToast();
 
   useEffect(() => {
     const fetchFormations = async () => {
       try {
-        const response = await axios.get(`${API}/formations`);
-        setFormations(response.data);
+        const [sessionsResponse, competencesResponse] = await Promise.all([
+          axios.get(`${API}/sessions-formation`),
+          axios.get(`${API}/formations`)
+        ]);
+        setSessions(sessionsResponse.data);
+        setCompetences(competencesResponse.data);
       } catch (error) {
         console.error('Erreur lors du chargement des formations:', error);
       } finally {
@@ -1989,85 +2007,405 @@ const Formations = () => {
     fetchFormations();
   }, []);
 
-  const handleInscription = async (formationId) => {
-    try {
+  const handleCreateSession = async () => {
+    if (!newSession.titre || !newSession.competence_id || !newSession.date_debut || !newSession.lieu || !newSession.formateur) {
       toast({
-        title: "Inscription réussie",
-        description: "Vous êtes maintenant inscrit à cette formation",
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/sessions-formation`, newSession);
+      toast({
+        title: "Formation créée",
+        description: "La session de formation a été programmée avec succès",
         variant: "success"
       });
+      setShowCreateModal(false);
+      resetNewSession();
+      
+      // Reload sessions
+      const response = await axios.get(`${API}/sessions-formation`);
+      setSessions(response.data);
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Impossible de s'inscrire à cette formation",
+        description: "Impossible de créer la session de formation",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleInscription = async (sessionId, isInscrit) => {
+    try {
+      if (isInscrit) {
+        await axios.delete(`${API}/sessions-formation/${sessionId}/desinscription`);
+        toast({
+          title: "Désinscription réussie",
+          description: "Vous êtes désinscrit de cette formation",
+          variant: "success"
+        });
+      } else {
+        await axios.post(`${API}/sessions-formation/${sessionId}/inscription`);
+        toast({
+          title: "Inscription réussie",
+          description: "Vous êtes maintenant inscrit à cette formation",
+          variant: "success"
+        });
+      }
+      
+      // Reload sessions
+      const response = await axios.get(`${API}/sessions-formation`);
+      setSessions(response.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de traiter l'inscription",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetNewSession = () => {
+    setNewSession({
+      titre: '',
+      competence_id: '',
+      duree_heures: 8,
+      date_debut: '',
+      heure_debut: '09:00',
+      lieu: '',
+      formateur: '',
+      descriptif: '',
+      plan_cours: '',
+      places_max: 20
+    });
+  };
+
+  const getCompetenceName = (competenceId) => {
+    const competence = competences.find(c => c.id === competenceId);
+    return competence ? competence.nom : 'Compétence non trouvée';
+  };
+
+  const isUserInscrit = (session) => {
+    return session.participants.includes(user.id);
+  };
+
+  const getStatutColor = (statut) => {
+    switch (statut) {
+      case 'planifie': return '#3B82F6';
+      case 'en_cours': return '#F59E0B';
+      case 'termine': return '#10B981';
+      case 'annule': return '#EF4444';
+      default: return '#6B7280';
+    }
+  };
+
+  const getStatutLabel = (statut) => {
+    switch (statut) {
+      case 'planifie': return 'Planifiée';
+      case 'en_cours': return 'En cours';
+      case 'termine': return 'Terminée';
+      case 'annule': return 'Annulée';
+      default: return statut;
     }
   };
 
   if (loading) return <div className="loading" data-testid="formations-loading">Chargement des formations...</div>;
 
   return (
-    <div className="formations">
+    <div className="formations-planning">
       <div className="formations-header">
         <div>
-          <h1 data-testid="formations-title">Gestion des formations</h1>
-          <p>Formations disponibles et inscriptions</p>
+          <h1 data-testid="formations-title">Planning des formations</h1>
+          <p>Sessions de formation et maintien des compétences</p>
         </div>
-        {user.role === 'admin' && (
-          <Button variant="default" data-testid="create-formation-btn">
-            + Nouvelle formation
+        {user.role !== 'employe' && (
+          <Button 
+            variant="default" 
+            onClick={() => setShowCreateModal(true)}
+            data-testid="create-session-btn"
+          >
+            📚 Créer une formation
           </Button>
         )}
       </div>
 
-      <div className="formations-grid">
-        {formations.map(formation => (
-          <div key={formation.id} className="formation-card" data-testid={`formation-${formation.id}`}>
-            <div className="formation-header">
-              <h3>{formation.nom}</h3>
-              {formation.obligatoire && (
-                <span className="obligatoire-badge">Obligatoire</span>
-              )}
-            </div>
-            
-            <div className="formation-details">
-              <p className="formation-description">{formation.description}</p>
-              
-              <div className="formation-meta">
-                <div className="meta-item">
-                  <span className="meta-icon">⏱️</span>
-                  <span>{formation.duree_heures}h de formation</span>
-                </div>
-                <div className="meta-item">
-                  <span className="meta-icon">📅</span>
-                  <span>Valide {formation.validite_mois} mois</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="formation-actions">
-              <Button 
-                variant="default" 
-                onClick={() => handleInscription(formation.id)}
-                data-testid={`inscribe-formation-${formation.id}`}
-              >
-                S'inscrire
-              </Button>
-              {user.role === 'admin' && (
-                <Button variant="ghost" data-testid={`edit-formation-${formation.id}`}>
-                  ✏️
-                </Button>
-              )}
-            </div>
+      {/* Statistiques des formations */}
+      <div className="formations-stats">
+        <div className="stat-card-formation">
+          <div className="stat-icon">📅</div>
+          <div className="stat-content">
+            <span className="stat-number">{sessions.filter(s => s.statut === 'planifie').length}</span>
+            <span className="stat-label">Formations planifiées</span>
           </div>
-        ))}
+        </div>
+        <div className="stat-card-formation">
+          <div className="stat-icon">👥</div>
+          <div className="stat-content">
+            <span className="stat-number">{sessions.reduce((total, s) => total + s.participants.length, 0)}</span>
+            <span className="stat-label">Participants inscrits</span>
+          </div>
+        </div>
+        <div className="stat-card-formation">
+          <div className="stat-icon">🎓</div>
+          <div className="stat-content">
+            <span className="stat-number">{sessions.filter(s => s.statut === 'termine').length}</span>
+            <span className="stat-label">Formations terminées</span>
+          </div>
+        </div>
       </div>
 
-      {formations.length === 0 && (
-        <div className="empty-state">
-          <h3>Aucune formation disponible</h3>
-          <p>Les formations seront affichées ici une fois configurées par l'administrateur.</p>
+      {/* Liste des sessions de formation */}
+      <div className="sessions-list">
+        {sessions.length > 0 ? (
+          <div className="sessions-grid">
+            {sessions.map(session => (
+              <div key={session.id} className="session-card" data-testid={`session-${session.id}`}>
+                <div className="session-header">
+                  <div className="session-title-area">
+                    <h3>{session.titre}</h3>
+                    <span 
+                      className="session-statut" 
+                      style={{ backgroundColor: getStatutColor(session.statut) }}
+                    >
+                      {getStatutLabel(session.statut)}
+                    </span>
+                  </div>
+                  <div className="session-competence">
+                    <span className="competence-badge">{getCompetenceName(session.competence_id)}</span>
+                  </div>
+                </div>
+
+                <div className="session-details">
+                  <div className="detail-row">
+                    <span className="detail-icon">📅</span>
+                    <span>{new Date(session.date_debut).toLocaleDateString('fr-FR')} à {session.heure_debut}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-icon">⏱️</span>
+                    <span>{session.duree_heures}h de formation</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-icon">📍</span>
+                    <span>{session.lieu}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="detail-icon">👨‍🏫</span>
+                    <span>{session.formateur}</span>
+                  </div>
+                </div>
+
+                <div className="session-description">
+                  <p>{session.descriptif}</p>
+                </div>
+
+                <div className="session-participants">
+                  <div className="participants-count">
+                    <span className="count-badge">
+                      {session.participants.length}/{session.places_max}
+                    </span>
+                    <span className="participants-label">participants</span>
+                  </div>
+                  <div className="participants-progress">
+                    <div 
+                      className="progress-bar"
+                      style={{ 
+                        width: `${(session.participants.length / session.places_max) * 100}%`,
+                        backgroundColor: session.participants.length >= session.places_max ? '#EF4444' : '#10B981'
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="session-actions">
+                  {session.statut === 'planifie' && (
+                    <Button
+                      variant={isUserInscrit(session) ? "destructive" : "default"}
+                      onClick={() => handleInscription(session.id, isUserInscrit(session))}
+                      data-testid={`inscription-btn-${session.id}`}
+                      disabled={!isUserInscrit(session) && session.participants.length >= session.places_max}
+                    >
+                      {isUserInscrit(session) ? '❌ Se désinscrire' : 
+                       session.participants.length >= session.places_max ? '🚫 Complet' : '✅ S\'inscrire'}
+                    </Button>
+                  )}
+                  {user.role !== 'employe' && (
+                    <Button variant="ghost" size="sm" data-testid={`edit-session-${session.id}`}>
+                      ✏️ Modifier
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="no-sessions">
+            <h3>Aucune formation planifiée</h3>
+            <p>Les sessions de formation apparaîtront ici une fois programmées.</p>
+            {user.role !== 'employe' && (
+              <Button 
+                variant="outline" 
+                onClick={() => setShowCreateModal(true)}
+                className="mt-4"
+              >
+                Créer la première formation
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Modal de création de session */}
+      {showCreateModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-session-modal">
+            <div className="modal-header">
+              <h3>📚 Créer une session de formation</h3>
+              <Button variant="ghost" onClick={() => setShowCreateModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="session-form-grid">
+                <div className="form-section">
+                  <h4 className="section-title">📋 Informations générales</h4>
+                  <div className="form-field">
+                    <Label>Titre de la formation *</Label>
+                    <Input
+                      value={newSession.titre}
+                      onChange={(e) => setNewSession({...newSession, titre: e.target.value})}
+                      placeholder="Ex: Formation sauvetage aquatique - Niveau 1"
+                      data-testid="session-titre-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Compétence associée *</Label>
+                    <select
+                      value={newSession.competence_id}
+                      onChange={(e) => setNewSession({...newSession, competence_id: e.target.value})}
+                      className="form-select"
+                      data-testid="session-competence-select"
+                    >
+                      <option value="">Sélectionner une compétence</option>
+                      {competences.map(comp => (
+                        <option key={comp.id} value={comp.id}>
+                          {comp.nom} - {comp.duree_heures}h
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Date de début *</Label>
+                      <Input
+                        type="date"
+                        value={newSession.date_debut}
+                        onChange={(e) => setNewSession({...newSession, date_debut: e.target.value})}
+                        min={new Date().toISOString().split('T')[0]}
+                        data-testid="session-date-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Heure de début *</Label>
+                      <Input
+                        type="time"
+                        value={newSession.heure_debut}
+                        onChange={(e) => setNewSession({...newSession, heure_debut: e.target.value})}
+                        data-testid="session-heure-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Durée (heures) *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="40"
+                        value={newSession.duree_heures}
+                        onChange={(e) => setNewSession({...newSession, duree_heures: parseInt(e.target.value)})}
+                        data-testid="session-duree-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Nombre de places *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={newSession.places_max}
+                        onChange={(e) => setNewSession({...newSession, places_max: parseInt(e.target.value)})}
+                        data-testid="session-places-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h4 className="section-title">📍 Logistique</h4>
+                  <div className="form-field">
+                    <Label>Lieu de formation *</Label>
+                    <Input
+                      value={newSession.lieu}
+                      onChange={(e) => setNewSession({...newSession, lieu: e.target.value})}
+                      placeholder="Ex: Caserne centrale, Salle de formation A"
+                      data-testid="session-lieu-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Formateur *</Label>
+                    <Input
+                      value={newSession.formateur}
+                      onChange={(e) => setNewSession({...newSession, formateur: e.target.value})}
+                      placeholder="Ex: Capitaine Martin Dubois"
+                      data-testid="session-formateur-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h4 className="section-title">📝 Contenu pédagogique</h4>
+                  <div className="form-field">
+                    <Label>Description de la formation *</Label>
+                    <textarea
+                      value={newSession.descriptif}
+                      onChange={(e) => setNewSession({...newSession, descriptif: e.target.value})}
+                      placeholder="Décrivez les objectifs et le contenu de cette formation..."
+                      rows="3"
+                      className="form-textarea"
+                      data-testid="session-descriptif-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Plan de cours (optionnel)</Label>
+                    <textarea
+                      value={newSession.plan_cours}
+                      onChange={(e) => setNewSession({...newSession, plan_cours: e.target.value})}
+                      placeholder="Détaillez le programme, les modules, les exercices pratiques..."
+                      rows="4"
+                      className="form-textarea"
+                      data-testid="session-plan-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleCreateSession} data-testid="create-session-submit-btn">
+                  📚 Créer la formation
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
