@@ -408,7 +408,7 @@ const Parametres = ({ user }) => {
               </div>
               <Button 
                 variant="default" 
-                onClick={() => alert('Création en cours de développement')}
+                onClick={() => setShowCreateTypeModal(true)}
                 data-testid="create-type-garde-btn"
               >
                 + Nouveau Type de Garde
