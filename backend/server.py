@@ -147,7 +147,7 @@ class Formation(BaseModel):
     nom: str
     description: str = ""
     duree_heures: int = 0
-    validite_mois: int = 12  # Durée de validité en mois
+    validite_mois: int = 12  # 0 = Pas de renouvellement
     obligatoire: bool = False
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
@@ -155,7 +155,7 @@ class FormationCreate(BaseModel):
     nom: str
     description: str = ""
     duree_heures: int = 0
-    validite_mois: int = 12
+    validite_mois: int = 12  # 0 = Pas de renouvellement
     obligatoire: bool = False
 
 class Disponibilite(BaseModel):
