@@ -1533,6 +1533,326 @@ const Parametres = () => {
         )}
       </div>
 
+      {/* Modals pour créer les éléments */}
+      {showCreateTypeModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateTypeModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-type-modal">
+            <div className="modal-header">
+              <h3>Nouveau type de garde</h3>
+              <Button variant="ghost" onClick={() => setShowCreateTypeModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label>Nom du type de garde *</Label>
+                  <Input
+                    value={newTypeGarde.nom}
+                    onChange={(e) => setNewTypeGarde({...newTypeGarde, nom: e.target.value})}
+                    placeholder="Ex: Garde Interne Nuit"
+                    data-testid="type-nom-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Heure de début *</Label>
+                    <Input
+                      type="time"
+                      value={newTypeGarde.heure_debut}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, heure_debut: e.target.value})}
+                      data-testid="type-heure-debut-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Heure de fin *</Label>
+                    <Input
+                      type="time"
+                      value={newTypeGarde.heure_fin}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, heure_fin: e.target.value})}
+                      data-testid="type-heure-fin-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Personnel requis</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={newTypeGarde.personnel_requis}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, personnel_requis: parseInt(e.target.value)})}
+                      data-testid="type-personnel-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Couleur d'affichage</Label>
+                    <Input
+                      type="color"
+                      value={newTypeGarde.couleur}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, couleur: e.target.value})}
+                      data-testid="type-couleur-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Jours d'application</Label>
+                  <div className="days-selection">
+                    {joursOptions.map(jour => (
+                      <label key={jour.value} className="day-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={newTypeGarde.jours_application.includes(jour.value)}
+                          onChange={() => handleJourChange(jour.value)}
+                        />
+                        <span>{jour.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="setting-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={newTypeGarde.officier_obligatoire}
+                      onChange={(e) => setNewTypeGarde({...newTypeGarde, officier_obligatoire: e.target.checked})}
+                    />
+                    <span>Officier obligatoire pour cette garde</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateTypeModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleCreateTypeGarde} data-testid="submit-type-garde-btn">
+                  Créer le type de garde
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCreateFormationModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateFormationModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-formation-modal">
+            <div className="modal-header">
+              <h3>Nouvelle formation</h3>
+              <Button variant="ghost" onClick={() => setShowCreateFormationModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label>Nom de la formation *</Label>
+                  <Input
+                    value={newFormation.nom}
+                    onChange={(e) => setNewFormation({...newFormation, nom: e.target.value})}
+                    placeholder="Ex: Formation Échelles"
+                    data-testid="formation-nom-input"
+                  />
+                </div>
+
+                <div className="form-field">
+                  <Label>Description</Label>
+                  <textarea
+                    value={newFormation.description}
+                    onChange={(e) => setNewFormation({...newFormation, description: e.target.value})}
+                    placeholder="Description détaillée de la formation..."
+                    rows="3"
+                    className="form-textarea"
+                    data-testid="formation-description-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Durée (heures)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={newFormation.duree_heures}
+                      onChange={(e) => setNewFormation({...newFormation, duree_heures: parseInt(e.target.value)})}
+                      data-testid="formation-duree-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Validité (mois)</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={newFormation.validite_mois}
+                      onChange={(e) => setNewFormation({...newFormation, validite_mois: parseInt(e.target.value)})}
+                      data-testid="formation-validite-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="setting-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={newFormation.obligatoire}
+                      onChange={(e) => setNewFormation({...newFormation, obligatoire: e.target.checked})}
+                    />
+                    <span>Formation obligatoire</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateFormationModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleCreateFormation} data-testid="submit-formation-btn">
+                  Créer la formation
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCreateUserModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateUserModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-account-modal">
+            <div className="modal-header">
+              <h3>Nouveau compte d'accès</h3>
+              <Button variant="ghost" onClick={() => setShowCreateUserModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Prénom *</Label>
+                    <Input
+                      value={newUser.prenom}
+                      onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
+                      data-testid="account-prenom-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Nom *</Label>
+                    <Input
+                      value={newUser.nom}
+                      onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
+                      data-testid="account-nom-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Email *</Label>
+                  <Input
+                    type="email"
+                    value={newUser.email}
+                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                    data-testid="account-email-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Téléphone</Label>
+                    <Input
+                      value={newUser.telephone}
+                      onChange={(e) => setNewUser({...newUser, telephone: e.target.value})}
+                      data-testid="account-phone-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Contact d'urgence</Label>
+                    <Input
+                      value={newUser.contact_urgence}
+                      onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
+                      data-testid="account-emergency-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Grade</Label>
+                    <select
+                      value={newUser.grade}
+                      onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
+                      className="form-select"
+                      data-testid="account-grade-select"
+                    >
+                      {grades.map(grade => (
+                        <option key={grade} value={grade}>{grade}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-field">
+                    <Label>Type d'emploi</Label>
+                    <select
+                      value={newUser.type_emploi}
+                      onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
+                      className="form-select"
+                      data-testid="account-employment-select"
+                    >
+                      <option value="temps_plein">Temps plein</option>
+                      <option value="temps_partiel">Temps partiel</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Rôle/Autorisation *</Label>
+                  <select
+                    value={newUser.role}
+                    onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                    className="form-select"
+                    data-testid="account-role-select"
+                  >
+                    {roles.map(role => (
+                      <option key={role.value} value={role.value}>{role.label}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Numéro d'employé</Label>
+                    <Input
+                      value={newUser.numero_employe}
+                      onChange={(e) => setNewUser({...newUser, numero_employe: e.target.value})}
+                      placeholder="Automatique si vide"
+                      data-testid="account-number-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Mot de passe temporaire</Label>
+                    <Input
+                      type="password"
+                      value={newUser.mot_de_passe}
+                      onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
+                      data-testid="account-password-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateUserModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" onClick={handleCreateUser} data-testid="submit-account-btn">
+                  Créer le compte
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Main Application Layout
 const AppLayout = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
