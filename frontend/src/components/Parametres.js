@@ -243,6 +243,29 @@ const Parametres = ({ user }) => {
                   />
                 </div>
               </div>
+              
+              <div className="form-field">
+                <Label>Jours d'application (récurrence)</Label>
+                <div className="days-selection">
+                  {joursOptions.map(jour => (
+                    <label key={jour.value} className="day-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={editForm.jours_application.includes(jour.value)}
+                        onChange={() => {
+                          const updatedJours = editForm.jours_application.includes(jour.value)
+                            ? editForm.jours_application.filter(j => j !== jour.value)
+                            : [...editForm.jours_application, jour.value];
+                          setEditForm({...editForm, jours_application: updatedJours});
+                        }}
+                        data-testid={`edit-day-${jour.value}`}
+                      />
+                      <span>{jour.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              
               <div className="form-field">
                 <label className="checkbox-label">
                   <input
