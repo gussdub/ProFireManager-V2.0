@@ -834,6 +834,28 @@ const Personnel = () => {
                     </div>
                   </div>
 
+                  {/* Option fonction supérieur pour les pompiers */}
+                  {newUser.grade === 'Pompier' && (
+                    <div className="form-field">
+                      <div className="fonction-superieur-option">
+                        <label className="fonction-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={newUser.fonction_superieur}
+                            onChange={(e) => setNewUser({...newUser, fonction_superieur: e.target.checked})}
+                            data-testid="user-fonction-superieur"
+                          />
+                          <div className="fonction-content">
+                            <span className="fonction-title">🎖️ Fonction supérieur</span>
+                            <span className="fonction-description">
+                              Ce pompier peut agir comme Lieutenant en dernier recours dans les affectations
+                            </span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="form-row">
                     <div className="form-field">
                       <Label>Numéro d'employé</Label>
