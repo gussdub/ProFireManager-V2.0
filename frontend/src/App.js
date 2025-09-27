@@ -682,15 +682,21 @@ const Personnel = () => {
                 {user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
               </span>
               {user.type_emploi === 'temps_partiel' && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => handleViewDisponibilites(user)}
-                  className="mt-1"
-                  data-testid={`view-availability-${user.id}`}
-                >
-                  📅 Disponibilités
-                </Button>
+                <div className="temps-partiel-info">
+                  <div className="heures-max-info">
+                    <span className="heures-max-label">Max :</span>
+                    <span className="heures-max-value">{user.heures_max_semaine || 40}h/sem</span>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => handleViewDisponibilites(user)}
+                    className="mt-1"
+                    data-testid={`view-availability-${user.id}`}
+                  >
+                    📅 Disponibilités
+                  </Button>
+                </div>
               )}
             </div>
 
