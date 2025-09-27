@@ -1465,6 +1465,110 @@ const Parametres = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de modification d'accès utilisateur */}
+      {showEditAccessModal && editingUser && (
+        <div className="modal-overlay" onClick={() => setShowEditAccessModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="edit-access-modal">
+            <div className="modal-header">
+              <h3>Modifier l'accès - {editingUser.prenom} {editingUser.nom}</h3>
+              <Button variant="ghost" onClick={() => setShowEditAccessModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="current-user-info">
+                <div className="user-summary">
+                  <div className="user-avatar">
+                    <span className="avatar-icon">👤</span>
+                  </div>
+                  <div className="user-details">
+                    <h4>{editingUser.prenom} {editingUser.nom}</h4>
+                    <p>{editingUser.email}</p>
+                    <p>Grade: {editingUser.grade} | {editingUser.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="access-form">
+                <div className="form-field">
+                  <Label>Rôle/Autorisation</Label>
+                  <select
+                    value={userAccess.role}
+                    onChange={(e) => setUserAccess({...userAccess, role: e.target.value})}
+                    className="form-select"
+                    data-testid="edit-user-role-select"
+                  >
+                    <option value="employe">👤 Employé</option>
+                    <option value="superviseur">🎖️ Superviseur</option>
+                    <option value="admin">👑 Administrateur</option>
+                  </select>
+                  <small className="field-description">
+                    Détermine les modules et fonctionnalités accessibles
+                  </small>
+                </div>
+
+                <div className="form-field">
+                  <Label>Statut du compte</Label>
+                  <select
+                    value={userAccess.statut}
+                    onChange={(e) => setUserAccess({...userAccess, statut: e.target.value})}
+                    className="form-select"
+                    data-testid="edit-user-status-select"
+                  >
+                    <option value="Actif">✅ Actif - Peut se connecter</option>
+                    <option value="Inactif">❌ Inactif - Connexion bloquée</option>
+                  </select>
+                  <small className="field-description">
+                    Un compte inactif ne peut plus se connecter temporairement
+                  </small>
+                </div>
+
+                <div className="permissions-preview">
+                  <h4>Aperçu des permissions :</h4>
+                  <div className="permissions-list">
+                    {userAccess.role === 'admin' && (
+                      <div className="permission-group">
+                        <span className="permission-title">👑 Administrateur</span>
+                        <ul>
+                          <li>Accès complet à tous les modules</li>
+                          <li>Gestion du personnel et création de comptes</li>
+                          <li>Configuration système et paramètres</li>
+                        </ul>
+                      </div>
+                    )}
+                    {userAccess.role === 'superviseur' && (
+                      <div className="permission-group">
+                        <span className="permission-title">🎖️ Superviseur</span>
+                        <ul>
+                          <li>Gestion du personnel (consultation)</li>
+                          <li>Validation du planning et remplacements</li>
+                          <li>Accès aux formations</li>
+                        </ul>
+                      </div>
+                    )}
+                    {userAccess.role === 'employe' && (
+                      <div className="permission-group">
+                        <span className="permission-title">👤 Employé</span>
+                        <ul>
+                          <li>Consultation du planning personnel</li>
+                          <li>Demandes de remplacement</li>
+                          <li>Gestion des disponibilités</li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEditAccessModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleUpdateAccess} data-testid="save-access-btn">
+                  Sauvegarder les modifications
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
