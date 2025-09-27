@@ -1391,7 +1391,7 @@ const MonProfil = () => {
             </div>
           </div>
 
-          {/* Section disponibilités (uniquement pour temps partiel) */}
+          {/* Section disponibilités avec calendrier mensuel (uniquement pour temps partiel) */}
           {userProfile?.type_emploi === 'temps_partiel' && (
             <div className="profile-section">
               <div className="section-header">
@@ -1401,46 +1401,108 @@ const MonProfil = () => {
                   onClick={() => setShowDispoModal(true)}
                   data-testid="edit-availability-btn"
                 >
-                  ✏️ Modifier
+                  ✏️ Modifier le calendrier
                 </Button>
               </div>
               <p className="section-description">
-                En tant qu'employé à temps partiel, définissez vos créneaux de disponibilité.
+                En tant qu'employé à temps partiel, définissez vos créneaux de disponibilité sur le calendrier.
               </p>
-              <div className="availability-section">
-                {userDisponibilites.length > 0 ? (
-                  <div className="disponibilites-list-profile">
-                    {userDisponibilites.map(dispo => (
-                      <div key={dispo.id} className="disponibilite-profile-item">
-                        <div className="dispo-day">
-                          <strong>{translateDay(dispo.jour_semaine)}</strong>
-                        </div>
-                        <div className="dispo-time">
-                          {dispo.heure_debut} - {dispo.heure_fin}
-                        </div>
-                        <div className="dispo-status">
-                          <span className={`status ${dispo.statut}`}>
-                            {dispo.statut === 'disponible' ? '✅ Disponible' : 
-                             dispo.statut === 'indisponible' ? '❌ Indisponible' : 
-                             '⚡ Préférence'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+              
+              <div className="availability-calendar-section">
+                <div className="calendar-view">
+                  <h3>Calendrier de disponibilités - {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>
+                  
+                  <Calendar
+                    mode="multiple"
+                    className="availability-calendar"
+                    modifiers={{
+                      available: userDisponibilites.map(d => {
+                        // Create dates for each day where user is available
+                        const today = new Date();
+                        const daysOfWeek = {
+                          'monday': 1, 'tuesday': 2, 'wednesday': 3, 'thursday': 4,
+                          'friday': 5, 'saturday': 6, 'sunday': 0
+                        };
+                        
+                        // Get all dates in current month for this day of week
+                        const availableDates = [];
+                        const year = today.getFullYear();
+                        const month = today.getMonth();
+                        const firstDay = new Date(year, month, 1);
+                        const lastDay = new Date(year, month + 1, 0);
+                        
+                        for (let date = new Date(firstDay); date <= lastDay; date.setDate(date.getDate() + 1)) {
+                          if (date.getDay() === daysOfWeek[d.jour_semaine]) {
+                            availableDates.push(new Date(date));
+                          }
+                        }
+                        return availableDates;
+                      }).flat()
+                    }}
+                    modifiersStyles={{
+                      available: { 
+                        backgroundColor: '#dcfce7', 
+                        color: '#166534',
+                        fontWeight: 'bold'
+                      }
+                    }}
+                  />
+                  
+                  <div className="calendar-legend">
+                    <div className="legend-item">
+                      <span className="legend-color available"></span>
+                      Jours disponibles configurés
+                    </div>
+                    <div className="legend-item">
+                      <span className="legend-color unavailable"></span>
+                      Jours non configurés
+                    </div>
                   </div>
-                ) : (
-                  <div className="no-disponibilites">
-                    <p>📅 Aucune disponibilité renseignée</p>
-                    <Button 
-                      variant="outline" 
-                      className="mt-2"
-                      onClick={() => setShowDispoModal(true)}
-                      data-testid="add-availability-btn"
-                    >
-                      + Ajouter mes disponibilités
-                    </Button>
+                </div>
+                
+                <div className="availability-summary-card">
+                  <h4>Résumé de mes disponibilités</h4>
+                  <div className="summary-stats">
+                    <div className="summary-stat">
+                      <span className="stat-number">{userDisponibilites.filter(d => d.statut === 'disponible').length}</span>
+                      <span className="stat-label">Jours/semaine</span>
+                    </div>
+                    <div className="summary-stat">
+                      <span className="stat-number">
+                        {userDisponibilites.reduce((total, dispo) => {
+                          if (dispo.statut === 'disponible') {
+                            const start = new Date(`1970-01-01T${dispo.heure_debut}`);
+                            const end = new Date(`1970-01-01T${dispo.heure_fin}`);
+                            const hours = (end - start) / (1000 * 60 * 60);
+                            return total + hours;
+                          }
+                          return total;
+                        }, 0)}h
+                      </span>
+                      <span className="stat-label">Par semaine</span>
+                    </div>
                   </div>
-                )}
+                  
+                  <div className="current-availability">
+                    <h5>Créneaux actuels :</h5>
+                    {userDisponibilites.length > 0 ? (
+                      <ul className="availability-list">
+                        {userDisponibilites.map(dispo => (
+                          <li key={dispo.id} className="availability-item">
+                            <span className="day-name">{translateDay(dispo.jour_semaine)}</span>
+                            <span className="time-range">{dispo.heure_debut} - {dispo.heure_fin}</span>
+                            <span className={`availability-status ${dispo.statut}`}>
+                              {dispo.statut === 'disponible' ? '✅' : 
+                               dispo.statut === 'indisponible' ? '❌' : '⚡'}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="no-availability">Aucune disponibilité configurée</p>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}
