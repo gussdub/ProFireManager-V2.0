@@ -39,11 +39,165 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60  # 24 hours
 # Simplified password hashing
 import hashlib
 
-def get_password_hash(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+# Helper functions
+def validate_complex_password(password: str) -> bool:
+    """
+    Valide qu'un mot de passe respecte les critères de complexité :
+    - 8 caractères minimum
+    - 1 majuscule
+    - 1 chiffre  
+    - 1 caractère spécial (!@#$%^&*+-?())
+    """
+    if len(password) < 8:
+        return False
+    
+    has_uppercase = bool(re.search(r'[A-Z]', password))
+    has_digit = bool(re.search(r'\d', password))
+    has_special = bool(re.search(r'[!@#$%^&*+\-?()]', password))
+    
+    return has_uppercase and has_digit and has_special
+
+def send_welcome_email(user_email: str, user_name: str, user_role: str, temp_password: str):
+    """
+    Envoie un email de bienvenue avec les informations de connexion
+    """
+    try:
+        # Définir les modules selon le rôle
+        modules_by_role = {
+            'admin': [
+                "📊 Tableau de bord - Vue d'ensemble et statistiques",
+                "👥 Personnel - Gestion complète des pompiers", 
+                "📅 Planning - Attribution automatique et manuelle",
+                "🔄 Remplacements - Validation des demandes",
+                "📚 Formations - Inscription et gestion",
+                "📈 Rapports - Analyses et exports",
+                "⚙️ Paramètres - Configuration système",
+                "👤 Mon profil - Informations personnelles"
+            ],
+            'superviseur': [
+                "📊 Tableau de bord - Vue d'ensemble et statistiques",
+                "👥 Personnel - Consultation des pompiers",
+                "📅 Planning - Gestion et validation", 
+                "🔄 Remplacements - Approbation des demandes",
+                "📚 Formations - Inscription et gestion",
+                "👤 Mon profil - Informations personnelles"
+            ],
+            'employe': [
+                "📊 Tableau de bord - Vue d'ensemble personnalisée",
+                "📅 Planning - Consultation de votre planning",
+                "🔄 Remplacements - Demandes de remplacement",
+                "📚 Formations - Inscription aux formations",
+                "👤 Mon profil - Informations et disponibilités"
+            ]
+        }
+        
+        role_name = {
+            'admin': 'Administrateur',
+            'superviseur': 'Superviseur', 
+            'employe': 'Employé'
+        }.get(user_role, 'Utilisateur')
+        
+        user_modules = modules_by_role.get(user_role, modules_by_role['employe'])
+        modules_html = ''.join([f'<li style="margin-bottom: 8px;">{module}</li>' for module in user_modules])
+        
+        subject = f"Bienvenue dans ProFireManager v2.0 - Votre compte {role_name}"
+        
+        html_content = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 80px; height: 80px; background: #dc2626; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                        <span style="color: white; font-size: 32px;">🔥</span>
+                    </div>
+                    <h1 style="color: #dc2626; margin: 0;">ProFireManager v2.0</h1>
+                    <p style="color: #666; margin: 5px 0;">Système de gestion des services d'incendie</p>
+                </div>
+                
+                <h2 style="color: #1e293b;">Bonjour {user_name},</h2>
+                
+                <p>Votre compte <strong>{role_name}</strong> a été créé avec succès dans ProFireManager v2.0, le système de gestion des horaires et remplacements automatisés pour les services d'incendie du Canada.</p>
+                
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <h3 style="color: #dc2626; margin-top: 0;">🔑 Informations de connexion :</h3>
+                    <p><strong>Email :</strong> {user_email}</p>
+                    <p><strong>Mot de passe temporaire :</strong> {temp_password}</p>
+                    <p style="color: #dc2626; font-weight: bold;">⚠️ Veuillez modifier votre mot de passe lors de votre première connexion</p>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="https://emergency-shifts-1.preview.emergentagent.com" 
+                       style="background: #dc2626; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
+                        🚒 Accéder à ProFireManager
+                    </a>
+                    <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                        💡 Conseil : Ajoutez ce lien à vos favoris pour un accès rapide
+                    </p>
+                </div>
+                
+                <h3 style="color: #1e293b;">📋 Modules disponibles pour votre rôle ({role_name}) :</h3>
+                <ul style="background: #f0fdf4; border-left: 4px solid #10b981; padding: 15px 20px; margin: 15px 0;">
+                    {modules_html}
+                </ul>
+                
+                <div style="background: #fef3c7; border: 1px solid #fcd34d; border-radius: 8px; padding: 15px; margin: 20px 0;">
+                    <h4 style="color: #92400e; margin-top: 0;">🔒 Sécurité de votre compte :</h4>
+                    <ul style="color: #78350f; margin: 10px 0;">
+                        <li>Modifiez votre mot de passe temporaire dès votre première connexion</li>
+                        <li>Utilisez un mot de passe complexe (8 caractères, majuscule, chiffre, caractère spécial)</li>
+                        <li>Ne partagez jamais vos identifiants</li>
+                        <li>Déconnectez-vous après chaque session</li>
+                    </ul>
+                </div>
+                
+                <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
+                
+                <p style="color: #666; font-size: 14px; text-align: center;">
+                    Cet email a été envoyé automatiquement par ProFireManager v2.0.<br>
+                    Si vous avez des questions, contactez votre administrateur système.
+                </p>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <p style="color: #999; font-size: 12px;">
+                        ProFireManager v2.0 - Système de gestion des services d'incendie du Canada<br>
+                        Développé pour optimiser la gestion des horaires et remplacements automatisés
+                    </p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        
+        # Configuration SendGrid
+        sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
+        sender_email = os.environ.get('SENDER_EMAIL', 'noreply@profiremanager.ca')
+        
+        if not sendgrid_api_key or sendgrid_api_key == 'SG.test-key-for-demo':
+            # Mode démo - simuler l'envoi
+            print(f"[DEMO MODE] Email envoyé à {user_email}: {subject}")
+            return True
+        
+        message = Mail(
+            from_email=sender_email,
+            to_emails=user_email,
+            subject=subject,
+            html_content=html_content
+        )
+        
+        sg = SendGridAPIClient(sendgrid_api_key)
+        response = sg.send(message)
+        
+        return response.status_code == 202
+        
+    except Exception as e:
+        print(f"Erreur envoi email: {str(e)}")
+        return False
 
 def verify_password(plain_password, hashed_password):
     return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
+
+def get_password_hash(password):
+    return hashlib.sha256(password.encode()).hexdigest()
 
 security = HTTPBearer()
 
