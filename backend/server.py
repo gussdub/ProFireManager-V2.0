@@ -1165,6 +1165,7 @@ async def init_demo_data():
             "contact_urgence": "514-666-4444",
             "grade": "Pompier",
             "type_emploi": "temps_partiel",
+            "heures_max_semaine": 25,  # 25h max par semaine
             "role": "employe",
             "numero_employe": "POM005",
             "date_embauche": "02/11/2020",
