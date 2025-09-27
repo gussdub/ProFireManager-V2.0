@@ -94,7 +94,55 @@ const Parametres = ({ user }) => {
     }
   }, [user]);
 
-  const fetchData = async () => {
+  const handleCreateType = async () => {
+    if (!createForm.nom || !createForm.heure_debut || !createForm.heure_fin) {
+      toast({
+        title: "Champs requis",
+        description: "Nom, heure de début et heure de fin sont obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/types-garde`, createForm);
+      toast({
+        title: "Type de garde créé",
+        description: "Le nouveau type de garde a été ajouté avec succès",
+        variant: "success"
+      });
+      setShowCreateTypeModal(false);
+      resetCreateForm();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le type de garde",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetCreateForm = () => {
+    setCreateForm({
+      nom: '',
+      heure_debut: '08:00',
+      heure_fin: '16:00',
+      personnel_requis: 1,
+      duree_heures: 8,
+      couleur: '#3B82F6',
+      jours_application: [],
+      officier_obligatoire: false
+    });
+  };
+
+  const handleCreateJourChange = (jour) => {
+    const updatedJours = createForm.jours_application.includes(jour)
+      ? createForm.jours_application.filter(j => j !== jour)
+      : [...createForm.jours_application, jour];
+    
+    setCreateForm({...createForm, jours_application: updatedJours});
+  };
     setLoading(true);
     try {
       const [typesResponse, formationsResponse, usersResponse] = await Promise.all([
