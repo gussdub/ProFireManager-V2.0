@@ -500,7 +500,7 @@ const Parametres = ({ user }) => {
                       <p>{formation.description}</p>
                       <div className="formation-details">
                         <span>⏱️ {formation.duree_heures}h</span>
-                        <span>📅 Validité: {formation.validite_mois} mois</span>
+                        <span>📅 Validité: {formation.validite_mois === 0 ? 'Pas de renouvellement' : `${formation.validite_mois} mois`}</span>
                         {formation.obligatoire && <span className="obligatoire">⚠️ OBLIGATOIRE</span>}
                       </div>
                     </div>
