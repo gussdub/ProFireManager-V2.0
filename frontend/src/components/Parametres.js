@@ -75,7 +75,23 @@ const Parametres = ({ user }) => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`${API}/types-garde/${editingType.id}`, editForm);
+      // Calculate duree_heures from time difference
+      const debut = new Date(`2000-01-01T${editForm.heure_debut}:00`);
+      const fin = new Date(`2000-01-01T${editForm.heure_fin}:00`);
+      let duree_heures = (fin - debut) / (1000 * 60 * 60);
+      
+      // Handle overnight shifts
+      if (duree_heures < 0) {
+        duree_heures += 24;
+      }
+      
+      const updateData = {
+        ...editForm,
+        duree_heures: Math.round(duree_heures),
+        jours_application: [] // Add default empty array
+      };
+      
+      await axios.put(`${API}/types-garde/${editingType.id}`, updateData);
       toast({
         title: "Type mis à jour",
         description: "Les modifications ont été sauvegardées",
@@ -84,9 +100,10 @@ const Parametres = ({ user }) => {
       setShowEditModal(false);
       fetchData();
     } catch (error) {
+      console.error('Update error:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour",
+        description: error.response?.data?.detail || "Impossible de mettre à jour",
         variant: "destructive"
       });
     }
