@@ -415,10 +415,10 @@ const Personnel = () => {
   }, []);
 
   const handleCreateUser = async () => {
-    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.grade || !newUser.type_emploi) {
+    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.grade || !newUser.type_emploi || !newUser.date_embauche) {
       toast({
         title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires",
+        description: "Veuillez remplir tous les champs obligatoires (marqués d'un *)",
         variant: "destructive"
       });
       return;
@@ -429,14 +429,13 @@ const Personnel = () => {
         ...newUser,
         role: 'employe',
         numero_employe: newUser.numero_employe || `POM${String(Date.now()).slice(-3)}`,
-        date_embauche: newUser.date_embauche || new Date().toLocaleDateString('fr-FR'),
-        mot_de_passe: newUser.mot_de_passe || 'motdepasse123'
+        mot_de_passe: 'TempPassword123!' // Mot de passe temporaire par défaut
       };
 
       await axios.post(`${API}/users`, userToCreate);
       toast({
         title: "Pompier créé",
-        description: "Le nouveau pompier a été ajouté avec succès",
+        description: "Le nouveau pompier a été ajouté avec succès. Configurez son accès dans Paramètres > Comptes d'Accès",
         variant: "success"
       });
       
