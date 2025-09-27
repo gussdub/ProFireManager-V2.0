@@ -276,6 +276,319 @@ const Parametres = ({ user }) => {
         ))}
       </div>
 
+      {/* Tab content sections */}
+      {activeTab === 'types-garde' && (
+        <div className="types-garde-content">
+          <div className="types-garde-grid">
+            {typesGarde.map(type => (
+              <div key={type.id} className="type-garde-card">
+                <div className="type-garde-header">
+                  <div className="type-info">
+                    <h3>{type.nom}</h3>
+                    <div className="type-schedule">
+                      <span>⏰ {type.heure_debut} - {type.heure_fin}</span>
+                      <span>👥 {type.personnel_requis} personnel</span>
+                      {type.officier_obligatoire && <span>🎖️ Officier requis</span>}
+                    </div>
+                  </div>
+                  <div className="type-actions">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleEdit(type)}
+                      data-testid={`edit-type-${type.id}`}
+                    >
+                      ✏️ Modifier
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="danger" 
+                      onClick={() => handleDelete(type.id)}
+                      data-testid={`delete-type-${type.id}`}
+                    >
+                      🗑️ Supprimer
+                    </Button>
+                  </div>
+                </div>
+                <div className="type-details">
+                  <span className="color-preview" style={{ backgroundColor: type.couleur }}></span>
+                  <span>Couleur: {type.couleur}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'formations' && (
+        <div className="formations-tab">
+          <div className="tab-header">
+            <div>
+              <h2>Gestion des formations</h2>
+              <p>Configurez les formations obligatoires et optionnelles</p>
+            </div>
+            <Button 
+              variant="default" 
+              onClick={() => setShowCreateFormationModal(true)}
+              data-testid="create-formation-btn"
+            >
+              + Nouvelle Formation
+            </Button>
+          </div>
+
+          <div className="formations-grid">
+            {formations.map(formation => (
+              <div key={formation.id} className="formation-card">
+                <div className="formation-header">
+                  <div className="formation-info">
+                    <h3>{formation.nom}</h3>
+                    <p>{formation.description}</p>
+                    <div className="formation-details">
+                      <span>⏱️ {formation.duree_heures}h</span>
+                      <span>📅 Validité: {formation.validite_mois} mois</span>
+                      {formation.obligatoire && <span className="obligatoire">⚠️ Obligatoire</span>}
+                    </div>
+                  </div>
+                  <div className="formation-actions">
+                    <Button 
+                      variant="ghost" 
+                      onClick={() => handleEditFormation(formation)}
+                      data-testid={`edit-formation-${formation.id}`}
+                    >
+                      ✏️ Modifier
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="danger" 
+                      onClick={() => handleDeleteFormation(formation.id)}
+                      data-testid={`delete-formation-${formation.id}`}
+                    >
+                      🗑️ Supprimer
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'attribution' && (
+        <div className="attribution-tab">
+          <div className="tab-header">
+            <div>
+              <h2>Paramètres d'Attribution Automatique</h2>
+              <p>Configurez les règles d'attribution intelligente des gardes selon les priorités établies</p>
+            </div>
+          </div>
+
+          <div className="attribution-settings">
+            <div className="priority-section">
+              <h3>Ordre de priorité (respecté par le système)</h3>
+              <div className="priority-list">
+                <div className="priority-item">
+                  <span className="priority-number">1</span>
+                  <div className="priority-content">
+                    <span className="priority-text">Assignations manuelles privilégiées</span>
+                    <span className="priority-description">Les assignations manuelles ne sont jamais écrasées</span>
+                  </div>
+                  <span className="priority-status active">✅ Actif</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">2</span>
+                  <div className="priority-content">
+                    <span className="priority-text">Respecter les disponibilités des employés</span>
+                    <span className="priority-description">Vérification des créneaux de disponibilité (temps partiel)</span>
+                  </div>
+                  <span className="priority-status active">✅ Actif</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">3</span>
+                  <div className="priority-content">
+                    <span className="priority-text">Respecter les grades (1 officier par garde si requis)</span>
+                    <span className="priority-description">Assignation d'un officier si configuré pour le type de garde</span>
+                  </div>
+                  <span className="priority-status active">✅ Actif</span>
+                </div>
+                <div className="priority-item">
+                  <span className="priority-number">4</span>
+                  <div className="priority-content">
+                    <span className="priority-text">Rotation équitable des employés</span>
+                    <span className="priority-description">Répartition équitable des heures de garde</span>
+                  </div>
+                  <span className="priority-status dev">⚙️ En cours</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="general-settings">
+              <h3>Paramètres généraux</h3>
+              <div className="settings-grid">
+                <label className="setting-toggle">
+                  <div className="toggle-info">
+                    <span className="toggle-title">Attribution automatique activée</span>
+                    <span className="toggle-desc">Active le système d'attribution automatique</span>
+                  </div>
+                  <div className="toggle-wrapper">
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.attribution_auto}
+                      onChange={(e) => handleSettingChange('attribution_auto', e.target.checked)}
+                      data-testid="toggle-auto-attribution"
+                    />
+                    <span className="toggle-slider"></span>
+                  </div>
+                </label>
+
+                <label className="setting-toggle">
+                  <div className="toggle-info">
+                    <span className="toggle-title">Notification par email des assignations</span>
+                    <span className="toggle-desc">Envoie un email à chaque nouvelle assignation</span>
+                  </div>
+                  <div className="toggle-wrapper">
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.notification_email}
+                      onChange={(e) => handleSettingChange('notification_email', e.target.checked)}
+                      data-testid="toggle-email-notifications"
+                    />
+                    <span className="toggle-slider"></span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'comptes' && (
+        <div className="comptes-tab">
+          <div className="tab-header">
+            <div>
+              <h2>Gestion des comptes d'accès</h2>
+              <p>Créez des comptes et définissez les autorisations selon les rôles</p>
+            </div>
+            <Button 
+              variant="default" 
+              onClick={() => setShowCreateUserModal(true)}
+              data-testid="create-user-account-btn"
+            >
+              + Nouveau Compte
+            </Button>
+          </div>
+
+          <div className="accounts-overview">
+            <div className="accounts-stats">
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'admin').length}</span>
+                <span className="stat-label">Administrateurs</span>
+              </div>
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'superviseur').length}</span>
+                <span className="stat-label">Superviseurs</span>
+              </div>
+              <div className="account-stat">
+                <span className="stat-number">{users.filter(u => u.role === 'employe').length}</span>
+                <span className="stat-label">Employés</span>
+              </div>
+            </div>
+
+            <div className="role-descriptions">
+              <div className="role-card admin">
+                <h3>👑 Administrateur</h3>
+                <ul>
+                  <li>Accès complet à tous les modules et paramètres</li>
+                  <li>Gestion du personnel et création de comptes</li>
+                  <li>Attribution manuelle et automatique des gardes</li>
+                  <li>Configuration des types de gardes et formations</li>
+                  <li>Rapports et analyses avancées</li>
+                </ul>
+              </div>
+
+              <div className="role-card superviseur">
+                <h3>🎖️ Superviseur</h3>
+                <ul>
+                  <li>Consultation et gestion du personnel</li>
+                  <li>Gestion et validation du planning</li>
+                  <li>Approbation des demandes de remplacement</li>
+                  <li>Accès aux formations et inscriptions</li>
+                  <li>Tableau de bord avec statistiques</li>
+                </ul>
+              </div>
+
+              <div className="role-card employe">
+                <h3>👤 Employé</h3>
+                <ul>
+                  <li>Consultation du planning personnel</li>
+                  <li>Demandes de remplacement et congés</li>
+                  <li>Inscription aux formations disponibles</li>
+                  <li>Gestion des disponibilités (temps partiel)</li>
+                  <li>Profil personnel et mot de passe</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'remplacements' && (
+        <div className="remplacements-settings-tab">
+          <div className="tab-header">
+            <div>
+              <h2>Paramètres des demandes de remplacement</h2>
+              <p>Configurez les règles de validation et délais de traitement</p>
+            </div>
+          </div>
+
+          <div className="replacement-config">
+            <div className="config-section">
+              <h3>Délais et limites</h3>
+              <div className="config-inputs">
+                <label className="config-input">
+                  <span className="input-label">Délai de réponse (heures)</span>
+                  <span className="input-description">Temps maximum pour répondre à une demande</span>
+                  <Input
+                    type="number"
+                    value={systemSettings.delai_reponse}
+                    onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
+                    data-testid="response-delay-input"
+                  />
+                </label>
+                
+                <label className="config-input">
+                  <span className="input-label">Nombre max de personnes à contacter</span>
+                  <span className="input-description">Maximum de remplaçants potentiels contactés</span>
+                  <Input
+                    type="number"
+                    value={systemSettings.max_personnes_contact}
+                    onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
+                    data-testid="max-contacts-input"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="config-section">
+              <h3>Règles de validation</h3>
+              <label className="setting-toggle">
+                <div className="toggle-info">
+                  <span className="toggle-title">Grade équivalent obligatoire</span>
+                  <span className="toggle-desc">Accepter uniquement les remplacements de grade équivalent ou supérieur</span>
+                </div>
+                <div className="toggle-wrapper">
+                  <input
+                    type="checkbox"
+                    checked={systemSettings.grade_equivalent}
+                    onChange={(e) => handleSettingChange('grade_equivalent', e.target.checked)}
+                    data-testid="toggle-grade-equivalent"
+                  />
+                  <span className="toggle-slider"></span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showEditTypeModal && editingItem && (
         <div className="modal-overlay" onClick={() => setShowEditTypeModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="edit-type-modal">
