@@ -713,121 +713,188 @@ const Personnel = () => {
         ))}
       </div>
 
-      {/* Create User Modal */}
+      {/* Create User Modal - Version optimisée */}
       {showCreateModal && (
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
-          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-user-modal">
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-user-modal">
             <div className="modal-header">
-              <h3>Nouveau pompier</h3>
+              <h3>🚒 Nouveau pompier</h3>
               <Button variant="ghost" onClick={() => setShowCreateModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
-              <div className="form-grid">
-                <div className="form-row">
+              <div className="personnel-form-grid">
+                {/* Section 1: Informations personnelles */}
+                <div className="form-section">
+                  <h4 className="section-title">👤 Informations personnelles</h4>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Prénom *</Label>
+                      <Input
+                        value={newUser.prenom}
+                        onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
+                        placeholder="Ex: Pierre"
+                        data-testid="user-prenom-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Nom *</Label>
+                      <Input
+                        value={newUser.nom}
+                        onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
+                        placeholder="Ex: Dupont"
+                        data-testid="user-nom-input"
+                      />
+                    </div>
+                  </div>
+
                   <div className="form-field">
-                    <Label>Prénom *</Label>
+                    <Label>Email *</Label>
                     <Input
-                      value={newUser.prenom}
-                      onChange={(e) => setNewUser({...newUser, prenom: e.target.value})}
-                      data-testid="user-prenom-input"
+                      type="email"
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      placeholder="ex: pierre.dupont@firemanager.ca"
+                      data-testid="user-email-input"
                     />
                   </div>
-                  <div className="form-field">
-                    <Label>Nom *</Label>
-                    <Input
-                      value={newUser.nom}
-                      onChange={(e) => setNewUser({...newUser, nom: e.target.value})}
-                      data-testid="user-nom-input"
-                    />
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Téléphone</Label>
+                      <Input
+                        value={newUser.telephone}
+                        onChange={(e) => setNewUser({...newUser, telephone: e.target.value})}
+                        placeholder="Ex: 514-555-1234"
+                        data-testid="user-phone-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Contact d'urgence</Label>
+                      <Input
+                        value={newUser.contact_urgence}
+                        onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
+                        placeholder="Ex: 514-999-8888"
+                        data-testid="user-emergency-input"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-field">
-                  <Label>Email *</Label>
-                  <Input
-                    type="email"
-                    value={newUser.email}
-                    onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                    data-testid="user-email-input"
-                  />
-                </div>
+                {/* Section 2: Informations professionnelles */}
+                <div className="form-section">
+                  <h4 className="section-title">🎖️ Informations professionnelles</h4>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Grade *</Label>
+                      <select
+                        value={newUser.grade}
+                        onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
+                        className="form-select"
+                        data-testid="user-grade-select"
+                      >
+                        <option value="">Sélectionner un grade</option>
+                        {grades.map(grade => (
+                          <option key={grade} value={grade}>{grade}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="form-field">
+                      <Label>Type d'emploi *</Label>
+                      <select
+                        value={newUser.type_emploi}
+                        onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
+                        className="form-select"
+                        data-testid="user-employment-select"
+                      >
+                        <option value="">Sélectionner le type</option>
+                        <option value="temps_plein">Temps plein</option>
+                        <option value="temps_partiel">Temps partiel</option>
+                      </select>
+                    </div>
+                  </div>
 
-                <div className="form-row">
-                  <div className="form-field">
-                    <Label>Téléphone</Label>
-                    <Input
-                      value={newUser.telephone}
-                      onChange={(e) => setNewUser({...newUser, telephone: e.target.value})}
-                      data-testid="user-phone-input"
-                    />
-                  </div>
-                  <div className="form-field">
-                    <Label>Contact d'urgence</Label>
-                    <Input
-                      value={newUser.contact_urgence}
-                      onChange={(e) => setNewUser({...newUser, contact_urgence: e.target.value})}
-                      placeholder="Numéro à contacter en cas d'urgence"
-                      data-testid="user-emergency-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-field">
-                    <Label>Grade *</Label>
-                    <select
-                      value={newUser.grade}
-                      onChange={(e) => setNewUser({...newUser, grade: e.target.value})}
-                      className="form-select"
-                      data-testid="user-grade-select"
-                    >
-                      <option value="">Sélectionner un grade</option>
-                      {grades.map(grade => (
-                        <option key={grade} value={grade}>{grade}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="form-field">
-                    <Label>Type d'emploi *</Label>
-                    <select
-                      value={newUser.type_emploi}
-                      onChange={(e) => setNewUser({...newUser, type_emploi: e.target.value})}
-                      className="form-select"
-                      data-testid="user-employment-select"
-                    >
-                      <option value="">Sélectionner le type</option>
-                      <option value="temps_plein">Temps plein</option>
-                      <option value="temps_partiel">Temps partiel</option>
-                    </select>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Numéro d'employé</Label>
+                      <Input
+                        value={newUser.numero_employe}
+                        onChange={(e) => setNewUser({...newUser, numero_employe: e.target.value})}
+                        placeholder="Ex: POM001 (automatique si vide)"
+                        data-testid="user-number-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Date d'embauche *</Label>
+                      <Input
+                        type="date"
+                        value={newUser.date_embauche}
+                        onChange={(e) => setNewUser({...newUser, date_embauche: e.target.value})}
+                        data-testid="user-hire-date-input"
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="form-field">
-                  <Label>Formations</Label>
-                  <div className="formations-selection">
+                {/* Section 3: Compétences et formations */}
+                <div className="form-section">
+                  <h4 className="section-title">📜 Compétences et certifications</h4>
+                  <div className="formations-selection-enhanced">
                     {formations.map(formation => (
-                      <label key={formation.id} className="formation-checkbox">
-                        <input
-                          type="checkbox"
-                          checked={newUser.formations.includes(formation.id)}
-                          onChange={() => handleFormationToggle(formation.id)}
-                        />
-                        <span className="formation-label">
-                          <strong>{formation.nom}</strong>
-                          {formation.obligatoire && <span className="obligatoire">*</span>}
-                          <br />
-                          <small>{formation.description}</small>
-                        </span>
-                      </label>
+                      <div key={formation.id} className="formation-card-selection">
+                        <div className="formation-checkbox-enhanced">
+                          <input
+                            type="checkbox"
+                            id={`formation-${formation.id}`}
+                            checked={newUser.formations.includes(formation.id)}
+                            onChange={() => handleFormationToggle(formation.id)}
+                            data-testid={`formation-${formation.id}`}
+                          />
+                          <label htmlFor={`formation-${formation.id}`} className="formation-label-enhanced">
+                            <div className="formation-header">
+                              <span className="formation-name">{formation.nom}</span>
+                              {formation.obligatoire && (
+                                <span className="obligatoire-badge">OBLIGATOIRE</span>
+                              )}
+                            </div>
+                            <div className="formation-details">
+                              <span className="formation-description">{formation.description}</span>
+                              <div className="formation-meta">
+                                <span>⏱️ {formation.duree_heures}h</span>
+                                <span>📅 {formation.validite_mois === 0 ? 'Pas de renouvellement' : `${formation.validite_mois} mois`}</span>
+                              </div>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
                     ))}
+                  </div>
+                </div>
+
+                {/* Section 4: Sécurité */}
+                <div className="form-section">
+                  <h4 className="section-title">🔒 Sécurité et accès</h4>
+                  <div className="form-field">
+                    <Label>Mot de passe temporaire *</Label>
+                    <Input
+                      type="password"
+                      value={newUser.mot_de_passe}
+                      onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
+                      placeholder="Minimum 8 caractères complexes"
+                      data-testid="user-password-input"
+                    />
+                    <small className="password-hint">
+                      Le mot de passe doit contenir : 8 caractères, 1 majuscule, 1 chiffre, 1 caractère spécial (!@#$%^&*+-?())
+                    </small>
                   </div>
                 </div>
               </div>
 
               <div className="modal-actions">
-                <Button variant="outline" onClick={() => setShowCreateModal(false)}>Annuler</Button>
+                <Button variant="outline" onClick={() => setShowCreateModal(false)}>
+                  Annuler
+                </Button>
                 <Button variant="default" onClick={handleCreateUser} data-testid="submit-user-btn">
-                  Créer le pompier
+                  🚒 Créer le pompier
                 </Button>
               </div>
             </div>
