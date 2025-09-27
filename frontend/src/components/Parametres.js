@@ -269,6 +269,45 @@ const Parametres = ({ user }) => {
     }
   };
 
+  const handleCreateFormation = async () => {
+    if (!newFormation.nom) {
+      toast({
+        title: "Champs requis",
+        description: "Le nom de la formation est obligatoire",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/formations`, newFormation);
+      toast({
+        title: "Formation créée",
+        description: "La nouvelle formation a été ajoutée avec succès",
+        variant: "success"
+      });
+      setShowCreateFormationModal(false);
+      resetNewFormation();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la formation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetNewFormation = () => {
+    setNewFormation({
+      nom: '',
+      description: '',
+      duree_heures: 8,
+      validite_mois: 12,
+      obligatoire: false
+    });
+  };
+
   const handleDeleteFormation = async (formationId) => {
     if (!window.confirm("Supprimer cette formation ?")) return;
     
