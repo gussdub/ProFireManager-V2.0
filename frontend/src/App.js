@@ -385,6 +385,7 @@ const Personnel = () => {
     telephone: '',
     contact_urgence: '',
     grade: '',
+    fonction_superieur: false,
     type_emploi: '',
     numero_employe: '',
     date_embauche: '',
