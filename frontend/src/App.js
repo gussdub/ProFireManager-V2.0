@@ -217,9 +217,17 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
     { id: 'monprofil', label: 'Mon profil', icon: '👤', roles: ['admin', 'superviseur', 'employe'] }
   ];
 
-  const filteredMenuItems = menuItems.filter(item => 
-    item.roles.includes(user?.role)
-  );
+  const filteredMenuItems = menuItems.filter(item => {
+    // Vérification du rôle
+    if (!item.roles.includes(user?.role)) return false;
+    
+    // Vérification spéciale pour "Mes disponibilités" - uniquement temps partiel
+    if (item.id === 'disponibilites' && user?.type_emploi !== 'temps_partiel') {
+      return false;
+    }
+    
+    return true;
+  });
 
   return (
     <div className="sidebar">
