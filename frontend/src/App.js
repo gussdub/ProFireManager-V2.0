@@ -1177,6 +1177,12 @@ const MonProfil = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [showDispoModal, setShowDispoModal] = useState(false);
+  const [selectedDates, setSelectedDates] = useState([]);
+  const [defaultTimeSlot, setDefaultTimeSlot] = useState({
+    heure_debut: '08:00',
+    heure_fin: '16:00',
+    statut: 'disponible'
+  });
   const [profileData, setProfileData] = useState({});
   const { toast } = useToast();
 
@@ -1246,9 +1252,73 @@ const MonProfil = () => {
     }
   };
 
+  const handleDateSelect = (dates) => {
+    setSelectedDates(dates || []);
+  };
+
+  const handleSaveDisponibilites = async () => {
+    if (selectedDates.length === 0) {
+      toast({
+        title: "Aucune date sélectionnée",
+        description: "Veuillez sélectionner au moins une date de disponibilité",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Create disponibilité objects for each selected date
+      const nouvelles_disponibilites = selectedDates.map(date => ({
+        user_id: user.id,
+        date: date.toISOString().split('T')[0],
+        heure_debut: defaultTimeSlot.heure_debut,
+        heure_fin: defaultTimeSlot.heure_fin,
+        statut: defaultTimeSlot.statut
+      }));
+
+      await axios.put(`${API}/disponibilites/${user.id}`, nouvelles_disponibilites);
+      
+      toast({
+        title: "Disponibilités sauvegardées",
+        description: `${selectedDates.length} jours de disponibilité configurés`,
+        variant: "success"
+      });
+
+      // Reload disponibilités
+      const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
+      setUserDisponibilites(dispoResponse.data);
+      setShowDispoModal(false);
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les disponibilités",
+        variant: "destructive"
+      });
+    }
+  };
+
   const getFormationName = (formationId) => {
     const formation = formations.find(f => f.id === formationId);
     return formation ? formation.nom : formationId;
+  };
+
+  // Convert stored disponibilités to calendar dates
+  const getAvailableDates = () => {
+    return userDisponibilites
+      .filter(d => d.statut === 'disponible')
+      .map(d => new Date(d.date));
+  };
+
+  const formatDateRange = (dates) => {
+    if (dates.length === 0) return "Aucune date";
+    
+    const sortedDates = dates.sort((a, b) => new Date(a.date) - new Date(b.date));
+    if (sortedDates.length === 1) {
+      return new Date(sortedDates[0].date).toLocaleDateString('fr-FR');
+    }
+    
+    return `${new Date(sortedDates[0].date).toLocaleDateString('fr-FR')} - ${new Date(sortedDates[sortedDates.length - 1].date).toLocaleDateString('fr-FR')}`;
   };
 
   if (loading) return <div className="loading" data-testid="profile-loading">Chargement du profil...</div>;
