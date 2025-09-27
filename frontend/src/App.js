@@ -1392,9 +1392,18 @@ const MonProfil = () => {
           {/* Section disponibilités (uniquement pour temps partiel) */}
           {userProfile?.type_emploi === 'temps_partiel' && (
             <div className="profile-section">
-              <h2>Mes disponibilités</h2>
+              <div className="section-header">
+                <h2>Mes disponibilités</h2>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowDispoModal(true)}
+                  data-testid="edit-availability-btn"
+                >
+                  ✏️ Modifier
+                </Button>
+              </div>
               <p className="section-description">
-                En tant qu'employé à temps partiel, vous pouvez gérer vos disponibilités ici.
+                En tant qu'employé à temps partiel, définissez vos créneaux de disponibilité.
               </p>
               <div className="availability-section">
                 {userDisponibilites.length > 0 ? (
@@ -1420,7 +1429,12 @@ const MonProfil = () => {
                 ) : (
                   <div className="no-disponibilites">
                     <p>📅 Aucune disponibilité renseignée</p>
-                    <Button variant="outline" className="mt-2">
+                    <Button 
+                      variant="outline" 
+                      className="mt-2"
+                      onClick={() => setShowDispoModal(true)}
+                      data-testid="add-availability-btn"
+                    >
                       + Ajouter mes disponibilités
                     </Button>
                   </div>
