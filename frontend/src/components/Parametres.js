@@ -201,12 +201,43 @@ const Parametres = ({ user }) => {
       ...prev,
       [setting]: value
     }));
-    // Here you would typically save to backend
     toast({
       title: "Paramètre mis à jour",
-      description: `${setting} modifié avec succès`,
+      description: "La configuration a été sauvegardée",
       variant: "success"
     });
+  };
+
+  const handleEditFormation = (formation) => {
+    setEditingItem(formation);
+    setNewFormation({
+      nom: formation.nom,
+      description: formation.description,
+      duree_heures: formation.duree_heures,
+      validite_mois: formation.validite_mois,
+      obligatoire: formation.obligatoire
+    });
+    setShowEditFormationModal(true);
+  };
+
+  const handleDeleteFormation = async (formationId) => {
+    if (!window.confirm("Supprimer cette formation ?")) return;
+    
+    try {
+      await axios.delete(`${API}/formations/${formationId}`);
+      toast({
+        title: "Formation supprimée",
+        description: "La formation a été supprimée avec succès",
+        variant: "success"
+      });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la formation",
+        variant: "destructive"
+      });
+    }
   };
 
   if (user?.role !== 'admin') {
