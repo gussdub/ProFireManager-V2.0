@@ -1034,6 +1034,109 @@ const Parametres = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de création de type de garde */}
+      {showCreateTypeModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateTypeModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-type-modal">
+            <div className="modal-header">
+              <h3>Nouveau type de garde</h3>
+              <Button variant="ghost" onClick={() => setShowCreateTypeModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label>Nom du type de garde *</Label>
+                  <Input
+                    value={createForm.nom}
+                    onChange={(e) => setCreateForm({...createForm, nom: e.target.value})}
+                    placeholder="Ex: Garde Interne Nuit"
+                    data-testid="create-nom-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Heure de début *</Label>
+                    <Input
+                      type="time"
+                      value={createForm.heure_debut}
+                      onChange={(e) => setCreateForm({...createForm, heure_debut: e.target.value})}
+                      data-testid="create-debut-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Heure de fin *</Label>
+                    <Input
+                      type="time"
+                      value={createForm.heure_fin}
+                      onChange={(e) => setCreateForm({...createForm, heure_fin: e.target.value})}
+                      data-testid="create-fin-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Personnel requis</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      value={createForm.personnel_requis}
+                      onChange={(e) => setCreateForm({...createForm, personnel_requis: parseInt(e.target.value)})}
+                      data-testid="create-personnel-input"
+                    />
+                  </div>
+                  <div className="form-field">
+                    <Label>Couleur</Label>
+                    <Input
+                      type="color"
+                      value={createForm.couleur}
+                      onChange={(e) => setCreateForm({...createForm, couleur: e.target.value})}
+                      data-testid="create-couleur-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Jours d'application (récurrence)</Label>
+                  <div className="days-selection">
+                    {joursOptions.map(jour => (
+                      <label key={jour.value} className="day-checkbox">
+                        <input
+                          type="checkbox"
+                          checked={createForm.jours_application.includes(jour.value)}
+                          onChange={() => handleCreateJourChange(jour.value)}
+                          data-testid={`create-day-${jour.value}`}
+                        />
+                        <span>{jour.label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="setting-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={createForm.officier_obligatoire}
+                      onChange={(e) => setCreateForm({...createForm, officier_obligatoire: e.target.checked})}
+                    />
+                    <span>Officier obligatoire pour cette garde</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateTypeModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleCreateType} data-testid="create-type-btn">
+                  Créer le type de garde
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
