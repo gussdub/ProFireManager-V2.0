@@ -2798,8 +2798,56 @@ const Rapports = () => {
     </div>
   );
 };
-// Parametres Component (Admin only)
+// Simple placeholder for Parametres
 const Parametres = () => {
+  const { user } = useAuth();
+  
+  if (user?.role !== 'admin') {
+    return (
+      <div className="access-denied">
+        <h1>Accès refusé</h1>
+        <p>Cette section est réservée aux administrateurs.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="parametres">
+      <div className="parametres-header">
+        <div>
+          <h1 data-testid="parametres-title">Paramètres du système</h1>
+          <p>Configuration globale de ProFireManager - En développement avancé</p>
+        </div>
+      </div>
+      
+      <div className="settings-preview">
+        <div className="preview-card">
+          <h3>🚒 Types de Gardes</h3>
+          <p>Configuration des types de gardes disponibles</p>
+          <Button variant="outline">Gérer les types</Button>
+        </div>
+        
+        <div className="preview-card">
+          <h3>📚 Formations</h3>
+          <p>Catalogue des formations et certifications</p>
+          <Button variant="outline">Gérer les formations</Button>
+        </div>
+        
+        <div className="preview-card">
+          <h3>⚙️ Attribution Automatique</h3>
+          <p>Paramètres d'attribution intelligente</p>
+          <Button variant="outline">Configurer</Button>
+        </div>
+        
+        <div className="preview-card">
+          <h3>👥 Comptes d'Accès</h3>
+          <p>Gestion des utilisateurs et permissions</p>
+          <Button variant="outline">Gérer les comptes</Button>
+        </div>
+      </div>
+    </div>
+  );
+};
   const { user } = useAuth();
   const [typesGarde, setTypesGarde] = useState([]);
   const [formations, setFormations] = useState([]);
