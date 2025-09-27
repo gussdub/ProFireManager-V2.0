@@ -571,7 +571,7 @@ async def delete_disponibilite(disponibilite_id: str, current_user: User = Depen
     
     return {"message": "Disponibilité supprimée avec succès"}
 
-# Attribution automatique endpoint
+# Attribution automatique intelligente avec rotation équitable et ancienneté
 @api_router.post("/planning/attribution-auto")
 async def attribution_automatique(semaine_debut: str, current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "superviseur"]:
@@ -591,7 +591,31 @@ async def attribution_automatique(semaine_debut: str, current_user: User = Depen
             }
         }).to_list(1000)
         
-        # Attribution automatique logic (respectant les priorités définies)
+        # Get monthly statistics for rotation équitable (current month)
+        current_month_start = datetime.strptime(semaine_debut, "%Y-%m-%d").replace(day=1).strftime("%Y-%m-%d")
+        current_month_end = (datetime.strptime(current_month_start, "%Y-%m-%d") + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        current_month_end = current_month_end.strftime("%Y-%m-%d")
+        
+        monthly_assignations = await db.assignations.find({
+            "date": {
+                "$gte": current_month_start,
+                "$lte": current_month_end
+            }
+        }).to_list(1000)
+        
+        # Calculate monthly hours for each user
+        user_monthly_hours = {}
+        for user in users:
+            user_hours = 0
+            for assignation in monthly_assignations:
+                if assignation["user_id"] == user["id"]:
+                    # Find type garde to get duration
+                    type_garde = next((t for t in types_garde if t["id"] == assignation["type_garde_id"]), None)
+                    if type_garde:
+                        user_hours += type_garde.get("duree_heures", 8)
+            user_monthly_hours[user["id"]] = user_hours
+        
+        # Attribution automatique logic (5 niveaux de priorité)
         nouvelles_assignations = []
         
         for type_garde in types_garde:
@@ -605,7 +629,7 @@ async def attribution_automatique(semaine_debut: str, current_user: User = Depen
                 if type_garde.get("jours_application") and day_name not in type_garde["jours_application"]:
                     continue
                 
-                # Check if already assigned manually
+                # ÉTAPE 1: Check if already assigned manually
                 existing = next((a for a in existing_assignations 
                                if a["date"] == date_str and a["type_garde_id"] == type_garde["id"]), None)
                 if existing and existing.get("assignation_type") == "manuel":
@@ -614,17 +638,20 @@ async def attribution_automatique(semaine_debut: str, current_user: User = Depen
                 # Find available users for this slot
                 available_users = []
                 for user in users:
-                    # Check if user has availability (for part-time employees)
+                    # ÉTAPE 2: Check if user has availability (for part-time employees)
                     if user["type_emploi"] == "temps_partiel":
                         # Get user disponibilités
                         user_dispos = await db.disponibilites.find({
                             "user_id": user["id"],
-                            "jour_semaine": day_name,
+                            "date": date_str,
                             "statut": "disponible"
                         }).to_list(10)
                         
                         if not user_dispos:
                             continue  # Skip if not available
+                    else:
+                        # Skip temps plein (planning fixe manuel)
+                        continue
                     
                     # Check if user already assigned on this date
                     already_assigned = next((a for a in existing_assignations 
@@ -634,47 +661,101 @@ async def attribution_automatique(semaine_debut: str, current_user: User = Depen
                     
                     available_users.append(user)
                 
-                # Apply grade requirements (1 officier obligatoire si configuré)
+                if not available_users:
+                    continue
+                
+                # ÉTAPE 3: Apply grade requirements (1 officier obligatoire si configuré)
                 if type_garde.get("officier_obligatoire", False):
-                    # Prioritize officers (Capitaine, Lieutenant, Directeur)
+                    # Filter officers (Capitaine, Lieutenant, Directeur)
                     officers = [u for u in available_users if u["grade"] in ["Capitaine", "Lieutenant", "Directeur"]]
                     if officers:
-                        selected_user = officers[0]  # Simple rotation logic
-                        
-                        assignation_obj = Assignation(
-                            user_id=selected_user["id"],
-                            type_garde_id=type_garde["id"],
-                            date=date_str,
-                            assignation_type="auto"
-                        )
-                        
-                        await db.assignations.insert_one(assignation_obj.dict())
-                        nouvelles_assignations.append(assignation_obj.dict())
-                        existing_assignations.append(assignation_obj.dict())
+                        available_users = officers
                 
-                elif available_users:
-                    # Select user based on rotation (simplest approach for MVP)
-                    selected_user = available_users[0]
-                    
-                    assignation_obj = Assignation(
-                        user_id=selected_user["id"],
-                        type_garde_id=type_garde["id"],
-                        date=date_str,
-                        assignation_type="auto"
-                    )
-                    
-                    await db.assignations.insert_one(assignation_obj.dict())
-                    nouvelles_assignations.append(assignation_obj.dict())
-                    existing_assignations.append(assignation_obj.dict())
+                # ÉTAPE 4: Rotation équitable - sort by monthly hours (ascending)
+                available_users.sort(key=lambda u: user_monthly_hours.get(u["id"], 0))
+                
+                # ÉTAPE 5: Ancienneté - among users with same hours, prioritize by ancienneté
+                min_hours = user_monthly_hours.get(available_users[0]["id"], 0)
+                users_with_min_hours = [u for u in available_users if user_monthly_hours.get(u["id"], 0) == min_hours]
+                
+                if len(users_with_min_hours) > 1:
+                    # Sort by ancienneté (date_embauche) - oldest first
+                    users_with_min_hours.sort(key=lambda u: datetime.strptime(u["date_embauche"], "%d/%m/%Y"))
+                
+                # Select the best candidate
+                selected_user = users_with_min_hours[0]
+                
+                assignation_obj = Assignation(
+                    user_id=selected_user["id"],
+                    type_garde_id=type_garde["id"],
+                    date=date_str,
+                    assignation_type="auto"
+                )
+                
+                await db.assignations.insert_one(assignation_obj.dict())
+                nouvelles_assignations.append(assignation_obj.dict())
+                existing_assignations.append(assignation_obj.dict())
+                
+                # Update monthly hours for next iteration
+                user_monthly_hours[selected_user["id"]] += type_garde.get("duree_heures", 8)
         
         return {
-            "message": f"Attribution automatique effectuée avec succès",
+            "message": f"Attribution automatique intelligente effectuée avec succès",
             "assignations_creees": len(nouvelles_assignations),
+            "algorithme": "5 niveaux: Manuel → Disponibilités → Grades → Rotation équitable → Ancienneté",
             "semaine": f"{semaine_debut} - {semaine_fin}"
         }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors de l'attribution automatique: {str(e)}")
+
+# Endpoint pour obtenir les statistiques personnelles mensuelles
+@api_router.get("/users/{user_id}/stats-mensuelles")
+async def get_user_monthly_stats(user_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Get current month assignations for this user
+        today = datetime.now(timezone.utc)
+        month_start = today.replace(day=1).strftime("%Y-%m-%d")
+        month_end = (today.replace(day=1) + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        month_end = month_end.strftime("%Y-%m-%d")
+        
+        user_assignations = await db.assignations.find({
+            "user_id": user_id,
+            "date": {
+                "$gte": month_start,
+                "$lte": month_end
+            }
+        }).to_list(1000)
+        
+        # Get types garde for calculating hours
+        types_garde = await db.types_garde.find().to_list(1000)
+        types_dict = {t["id"]: t for t in types_garde}
+        
+        # Calculate stats
+        gardes_ce_mois = len(user_assignations)
+        heures_travaillees = 0
+        
+        for assignation in user_assignations:
+            type_garde = types_dict.get(assignation["type_garde_id"])
+            if type_garde:
+                heures_travaillees += type_garde.get("duree_heures", 8)
+        
+        # Get user formations count
+        user_data = await db.users.find_one({"id": user_id})
+        certifications = len(user_data.get("formations", [])) if user_data else 0
+        
+        return {
+            "gardes_ce_mois": gardes_ce_mois,
+            "heures_travaillees": heures_travaillees,
+            "certifications": certifications,
+            "mois": today.strftime("%B %Y")
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur lors du calcul des statistiques: {str(e)}")
 
 # Statistics routes
 @api_router.get("/statistiques", response_model=Statistiques)
