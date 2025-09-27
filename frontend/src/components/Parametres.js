@@ -922,14 +922,20 @@ const Parametres = ({ user }) => {
                     />
                   </div>
                   <div className="form-field">
-                    <Label>Validité (mois)</Label>
-                    <Input
-                      type="number"
-                      min="1"
+                    <Label>Validité</Label>
+                    <select
                       value={editFormation.validite_mois}
                       onChange={(e) => setEditFormation({...editFormation, validite_mois: parseInt(e.target.value)})}
+                      className="form-select"
                       data-testid="edit-formation-validite"
-                    />
+                    >
+                      <option value="0">Pas de renouvellement</option>
+                      <option value="6">6 mois</option>
+                      <option value="12">12 mois</option>
+                      <option value="24">24 mois</option>
+                      <option value="36">36 mois</option>
+                      <option value="60">60 mois</option>
+                    </select>
                   </div>
                 </div>
 
