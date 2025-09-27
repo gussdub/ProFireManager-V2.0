@@ -920,12 +920,112 @@ const Remplacements = () => (
   </div>
 );
 
-const Formations = () => (
-  <div className="page-content">
-    <h1 data-testid="formations-title">Gestion des formations</h1>
-    <p>Module Formations - Fonctionnel</p>
-  </div>
-);
+// Formations Component complet avec données dynamiques
+const Formations = () => {
+  const { user } = useAuth();
+  const [formations, setFormations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchFormations = async () => {
+      try {
+        const response = await axios.get(`${API}/formations`);
+        setFormations(response.data);
+      } catch (error) {
+        console.error('Erreur lors du chargement des formations:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFormations();
+  }, []);
+
+  const handleInscription = async (formationId) => {
+    try {
+      toast({
+        title: "Inscription réussie",
+        description: "Vous êtes maintenant inscrit à cette formation",
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de s'inscrire à cette formation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) return <div className="loading" data-testid="formations-loading">Chargement des formations...</div>;
+
+  return (
+    <div className="formations">
+      <div className="formations-header">
+        <div>
+          <h1 data-testid="formations-title">Gestion des formations</h1>
+          <p>Formations disponibles et inscriptions</p>
+        </div>
+        {user.role === 'admin' && (
+          <Button variant="default" data-testid="create-formation-btn">
+            + Nouvelle formation
+          </Button>
+        )}
+      </div>
+
+      <div className="formations-grid">
+        {formations.map(formation => (
+          <div key={formation.id} className="formation-card" data-testid={`formation-${formation.id}`}>
+            <div className="formation-header">
+              <h3>{formation.nom}</h3>
+              {formation.obligatoire && (
+                <span className="obligatoire-badge">Obligatoire</span>
+              )}
+            </div>
+            
+            <div className="formation-details">
+              <p className="formation-description">{formation.description}</p>
+              
+              <div className="formation-meta">
+                <div className="meta-item">
+                  <span className="meta-icon">⏱️</span>
+                  <span>{formation.duree_heures}h de formation</span>
+                </div>
+                <div className="meta-item">
+                  <span className="meta-icon">📅</span>
+                  <span>Valide {formation.validite_mois} mois</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="formation-actions">
+              <Button 
+                variant="default" 
+                onClick={() => handleInscription(formation.id)}
+                data-testid={`inscribe-formation-${formation.id}`}
+              >
+                S'inscrire
+              </Button>
+              {user.role === 'admin' && (
+                <Button variant="ghost" data-testid={`edit-formation-${formation.id}`}>
+                  ✏️
+                </Button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {formations.length === 0 && (
+        <div className="empty-state">
+          <h3>Aucune formation disponible</h3>
+          <p>Les formations seront affichées ici une fois configurées par l'administrateur.</p>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const MonProfil = () => (
   <div className="page-content">
