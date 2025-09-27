@@ -834,10 +834,21 @@ const Parametres = ({ user }) => {
                       </div>
                     </div>
                     <div className="user-access-actions">
-                      <Button variant="ghost" size="sm" data-testid={`modify-access-${user.id}`}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleEditAccess(user)}
+                        data-testid={`modify-access-${user.id}`}
+                      >
                         ✏️ Modifier accès
                       </Button>
-                      <Button variant="ghost" size="sm" className="danger" data-testid={`revoke-access-${user.id}`}>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        className="danger" 
+                        onClick={() => handleRevokeUser(user.id, `${user.prenom} ${user.nom}`)}
+                        data-testid={`revoke-access-${user.id}`}
+                      >
                         🚫 Révoquer
                       </Button>
                     </div>
