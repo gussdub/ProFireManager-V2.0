@@ -23,6 +23,17 @@ const Parametres = ({ user }) => {
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
+  // Edit form state for types garde
+  const [editForm, setEditForm] = useState({
+    nom: '',
+    heure_debut: '',
+    heure_fin: '',
+    personnel_requis: 1,
+    couleur: '#3B82F6',
+    jours_application: [],
+    officier_obligatoire: false
+  });
+  
   // Form states
   const [newFormation, setNewFormation] = useState({
     nom: '',
