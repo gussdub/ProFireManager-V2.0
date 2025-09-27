@@ -323,6 +323,7 @@ class Disponibilite(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     date: str  # Date exacte YYYY-MM-DD
+    type_garde_id: Optional[str] = None  # Spécifier pour quel type de garde
     heure_debut: str
     heure_fin: str
     statut: str = "disponible"  # disponible, indisponible, preference
@@ -331,6 +332,7 @@ class Disponibilite(BaseModel):
 class DisponibiliteCreate(BaseModel):
     user_id: str
     date: str  # Date exacte YYYY-MM-DD
+    type_garde_id: Optional[str] = None
     heure_debut: str
     heure_fin: str
     statut: str = "disponible"
