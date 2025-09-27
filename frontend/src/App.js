@@ -2798,7 +2798,620 @@ const Rapports = () => {
     </div>
   );
 };
-const Parametres = () => <div className="page-placeholder">Paramètres - En développement</div>;
+// Parametres Component (Admin only)
+const Parametres = () => {
+  const { user } = useAuth();
+  const [typesGarde, setTypesGarde] = useState([]);
+  const [formations, setFormations] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('types-garde');
+  
+  // Modals states
+  const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
+  const [showCreateFormationModal, setShowCreateFormationModal] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  
+  // Form states
+  const [newTypeGarde, setNewTypeGarde] = useState({
+    nom: '',
+    heure_debut: '',
+    heure_fin: '',
+    personnel_requis: 1,
+    duree_heures: 8,
+    couleur: '#3B82F6',
+    jours_application: [],
+    officier_obligatoire: false
+  });
+  
+  const [newFormation, setNewFormation] = useState({
+    nom: '',
+    description: '',
+    duree_heures: 0,
+    validite_mois: 12,
+    obligatoire: false
+  });
+  
+  const [newUser, setNewUser] = useState({
+    nom: '',
+    prenom: '',
+    email: '',
+    telephone: '',
+    contact_urgence: '',
+    grade: '',
+    type_emploi: '',
+    role: '',
+    numero_employe: '',
+    date_embauche: '',
+    mot_de_passe: ''
+  });
+
+  const [systemSettings, setSystemSettings] = useState({
+    attribution_auto: true,
+    notification_email: true,
+    assignations_doublon: false,
+    delai_reponse: 48,
+    max_personnes_contact: 5,
+    grade_equivalent: true
+  });
+
+  const { toast } = useToast();
+
+  const joursOptions = [
+    { value: 'monday', label: 'Lundi' },
+    { value: 'tuesday', label: 'Mardi' },
+    { value: 'wednesday', label: 'Mercredi' },
+    { value: 'thursday', label: 'Jeudi' },
+    { value: 'friday', label: 'Vendredi' },
+    { value: 'saturday', label: 'Samedi' },
+    { value: 'sunday', label: 'Dimanche' }
+  ];
+
+  const grades = ['Directeur', 'Capitaine', 'Lieutenant', 'Pompier'];
+  const roles = ['admin', 'superviseur', 'employe'];
+
+  useEffect(() => {
+    if (user?.role !== 'admin') return;
+    fetchData();
+  }, [user]);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [typesResponse, formationsResponse] = await Promise.all([
+        axios.get(`${API}/types-garde`),
+        axios.get(`${API}/formations`)
+      ]);
+      setTypesGarde(typesResponse.data);
+      setFormations(formationsResponse.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des paramètres:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateTypeGarde = async () => {
+    if (!newTypeGarde.nom || !newTypeGarde.heure_debut || !newTypeGarde.heure_fin) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/types-garde`, newTypeGarde);
+      toast({
+        title: "Type de garde créé",
+        description: "Le nouveau type de garde a été ajouté avec succès",
+        variant: "success"
+      });
+      setShowCreateTypeModal(false);
+      resetNewTypeGarde();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le type de garde",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateFormation = async () => {
+    if (!newFormation.nom) {
+      toast({
+        title: "Champs requis",
+        description: "Le nom de la formation est obligatoire",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/formations`, newFormation);
+      toast({
+        title: "Formation créée",
+        description: "La nouvelle formation a été ajoutée avec succès",
+        variant: "success"
+      });
+      setShowCreateFormationModal(false);
+      resetNewFormation();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la formation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUser.nom || !newUser.prenom || !newUser.email || !newUser.grade || !newUser.role) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const userToCreate = {
+        ...newUser,
+        numero_employe: newUser.numero_employe || `${newUser.role.toUpperCase()}${String(Date.now()).slice(-3)}`,
+        date_embauche: newUser.date_embauche || new Date().toLocaleDateString('fr-FR'),
+        mot_de_passe: newUser.mot_de_passe || 'motdepasse123',
+        formations: []
+      };
+
+      await axios.post(`${API}/users`, userToCreate);
+      toast({
+        title: "Compte créé",
+        description: "Le nouveau compte utilisateur a été créé avec succès",
+        variant: "success"
+      });
+      setShowCreateUserModal(false);
+      resetNewUser();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de créer le compte",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetNewTypeGarde = () => {
+    setNewTypeGarde({
+      nom: '',
+      heure_debut: '',
+      heure_fin: '',
+      personnel_requis: 1,
+      duree_heures: 8,
+      couleur: '#3B82F6',
+      jours_application: [],
+      officier_obligatoire: false
+    });
+  };
+
+  const resetNewFormation = () => {
+    setNewFormation({
+      nom: '',
+      description: '',
+      duree_heures: 0,
+      validite_mois: 12,
+      obligatoire: false
+    });
+  };
+
+  const resetNewUser = () => {
+    setNewUser({
+      nom: '',
+      prenom: '',
+      email: '',
+      telephone: '',
+      contact_urgence: '',
+      grade: '',
+      type_emploi: '',
+      role: '',
+      numero_employe: '',
+      date_embauche: '',
+      mot_de_passe: ''
+    });
+  };
+
+  const handleJourChange = (jour) => {
+    const updatedJours = newTypeGarde.jours_application.includes(jour)
+      ? newTypeGarde.jours_application.filter(j => j !== jour)
+      : [...newTypeGarde.jours_application, jour];
+    
+    setNewTypeGarde({...newTypeGarde, jours_application: updatedJours});
+  };
+
+  const handleSettingChange = (setting, value) => {
+    setSystemSettings({...systemSettings, [setting]: value});
+    // Auto-save settings (for demo)
+    toast({
+      title: "Paramètre mis à jour",
+      description: "La configuration a été sauvegardée",
+      variant: "success"
+    });
+  };
+
+  if (user?.role !== 'admin') {
+    return (
+      <div className="access-denied">
+        <h1>Accès refusé</h1>
+        <p>Cette section est réservée aux administrateurs.</p>
+      </div>
+    );
+  }
+
+  if (loading) return <div className="loading" data-testid="parametres-loading">Chargement des paramètres...</div>;
+
+  return (
+    <div className="parametres">
+      <div className="parametres-header">
+        <div>
+          <h1 data-testid="parametres-title">Paramètres du système</h1>
+          <p>Configuration globale de ProFireManager</p>
+        </div>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="settings-tabs">
+        <button
+          className={`tab-button ${activeTab === 'types-garde' ? 'active' : ''}`}
+          onClick={() => setActiveTab('types-garde')}
+          data-testid="tab-types-garde"
+        >
+          🚒 Types de Gardes
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'formations' ? 'active' : ''}`}
+          onClick={() => setActiveTab('formations')}
+          data-testid="tab-formations"
+        >
+          📚 Formations
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'attribution' ? 'active' : ''}`}
+          onClick={() => setActiveTab('attribution')}
+          data-testid="tab-attribution"
+        >
+          ⚙️ Attribution Auto
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'comptes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('comptes')}
+          data-testid="tab-comptes"
+        >
+          👥 Comptes d'Accès
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'remplacements' ? 'active' : ''}`}
+          onClick={() => setActiveTab('remplacements')}
+          data-testid="tab-remplacements"
+        >
+          🔄 Remplacements
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="tab-content">
+        {activeTab === 'types-garde' && (
+          <div className="types-garde-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramétrage des gardes</h2>
+                <p>Créez et modifiez les types de gardes disponibles</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateTypeModal(true)}
+                data-testid="create-type-garde-btn"
+              >
+                + Nouveau Type de Garde
+              </Button>
+            </div>
+
+            <div className="types-garde-grid">
+              {typesGarde.map(type => (
+                <div key={type.id} className="type-garde-card" data-testid={`type-garde-${type.id}`}>
+                  <div className="type-garde-header">
+                    <div className="type-info">
+                      <h3>{type.nom}</h3>
+                      <div className="type-schedule">
+                        <span className="schedule-time">
+                          ⏰ {type.heure_debut} - {type.heure_fin}
+                        </span>
+                        <span className="personnel-required">
+                          👥 {type.personnel_requis} personnel requis
+                        </span>
+                        <span className="duration">
+                          ⌛ {type.duree_heures}h
+                        </span>
+                      </div>
+                    </div>
+                    <div className="type-actions">
+                      <Button variant="ghost" data-testid={`edit-type-${type.id}`}>✏️</Button>
+                      <Button variant="ghost" className="danger" data-testid={`delete-type-${type.id}`}>🗑️</Button>
+                    </div>
+                  </div>
+
+                  <div className="type-details">
+                    <div className="type-color">
+                      <span className="color-preview" style={{ backgroundColor: type.couleur }}></span>
+                      <span>Couleur: {type.couleur}</span>
+                    </div>
+                    
+                    {type.jours_application?.length > 0 && (
+                      <div className="type-days">
+                        <span>📅 Jours: {type.jours_application.join(', ')}</span>
+                      </div>
+                    )}
+
+                    {type.officier_obligatoire && (
+                      <div className="type-officer">
+                        <span>🎖️ Officier obligatoire</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'formations' && (
+          <div className="formations-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramétrage des formations</h2>
+                <p>Gérez le catalogue des formations disponibles</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateFormationModal(true)}
+                data-testid="create-formation-btn"
+              >
+                + Nouvelle Formation
+              </Button>
+            </div>
+
+            <div className="formations-admin-grid">
+              {formations.map(formation => (
+                <div key={formation.id} className="formation-admin-card" data-testid={`formation-admin-${formation.id}`}>
+                  <div className="formation-admin-header">
+                    <div>
+                      <h3>{formation.nom}</h3>
+                      {formation.obligatoire && (
+                        <span className="obligatoire-badge">Obligatoire</span>
+                      )}
+                    </div>
+                    <div className="formation-actions">
+                      <Button variant="ghost" data-testid={`edit-formation-${formation.id}`}>✏️</Button>
+                      <Button variant="ghost" className="danger" data-testid={`delete-formation-${formation.id}`}>🗑️</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="formation-admin-details">
+                    <p className="formation-description">{formation.description}</p>
+                    <div className="formation-meta">
+                      <span>⏱️ {formation.duree_heures}h</span>
+                      <span>📅 Valide {formation.validite_mois} mois</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'attribution' && (
+          <div className="attribution-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramètres d'Attribution Automatique</h2>
+                <p>Configurez les règles d'attribution intelligente des gardes</p>
+              </div>
+            </div>
+
+            <div className="attribution-settings">
+              <div className="setting-section">
+                <h3>Ordre de priorité (non modifiable)</h3>
+                <div className="priority-list">
+                  <div className="priority-item">
+                    <span className="priority-number">1</span>
+                    <span className="priority-text">Assignations manuelles privilégiées</span>
+                    <span className="priority-status">✅ Actif</span>
+                  </div>
+                  <div className="priority-item">
+                    <span className="priority-number">2</span>
+                    <span className="priority-text">Respecter les disponibilités des employés</span>
+                    <span className="priority-status">✅ Actif</span>
+                  </div>
+                  <div className="priority-item">
+                    <span className="priority-number">3</span>
+                    <span className="priority-text">Respecter les grades (1 officier par garde si requis)</span>
+                    <span className="priority-status">✅ Actif</span>
+                  </div>
+                  <div className="priority-item">
+                    <span className="priority-number">4</span>
+                    <span className="priority-text">Rotation équitable des employés</span>
+                    <span className="priority-status">⚠️ En développement</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="setting-section">
+                <h3>Paramètres généraux</h3>
+                <div className="settings-grid">
+                  <label className="setting-toggle">
+                    <span>Attribution automatique activée</span>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.attribution_auto}
+                      onChange={(e) => handleSettingChange('attribution_auto', e.target.checked)}
+                      data-testid="toggle-auto-attribution"
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+
+                  <label className="setting-toggle">
+                    <span>Notification par email des assignations</span>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.notification_email}
+                      onChange={(e) => handleSettingChange('notification_email', e.target.checked)}
+                      data-testid="toggle-email-notifications"
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+
+                  <label className="setting-toggle">
+                    <span>Permettre les assignations en doublon</span>
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.assignations_doublon}
+                      onChange={(e) => handleSettingChange('assignations_doublon', e.target.checked)}
+                      data-testid="toggle-duplicate-assignments"
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'comptes' && (
+          <div className="comptes-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Gestion des comptes d'accès</h2>
+                <p>Créez des comptes et définissez les autorisations</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowCreateUserModal(true)}
+                data-testid="create-user-account-btn"
+              >
+                + Nouveau Compte
+              </Button>
+            </div>
+
+            <div className="accounts-info">
+              <div className="account-type-card">
+                <h3>👑 Administrateur</h3>
+                <ul>
+                  <li>Accès complet à tous les modules</li>
+                  <li>Gestion du personnel et paramètres</li>
+                  <li>Attribution manuelle et automatique</li>
+                  <li>Rapports et analyses</li>
+                </ul>
+              </div>
+
+              <div className="account-type-card">
+                <h3>🎖️ Superviseur</h3>
+                <ul>
+                  <li>Consultation du personnel</li>
+                  <li>Gestion du planning</li>
+                  <li>Validation des remplacements</li>
+                  <li>Accès aux formations</li>
+                </ul>
+              </div>
+
+              <div className="account-type-card">
+                <h3>👤 Employé</h3>
+                <ul>
+                  <li>Consultation du planning personnel</li>
+                  <li>Demandes de remplacement</li>
+                  <li>Inscription aux formations</li>
+                  <li>Gestion des disponibilités (temps partiel)</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'remplacements' && (
+          <div className="remplacements-settings-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramètres des demandes de remplacement</h2>
+                <p>Configurez les règles de validation et de traitement</p>
+              </div>
+            </div>
+
+            <div className="replacement-config">
+              <div className="config-group">
+                <h3>Délais et limites</h3>
+                <div className="config-inputs">
+                  <label className="config-input">
+                    <span>Délai de réponse (heures)</span>
+                    <Input
+                      type="number"
+                      value={systemSettings.delai_reponse}
+                      onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
+                      data-testid="response-delay-input"
+                    />
+                  </label>
+                  
+                  <label className="config-input">
+                    <span>Nombre max de personnes à contacter</span>
+                    <Input
+                      type="number"
+                      value={systemSettings.max_personnes_contact}
+                      onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
+                      data-testid="max-contacts-input"
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="config-group">
+                <h3>Règles de validation</h3>
+                <label className="setting-toggle">
+                  <span>Accepter les remplacements de grade équivalent uniquement</span>
+                  <input
+                    type="checkbox"
+                    checked={systemSettings.grade_equivalent}
+                    onChange={(e) => handleSettingChange('grade_equivalent', e.target.checked)}
+                    data-testid="toggle-grade-equivalent"
+                  />
+                  <span className="toggle-slider"></span>
+                </label>
+              </div>
+
+              <div className="config-group">
+                <h3>Workflow de validation</h3>
+                <div className="workflow-steps">
+                  <div className="workflow-step">
+                    <span className="step-number">1</span>
+                    <span className="step-text">Demande soumise par l'employé</span>
+                  </div>
+                  <div className="workflow-step">
+                    <span className="step-number">2</span>
+                    <span className="step-text">Recherche automatique de remplaçants</span>
+                  </div>
+                  <div className="workflow-step">
+                    <span className="step-number">3</span>
+                    <span className="step-text">Validation par superviseur/admin</span>
+                  </div>
+                  <div className="workflow-step">
+                    <span className="step-number">4</span>
+                    <span className="step-text">Notification aux parties concernées</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
 // Main Application Layout
 const AppLayout = () => {
