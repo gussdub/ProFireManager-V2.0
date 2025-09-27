@@ -6101,110 +6101,25 @@ body {
 .calendar-section-large {
   background: white;
   border-radius: 12px;
-  padding: 2rem;
+  padding: 3rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 600px;
 }
 
-.calendar-section-large h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #1e293b;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-/* Fix calendar bug and add type garde legend */
 .availability-calendar-large {
   border: 2px solid #e2e8f0;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2rem;
   margin-bottom: 1.5rem;
-  transform: scale(1.1);
+  transform: scale(1.4);
   transform-origin: center;
-  background: white;
-  box-shadow: none;
+  min-height: 400px;
 }
 
 .availability-calendar-large .rdp {
-  --rdp-cell-size: 45px;
+  --rdp-cell-size: 50px;
   --rdp-accent-color: #dc2626;
-  margin: 0;
-}
-
-.availability-calendar-large .rdp-day {
-  border-radius: 8px;
-  font-weight: 500;
-}
-
-.type-garde-legend {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-}
-
-.type-garde-legend h4 {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 0.75rem;
-}
-
-.type-legend-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.type-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-  color: #64748b;
-}
-
-.type-color-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.1);
-}
-
-.calendar-legend-modern {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding: 1rem;
-  background: #f8fafc;
-  border-radius: 8px;
-}
-
-.legend-item-modern {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: 0.875rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.legend-dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid;
-}
-
-.legend-dot.available {
-  background-color: #dcfce7;
-  border-color: #bbf7d0;
-}
-
-.legend-dot.unavailable {
-  background-color: #f3f4f6;
-  border-color: #d1d5db;
+  margin: 2rem 0;
 }
 
 .availability-details-enhanced {
