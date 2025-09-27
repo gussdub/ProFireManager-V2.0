@@ -1089,7 +1089,112 @@ const Parametres = () => {
     });
   };
 
+  const handleEditTypeGarde = (type) => {
+    setEditingItem(type);
+    setNewTypeGarde({
+      nom: type.nom,
+      heure_debut: type.heure_debut,
+      heure_fin: type.heure_fin,
+      personnel_requis: type.personnel_requis,
+      duree_heures: type.duree_heures,
+      couleur: type.couleur,
+      jours_application: type.jours_application || [],
+      officier_obligatoire: type.officier_obligatoire || false
+    });
+    setShowEditTypeModal(true);
+  };
+
+  const handleUpdateTypeGarde = async () => {
+    if (!newTypeGarde.nom || !newTypeGarde.heure_debut || !newTypeGarde.heure_fin) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.put(`${API}/types-garde/${editingItem.id}`, newTypeGarde);
+      toast({
+        title: "Type de garde mis à jour",
+        description: "Les modifications ont été sauvegardées avec succès",
+        variant: "success"
+      });
+      setShowEditTypeModal(false);
+      setEditingItem(null);
+      resetNewTypeGarde();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le type de garde",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDeleteType = async (typeId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce type de garde ? Cette action supprimera aussi toutes les assignations associées.")) return;
+    
+    try {
+      await axios.delete(`${API}/types-garde/${typeId}`);
+      toast({
+        title: "Type supprimé",
+        description: "Le type de garde a été supprimé avec succès",
+        variant: "success"
+      });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de supprimer le type de garde",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleEditFormation = (formation) => {
+    setEditingItem(formation);
+    setNewFormation({
+      nom: formation.nom,
+      description: formation.description,
+      duree_heures: formation.duree_heures,
+      validite_mois: formation.validite_mois,
+      obligatoire: formation.obligatoire
+    });
+    setShowEditFormationModal(true);
+  };
+
+  const handleUpdateFormation = async () => {
+    if (!newFormation.nom) {
+      toast({
+        title: "Champs requis",
+        description: "Le nom de la formation est obligatoire",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.put(`${API}/formations/${editingItem.id}`, newFormation);
+      toast({
+        title: "Formation mise à jour",
+        description: "Les modifications ont été sauvegardées avec succès",
+        variant: "success"
+      });
+      setShowEditFormationModal(false);
+      setEditingItem(null);
+      resetNewFormation();
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la formation",
+        variant: "destructive"
+      });
+    }
+  };
     if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce type de garde ?")) return;
     
     try {
