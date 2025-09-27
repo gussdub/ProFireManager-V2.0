@@ -2414,12 +2414,11 @@ const MesDisponibilites = () => {
 };
 
 // Mon Profil Component épuré - sans disponibilités et remplacements
+// Mon Profil Component épuré - sans disponibilités et remplacements
 const MonProfil = () => {
   const { user } = useAuth();
   const [userProfile, setUserProfile] = useState(null);
   const [formations, setFormations] = useState([]);
-  const [userDisponibilites, setUserDisponibilites] = useState([]);
-  const [userRemplacements, setUserRemplacements] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState({
     gardes_ce_mois: 0,
     heures_travaillees: 0,
@@ -2427,26 +2426,11 @@ const MonProfil = () => {
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [showReplacementModal, setShowReplacementModal] = useState(false);
-  const [selectedDates, setSelectedDates] = useState([]);
-  const [availabilityConfig, setAvailabilityConfig] = useState({
-    type_garde_id: '',
-    heure_debut: '08:00',
-    heure_fin: '16:00',
-    statut: 'disponible'
-  });
-  const [typesGarde, setTypesGarde] = useState([]);
   const [passwordData, setPasswordData] = useState({
     current_password: '',
     new_password: '',
     confirm_password: ''
-  });
-  const [newReplacement, setNewReplacement] = useState({
-    type_garde_id: '',
-    date: '',
-    raison: ''
   });
   const [profileData, setProfileData] = useState({});
   const { toast } = useToast();
@@ -2454,17 +2438,15 @@ const MonProfil = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const [userResponse, formationsResponse, statsResponse, typesGardeResponse] = await Promise.all([
+        const [userResponse, formationsResponse, statsResponse] = await Promise.all([
           axios.get(`${API}/users/${user.id}`),
           axios.get(`${API}/formations`),
-          axios.get(`${API}/users/${user.id}/stats-mensuelles`),
-          axios.get(`${API}/types-garde`)
+          axios.get(`${API}/users/${user.id}/stats-mensuelles`)
         ]);
         
         setUserProfile(userResponse.data);
         setFormations(formationsResponse.data);
         setMonthlyStats(statsResponse.data);
-        setTypesGarde(typesGardeResponse.data);
         setProfileData({
           nom: userResponse.data.nom,
           prenom: userResponse.data.prenom,
@@ -2473,16 +2455,6 @@ const MonProfil = () => {
           contact_urgence: userResponse.data.contact_urgence || '',
           heures_max_semaine: userResponse.data.heures_max_semaine || 25
         });
-
-        // Load disponibilités if part-time employee
-        if (userResponse.data.type_emploi === 'temps_partiel') {
-          const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
-          setUserDisponibilites(dispoResponse.data);
-        }
-
-        // Load user remplacements
-        const remplacementsResponse = await axios.get(`${API}/remplacements`);
-        setUserRemplacements(remplacementsResponse.data.filter(r => r.demandeur_id === user.id));
 
       } catch (error) {
         console.error('Erreur lors du chargement du profil:', error);
@@ -2509,92 +2481,6 @@ const MonProfil = () => {
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder les modifications.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const handleSaveAvailability = async () => {
-    if (selectedDates.length === 0) {
-      toast({
-        title: "Aucune date sélectionnée",
-        description: "Veuillez sélectionner au moins une date",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    if (!availabilityConfig.type_garde_id) {
-      toast({
-        title: "Type de garde requis",
-        description: "Veuillez sélectionner un type de garde",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const nouvelles_disponibilites = selectedDates.map(date => ({
-      user_id: user.id,
-      date: date.toISOString().split('T')[0],
-      type_garde_id: availabilityConfig.type_garde_id,
-      heure_debut: availabilityConfig.heure_debut,
-      heure_fin: availabilityConfig.heure_fin,
-      statut: availabilityConfig.statut
-    }));
-
-    try {
-      await axios.put(`${API}/disponibilites/${user.id}`, nouvelles_disponibilites);
-      toast({
-        title: "Disponibilités sauvegardées",
-        description: `${selectedDates.length} jours configurés pour ${getTypeGardeName(availabilityConfig.type_garde_id)}`,
-        variant: "success"
-      });
-      setShowCalendarModal(false);
-      
-      // Reload disponibilités
-      const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
-      setUserDisponibilites(dispoResponse.data);
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const getTypeGardeName = (typeGardeId) => {
-    const typeGarde = typesGarde.find(t => t.id === typeGardeId);
-    return typeGarde ? typeGarde.nom : 'Type non spécifié';
-  };
-
-  const handleCreateReplacement = async () => {
-    if (!newReplacement.type_garde_id || !newReplacement.date || !newReplacement.raison.trim()) {
-      toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      await axios.post(`${API}/remplacements`, newReplacement);
-      toast({
-        title: "Demande créée",
-        description: "Votre demande de remplacement a été soumise",
-        variant: "success"
-      });
-      setShowReplacementModal(false);
-      setNewReplacement({ type_garde_id: '', date: '', raison: '' });
-      
-      // Reload remplacements
-      const remplacementsResponse = await axios.get(`${API}/remplacements`);
-      setUserRemplacements(remplacementsResponse.data.filter(r => r.demandeur_id === user.id));
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la demande",
         variant: "destructive"
       });
     }
@@ -2637,12 +2523,6 @@ const MonProfil = () => {
     }
   };
 
-  const getAvailableDates = () => {
-    return userDisponibilites
-      .filter(d => d.statut === 'disponible')
-      .map(d => new Date(d.date));
-  };
-
   const getFormationName = (formationId) => {
     const formation = formations.find(f => f.id === formationId);
     return formation ? formation.nom : formationId;
@@ -2659,7 +2539,7 @@ const MonProfil = () => {
 
       <div className="profile-content">
         <div className="profile-main">
-          {/* Informations personnelles */}
+          {/* Informations personnelles - Modifiables par tous */}
           <div className="profile-section">
             <div className="section-header">
               <h2>Informations personnelles</h2>
@@ -2742,7 +2622,7 @@ const MonProfil = () => {
                     <span className="heures-max-unit">heures/semaine</span>
                   </div>
                   <small className="heures-max-help">
-                    Indiquez le nombre maximum d'heures que vous souhaitez travailler par semaine. Cette limite sera respectée lors de l'attribution automatique des gardes.
+                    Cette limite sera respectée lors de l'attribution automatique des gardes.
                   </small>
                 </div>
               )}
@@ -2771,6 +2651,7 @@ const MonProfil = () => {
                 <span className="info-label">Grade:</span>
                 <span className="info-value locked" data-testid="profile-grade">
                   {userProfile?.grade} 🔒
+                  {userProfile?.fonction_superieur && <span className="fonction-sup-profile"> + Fonction supérieur</span>}
                 </span>
               </div>
               <div className="info-item">
@@ -2809,131 +2690,6 @@ const MonProfil = () => {
               )}
             </div>
           </div>
-
-          {/* Section disponibilités (uniquement pour temps partiel) */}
-          {userProfile?.type_emploi === 'temps_partiel' && (
-            <div className="profile-section">
-              <div className="section-header">
-                <h2>Mes disponibilités</h2>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowCalendarModal(true)}
-                  data-testid="edit-calendar-btn"
-                >
-                  📅 Modifier le calendrier
-                </Button>
-              </div>
-              
-              <div className="availability-calendar-section">
-                <div className="calendar-view">
-                  <h3>Calendrier de disponibilités - {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>
-                  
-                  <Calendar
-                    mode="multiple"
-                    selected={getAvailableDates()}
-                    className="availability-calendar"
-                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
-                    modifiers={{
-                      available: getAvailableDates()
-                    }}
-                    modifiersStyles={{
-                      available: { 
-                        backgroundColor: '#dcfce7', 
-                        color: '#166534',
-                        fontWeight: 'bold'
-                      }
-                    }}
-                  />
-                  
-                  <div className="calendar-legend">
-                    <div className="legend-item">
-                      <span className="legend-color available"></span>
-                      Jours disponibles configurés
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="availability-summary-card">
-                  <h4>Résumé</h4>
-                  <div className="summary-stats">
-                    <div className="summary-stat">
-                      <span className="stat-number">{userDisponibilites.length}</span>
-                      <span className="stat-label">Jours configurés</span>
-                    </div>
-                  </div>
-                  
-                  <div className="current-availability">
-                    <h5>Prochaines disponibilités :</h5>
-                    {userDisponibilites.slice(0, 3).map(dispo => (
-                      <div key={dispo.id} className="date-item">
-                        <span>{new Date(dispo.date).toLocaleDateString('fr-FR')}</span>
-                        <span>{dispo.heure_debut}-{dispo.heure_fin}</span>
-                        <span>✅</span>
-                      </div>
-                    ))}
-                    {userDisponibilites.length > 3 && (
-                      <p className="more-dates">+{userDisponibilites.length - 3} autres dates...</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Section remplacements personnels (pour employés) */}
-          {user.role === 'employe' && (
-            <div className="profile-section">
-              <div className="section-header">
-                <h2>Mes demandes de remplacement</h2>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setShowReplacementModal(true)}
-                  data-testid="create-replacement-profile-btn"
-                >
-                  + Nouvelle demande
-                </Button>
-              </div>
-              <div className="personal-replacements">
-                {userRemplacements.length > 0 ? (
-                  <div className="replacements-personal-list">
-                    {userRemplacements.map(remplacement => (
-                      <div key={remplacement.id} className="replacement-personal-item">
-                        <div className="replacement-info">
-                          <h4>{getTypeGardeName(remplacement.type_garde_id)}</h4>
-                          <p>{new Date(remplacement.date).toLocaleDateString('fr-FR')}</p>
-                          <p className="replacement-reason">{remplacement.raison}</p>
-                          <small>Demandé le {new Date(remplacement.created_at).toLocaleDateString('fr-FR')}</small>
-                        </div>
-                        <div className="replacement-status">
-                          <span 
-                            className="status-badge" 
-                            style={{ 
-                              backgroundColor: remplacement.statut === 'en_cours' ? '#F59E0B' : 
-                                             remplacement.statut === 'approuve' ? '#10B981' : '#EF4444'
-                            }}
-                          >
-                            {remplacement.statut === 'en_cours' ? 'En cours' : 
-                             remplacement.statut === 'approuve' ? 'Approuvé' : 'Refusé'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="no-replacements">
-                    <p>Aucune demande de remplacement</p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowReplacementModal(true)}
-                      data-testid="first-replacement-btn"
-                    >
-                      Créer ma première demande
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
 
           {/* Sécurité du compte */}
           <div className="profile-section">
@@ -2993,15 +2749,6 @@ const MonProfil = () => {
                   <span className="stat-label">Certifications</span>
                 </div>
               </div>
-              {user.role === 'employe' && (
-                <div className="stat-item">
-                  <span className="stat-icon">🔄</span>
-                  <div className="stat-content">
-                    <span className="stat-value">{userRemplacements.length}</span>
-                    <span className="stat-label">Remplacements demandés</span>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -3018,131 +2765,6 @@ const MonProfil = () => {
           )}
         </div>
       </div>
-
-      {/* Modal de calendrier avec sélection type de garde */}
-      {showCalendarModal && userProfile?.type_emploi === 'temps_partiel' && (
-        <div className="modal-overlay" onClick={() => setShowCalendarModal(false)}>
-          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="calendar-modal">
-            <div className="modal-header">
-              <h3>📅 Configurer mes disponibilités</h3>
-              <Button variant="ghost" onClick={() => setShowCalendarModal(false)}>✕</Button>
-            </div>
-            <div className="modal-body">
-              <div className="availability-config-advanced">
-                {/* Configuration du type de garde */}
-                <div className="config-section">
-                  <h4>🚒 Type de garde spécifique</h4>
-                  <div className="type-garde-selection">
-                    <Label>Pour quel type de garde êtes-vous disponible ?</Label>
-                    <select
-                      value={availabilityConfig.type_garde_id}
-                      onChange={(e) => setAvailabilityConfig({...availabilityConfig, type_garde_id: e.target.value})}
-                      className="form-select"
-                      data-testid="availability-type-garde-select"
-                    >
-                      <option value="">Tous les types de garde</option>
-                      {typesGarde.map(type => (
-                        <option key={type.id} value={type.id}>
-                          {type.nom} ({type.heure_debut} - {type.heure_fin})
-                        </option>
-                      ))}
-                    </select>
-                    <small>
-                      Sélectionnez un type spécifique ou laissez "Tous les types" pour une disponibilité générale
-                    </small>
-                  </div>
-                </div>
-
-                {/* Configuration des horaires */}
-                <div className="config-section">
-                  <h4>⏰ Créneaux horaires</h4>
-                  <div className="time-config-row">
-                    <div className="time-field">
-                      <Label>Heure de début</Label>
-                      <Input 
-                        type="time" 
-                        value={availabilityConfig.heure_debut}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_debut: e.target.value})}
-                        data-testid="availability-start-time"
-                      />
-                    </div>
-                    <div className="time-field">
-                      <Label>Heure de fin</Label>
-                      <Input 
-                        type="time" 
-                        value={availabilityConfig.heure_fin}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, heure_fin: e.target.value})}
-                        data-testid="availability-end-time"
-                      />
-                    </div>
-                    <div className="status-field">
-                      <Label>Statut</Label>
-                      <select 
-                        value={availabilityConfig.statut}
-                        onChange={(e) => setAvailabilityConfig({...availabilityConfig, statut: e.target.value})}
-                        className="form-select"
-                        data-testid="availability-status-select"
-                      >
-                        <option value="disponible">✅ Disponible</option>
-                        <option value="preference">⚡ Préférence</option>
-                        <option value="indisponible">❌ Indisponible</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sélection des dates */}
-                <div className="config-section">
-                  <h4>📆 Sélection des dates</h4>
-                  <div className="calendar-instructions">
-                    <p>Cliquez sur les dates où vous êtes disponible pour le type de garde sélectionné :</p>
-                  </div>
-                  
-                  <Calendar
-                    mode="multiple"
-                    selected={selectedDates}
-                    onSelect={setSelectedDates}
-                    className="interactive-calendar"
-                    disabled={(date) => date < new Date().setHours(0,0,0,0)}
-                  />
-                  
-                  <div className="selection-summary-advanced">
-                    <div className="summary-item">
-                      <strong>Type de garde :</strong> {getTypeGardeName(availabilityConfig.type_garde_id) || 'Tous les types'}
-                    </div>
-                    <div className="summary-item">
-                      <strong>Dates sélectionnées :</strong> {selectedDates?.length || 0} jour(s)
-                    </div>
-                    <div className="summary-item">
-                      <strong>Horaires :</strong> {availabilityConfig.heure_debut} - {availabilityConfig.heure_fin}
-                    </div>
-                    <div className="summary-item">
-                      <strong>Statut :</strong> {
-                        availabilityConfig.statut === 'disponible' ? '✅ Disponible' :
-                        availabilityConfig.statut === 'preference' ? '⚡ Préférence' : '❌ Indisponible'
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <Button variant="outline" onClick={() => setShowCalendarModal(false)}>
-                  Annuler
-                </Button>
-                <Button 
-                  variant="default" 
-                  onClick={handleSaveAvailability}
-                  data-testid="save-calendar-btn"
-                  disabled={!selectedDates || selectedDates.length === 0}
-                >
-                  Sauvegarder ({selectedDates?.length || 0} jour(s))
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Modal de changement de mot de passe */}
       {showPasswordModal && (
@@ -3194,70 +2816,6 @@ const MonProfil = () => {
                 </Button>
                 <Button variant="default" onClick={handleChangePassword} data-testid="save-password-btn">
                   Modifier le mot de passe
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de demande de remplacement */}
-      {showReplacementModal && (
-        <div className="modal-overlay" onClick={() => setShowReplacementModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="replacement-request-modal">
-            <div className="modal-header">
-              <h3>🔄 Nouvelle demande de remplacement</h3>
-              <Button variant="ghost" onClick={() => setShowReplacementModal(false)}>✕</Button>
-            </div>
-            <div className="modal-body">
-              <div className="replacement-form">
-                <div className="form-field">
-                  <Label>Type de garde *</Label>
-                  <select
-                    value={newReplacement.type_garde_id}
-                    onChange={(e) => setNewReplacement({...newReplacement, type_garde_id: e.target.value})}
-                    className="form-select"
-                    data-testid="replacement-type-garde-select"
-                  >
-                    <option value="">Sélectionner un type de garde</option>
-                    {typesGarde.map(type => (
-                      <option key={type.id} value={type.id}>
-                        {type.nom} ({type.heure_debut} - {type.heure_fin})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-field">
-                  <Label>Date de la garde *</Label>
-                  <Input
-                    type="date"
-                    value={newReplacement.date}
-                    onChange={(e) => setNewReplacement({...newReplacement, date: e.target.value})}
-                    min={new Date().toISOString().split('T')[0]}
-                    data-testid="replacement-date-input"
-                  />
-                </div>
-
-                <div className="form-field">
-                  <Label>Raison du remplacement *</Label>
-                  <textarea
-                    value={newReplacement.raison}
-                    onChange={(e) => setNewReplacement({...newReplacement, raison: e.target.value})}
-                    placeholder="Expliquez la raison de votre demande (maladie, congé personnel, urgence familiale...)"
-                    rows="4"
-                    className="form-textarea"
-                    data-testid="replacement-reason-input"
-                  />
-                </div>
-              </div>
-
-              <div className="modal-actions">
-                <Button variant="outline" onClick={() => setShowReplacementModal(false)}>
-                  Annuler
-                </Button>
-                <Button variant="default" onClick={handleCreateReplacement} data-testid="submit-replacement-request-btn">
-                  Créer la demande
                 </Button>
               </div>
             </div>
