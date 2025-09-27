@@ -143,6 +143,8 @@ const Parametres = ({ user }) => {
     
     setCreateForm({...createForm, jours_application: updatedJours});
   };
+
+  const fetchData = async () => {
     setLoading(true);
     try {
       const [typesResponse, formationsResponse, usersResponse] = await Promise.all([
