@@ -895,71 +895,102 @@ const Parametres = ({ user }) => {
             <div className="tab-header">
               <div>
                 <h2>Paramètres des Remplacements</h2>
-                <p>Configuration des règles de validation et délais</p>
+                <p>Configuration des règles de validation et délais de traitement automatique</p>
               </div>
-              <Button variant="outline" data-testid="save-replacement-settings-btn">
-                💾 Sauvegarder les paramètres
-              </Button>
             </div>
             
             <div className="replacement-settings">
               <div className="setting-group">
                 <h3>Délais et limites</h3>
-                <div className="setting-inputs">
-                  <label>
-                    <span>Délai de réponse (heures)</span>
-                    <div className="input-with-actions">
+                <div className="setting-inputs-optimized">
+                  <div className="input-group">
+                    <Label>Délai de réponse (minutes)</Label>
+                    <div className="input-with-reset">
                       <Input
                         type="number"
-                        value={systemSettings.delai_reponse}
-                        onChange={(e) => handleSettingChange('delai_reponse', parseInt(e.target.value))}
-                        data-testid="delai-reponse-input"
+                        min="30"
+                        max="10080"
+                        step="30"
+                        value={systemSettings.delai_reponse_minutes}
+                        onChange={(e) => handleSettingChange('delai_reponse_minutes', parseInt(e.target.value))}
+                        data-testid="delai-reponse-minutes-input"
                       />
-                      <Button variant="ghost" size="sm" data-testid="reset-delai-btn">🔄</Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSettingChange('delai_reponse_minutes', 2880)}
+                        data-testid="reset-delai-btn"
+                      >
+                        🔄
+                      </Button>
                     </div>
-                    <small>Actuellement: {systemSettings.delai_reponse} heures</small>
-                  </label>
+                  </div>
                   
-                  <label>
-                    <span>Max personnes à contacter</span>
-                    <div className="input-with-actions">
+                  <div className="input-group">
+                    <Label>Max personnes à contacter</Label>
+                    <div className="input-with-reset">
                       <Input
                         type="number"
+                        min="1"
+                        max="20"
                         value={systemSettings.max_personnes_contact}
                         onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
                         data-testid="max-contact-input"
                       />
-                      <Button variant="ghost" size="sm" data-testid="reset-contact-btn">🔄</Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm" 
+                        onClick={() => handleSettingChange('max_personnes_contact', 5)}
+                        data-testid="reset-contact-btn"
+                      >
+                        🔄
+                      </Button>
                     </div>
-                    <small>Actuellement: {systemSettings.max_personnes_contact} personnes</small>
-                  </label>
+                  </div>
                 </div>
               </div>
               
               <div className="setting-group">
-                <h3>Règles de validation</h3>
-                <div className="rules-settings">
-                  <label className="setting-toggle">
-                    <div className="toggle-info">
-                      <span>Grade équivalent obligatoire</span>
-                      <small>Accepter uniquement les remplacements de grade équivalent ou supérieur</small>
-                    </div>
+                <h3>Règles de validation automatique</h3>
+                <div className="validation-rules">
+                  <label className="validation-rule">
                     <input
                       type="checkbox"
-                      checked={systemSettings.grade_equivalent}
-                      onChange={(e) => handleSettingChange('grade_equivalent', e.target.checked)}
-                      data-testid="grade-equivalent-toggle"
+                      checked={systemSettings.privilegier_disponibles}
+                      onChange={(e) => handleSettingChange('privilegier_disponibles', e.target.checked)}
+                      data-testid="toggle-privilegier-disponibles"
                     />
+                    <div className="rule-content">
+                      <span className="rule-title">Privilégier les personnes disponibles</span>
+                      <span className="rule-description">Priorité aux employés ayant renseigné leur disponibilité pour le créneau</span>
+                    </div>
                   </label>
                   
-                  <div className="validation-actions">
-                    <Button variant="outline" size="sm" data-testid="test-validation-btn">
-                      🧪 Tester les règles
-                    </Button>
-                    <Button variant="outline" size="sm" data-testid="reset-rules-btn">
-                      🔄 Réinitialiser par défaut
-                    </Button>
-                  </div>
+                  <label className="validation-rule">
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.grade_egal}
+                      onChange={(e) => handleSettingChange('grade_egal', e.target.checked)}
+                      data-testid="toggle-grade-egal"
+                    />
+                    <div className="rule-content">
+                      <span className="rule-title">Grade équivalent ou supérieur</span>
+                      <span className="rule-description">Accepter uniquement les remplacements de grade égal ou supérieur</span>
+                    </div>
+                  </label>
+                  
+                  <label className="validation-rule">
+                    <input
+                      type="checkbox"
+                      checked={systemSettings.competences_egales}
+                      onChange={(e) => handleSettingChange('competences_egales', e.target.checked)}
+                      data-testid="toggle-competences-egales"
+                    />
+                    <div className="rule-content">
+                      <span className="rule-title">Compétences équivalentes</span>
+                      <span className="rule-description">Le remplaçant doit avoir les mêmes compétences que le demandeur</span>
+                    </div>
+                  </label>
                 </div>
               </div>
 
@@ -975,6 +1006,27 @@ const Parametres = ({ user }) => {
                   <Button variant="outline" data-testid="backup-settings-btn">
                     💾 Sauvegarder paramètres
                   </Button>
+                </div>
+              </div>
+
+              <div className="validation-summary">
+                <h3>Résumé de la validation</h3>
+                <div className="summary-content">
+                  <p>Lorsqu'une demande de remplacement est soumise, le système appliquera les règles suivantes dans l'ordre :</p>
+                  <ol className="validation-order">
+                    <li className={systemSettings.privilegier_disponibles ? 'active' : 'inactive'}>
+                      {systemSettings.privilegier_disponibles ? '✅' : '❌'} Vérifier la disponibilité des remplaçants potentiels
+                    </li>
+                    <li className={systemSettings.grade_egal ? 'active' : 'inactive'}>
+                      {systemSettings.grade_egal ? '✅' : '❌'} Filtrer par grade équivalent ou supérieur
+                    </li>
+                    <li className={systemSettings.competences_egales ? 'active' : 'inactive'}>
+                      {systemSettings.competences_egales ? '✅' : '❌'} Vérifier les compétences équivalentes
+                    </li>
+                  </ol>
+                  <p className="summary-note">
+                    <strong>Résultat :</strong> Délai maximum de {systemSettings.delai_reponse_minutes} minutes pour contacter jusqu'à {systemSettings.max_personnes_contact} remplaçants potentiels.
+                  </p>
                 </div>
               </div>
             </div>
