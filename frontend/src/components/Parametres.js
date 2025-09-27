@@ -430,11 +430,11 @@ const Parametres = ({ user }) => {
           🚒 Types de Gardes
         </button>
         <button
-          className={`tab-button ${activeTab === 'formations' ? 'active' : ''}`}
-          onClick={() => setActiveTab('formations')}
-          data-testid="tab-formations"
+          className={`tab-button ${activeTab === 'competences' ? 'active' : ''}`}
+          onClick={() => setActiveTab('competences')}
+          data-testid="tab-competences"
         >
-          📚 Formations
+          📜 Compétences
         </button>
         <button
           className={`tab-button ${activeTab === 'attribution' ? 'active' : ''}`}
