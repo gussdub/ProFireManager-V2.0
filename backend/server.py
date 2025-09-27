@@ -360,7 +360,48 @@ def clean_mongo_doc(doc):
         doc.pop("_id", None)
     return doc
 
-# Planning routes
+@api_router.put("/types-garde/{type_garde_id}", response_model=TypeGarde)
+async def update_type_garde(type_garde_id: str, type_garde_update: TypeGardeCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Check if type garde exists
+    existing_type = await db.types_garde.find_one({"id": type_garde_id})
+    if not existing_type:
+        raise HTTPException(status_code=404, detail="Type de garde non trouvé")
+    
+    # Update type garde data
+    type_dict = type_garde_update.dict()
+    type_dict["id"] = type_garde_id
+    type_dict["created_at"] = existing_type.get("created_at")
+    
+    result = await db.types_garde.replace_one({"id": type_garde_id}, type_dict)
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de mettre à jour le type de garde")
+    
+    updated_type = await db.types_garde.find_one({"id": type_garde_id})
+    updated_type = clean_mongo_doc(updated_type)
+    return TypeGarde(**updated_type)
+
+@api_router.delete("/types-garde/{type_garde_id}")
+async def delete_type_garde(type_garde_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Check if type garde exists
+    existing_type = await db.types_garde.find_one({"id": type_garde_id})
+    if not existing_type:
+        raise HTTPException(status_code=404, detail="Type de garde non trouvé")
+    
+    # Delete type garde
+    result = await db.types_garde.delete_one({"id": type_garde_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Impossible de supprimer le type de garde")
+    
+    # Also delete related assignations
+    await db.assignations.delete_many({"type_garde_id": type_garde_id})
+    
+    return {"message": "Type de garde supprimé avec succès"}
 @api_router.get("/planning/{semaine_debut}")
 async def get_planning(semaine_debut: str, current_user: User = Depends(get_current_user)):
     planning = await db.planning.find_one({"semaine_debut": semaine_debut})
