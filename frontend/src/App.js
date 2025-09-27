@@ -2083,6 +2083,7 @@ const MesDisponibilites = () => {
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [selectedDates, setSelectedDates] = useState([]);
   const [selectedDateDetails, setSelectedDateDetails] = useState(null);
+  const [pendingConfigurations, setPendingConfigurations] = useState([]);
   const [availabilityConfig, setAvailabilityConfig] = useState({
     type_garde_id: '',
     heure_debut: '08:00',
