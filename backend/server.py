@@ -411,16 +411,39 @@ async def create_user(user_create: UserCreate, current_user: User = Depends(get_
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Accès refusé")
     
+    # Validation du mot de passe complexe
+    if not validate_complex_password(user_create.mot_de_passe):
+        raise HTTPException(
+            status_code=400, 
+            detail="Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial (!@#$%^&*+-?())"
+        )
+    
     # Check if user already exists
     existing_user = await db.users.find_one({"email": user_create.email})
     if existing_user:
         raise HTTPException(status_code=400, detail="Cet email est déjà utilisé")
     
     user_dict = user_create.dict()
+    temp_password = user_dict["mot_de_passe"]  # Sauvegarder pour l'email
     user_dict["mot_de_passe_hash"] = get_password_hash(user_dict.pop("mot_de_passe"))
     user_obj = User(**user_dict)
     
     await db.users.insert_one(user_obj.dict())
+    
+    # Envoyer l'email de bienvenue
+    try:
+        user_name = f"{user_create.prenom} {user_create.nom}"
+        email_sent = send_welcome_email(user_create.email, user_name, user_create.role, temp_password)
+        
+        if email_sent:
+            print(f"Email de bienvenue envoyé à {user_create.email}")
+        else:
+            print(f"Échec envoi email à {user_create.email}")
+            
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'email: {str(e)}")
+        # Ne pas échouer la création du compte si l'email échoue
+    
     return user_obj
 
 @api_router.get("/users", response_model=List[User])
