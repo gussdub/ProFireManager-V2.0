@@ -1257,13 +1257,31 @@ const Parametres = ({ user }) => {
                     </select>
                   </div>
                   <div className="form-field">
-                    <Label>Mot de passe temporaire</Label>
+                    <Label>Mot de passe temporaire *</Label>
                     <Input
                       type="password"
                       value={newUser.mot_de_passe}
                       onChange={(e) => setNewUser({...newUser, mot_de_passe: e.target.value})}
                       data-testid="new-user-password"
+                      placeholder="Minimum 8 caractères complexes"
                     />
+                    <div className="password-requirements">
+                      <small className="requirement-title">Exigences du mot de passe :</small>
+                      <div className="requirements-list">
+                        <span className={`requirement ${newUser.mot_de_passe.length >= 8 ? 'valid' : 'invalid'}`}>
+                          {newUser.mot_de_passe.length >= 8 ? '✅' : '❌'} 8 caractères minimum
+                        </span>
+                        <span className={`requirement ${/[A-Z]/.test(newUser.mot_de_passe) ? 'valid' : 'invalid'}`}>
+                          {/[A-Z]/.test(newUser.mot_de_passe) ? '✅' : '❌'} 1 majuscule
+                        </span>
+                        <span className={`requirement ${/\d/.test(newUser.mot_de_passe) ? 'valid' : 'invalid'}`}>
+                          {/\d/.test(newUser.mot_de_passe) ? '✅' : '❌'} 1 chiffre
+                        </span>
+                        <span className={`requirement ${/[!@#$%^&*+\-?()]/.test(newUser.mot_de_passe) ? 'valid' : 'invalid'}`}>
+                          {/[!@#$%^&*+\-?()]/.test(newUser.mot_de_passe) ? '✅' : '❌'} 1 caractère spécial (!@#$%^&*+-?())
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
