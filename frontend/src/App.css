@@ -5548,7 +5548,59 @@ body {
   margin-top: 0.125rem;
 }
 
-/* Responsive compact formations */
+/* Temps Partiel Info Styles */
+.temps-partiel-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.heures-max-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.heures-max-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.heures-max-value {
+  color: #dc2626;
+  font-weight: 600;
+  background-color: #fef2f2;
+  padding: 0.125rem 0.375rem;
+  border-radius: 10px;
+  border: 1px solid #fecaca;
+}
+
+/* Profile heures max input */
+.heures-max-input {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.heures-max-input input {
+  max-width: 100px;
+}
+
+.heures-max-unit {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.heures-max-help {
+  color: #6b7280;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
 @media (max-width: 1024px) {
   .formations-compact-grid {
     grid-template-columns: 1fr;
