@@ -2133,7 +2133,95 @@ const MesDisponibilites = () => {
     }
   };
 
-  const handleSaveAvailability = async () => {
+  const [selectedConfigurations, setSelectedConfigurations] = useState([]);
+  const [currentConfig, setCurrentConfig] = useState({
+    type_garde_id: '',
+    heure_debut: '08:00',
+    heure_fin: '16:00',
+    statut: 'disponible',
+    dates: []
+  });
+
+  const handleAddConfiguration = () => {
+    if (selectedDates.length === 0) {
+      toast({
+        title: "Aucune date sélectionnée",
+        description: "Veuillez sélectionner au moins une date",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newConfig = {
+      id: Date.now(),
+      type_garde_id: availabilityConfig.type_garde_id,
+      type_garde_name: getTypeGardeName(availabilityConfig.type_garde_id) || 'Tous les types',
+      heure_debut: availabilityConfig.heure_debut,
+      heure_fin: availabilityConfig.heure_fin,
+      statut: availabilityConfig.statut,
+      dates: [...selectedDates],
+      couleur: getColorByTypeGarde(availabilityConfig.type_garde_id)
+    };
+
+    setSelectedConfigurations([...selectedConfigurations, newConfig]);
+    setSelectedDates([]);
+    
+    toast({
+      title: "Configuration ajoutée",
+      description: `${newConfig.dates.length} jour(s) pour ${newConfig.type_garde_name}`,
+      variant: "success"
+    });
+  };
+
+  const handleRemoveConfiguration = (configId) => {
+    setSelectedConfigurations(prev => prev.filter(c => c.id !== configId));
+  };
+
+  const handleSaveAllConfigurations = async () => {
+    if (selectedConfigurations.length === 0) {
+      toast({
+        title: "Aucune configuration",
+        description: "Veuillez ajouter au moins une configuration",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Flatten all configurations into individual disponibilités
+      const allDisponibilites = selectedConfigurations.flatMap(config => 
+        config.dates.map(date => ({
+          user_id: user.id,
+          date: date.toISOString().split('T')[0],
+          type_garde_id: config.type_garde_id || null,
+          heure_debut: config.heure_debut,
+          heure_fin: config.heure_fin,
+          statut: config.statut
+        }))
+      );
+
+      await axios.put(`${API}/disponibilites/${user.id}`, allDisponibilites);
+      
+      toast({
+        title: "Toutes les disponibilités sauvegardées",
+        description: `${allDisponibilites.length} disponibilités configurées avec succès`,
+        variant: "success"
+      });
+      
+      setShowCalendarModal(false);
+      setSelectedConfigurations([]);
+      
+      // Reload disponibilités
+      const dispoResponse = await axios.get(`${API}/disponibilites/${user.id}`);
+      setUserDisponibilites(dispoResponse.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder",
+        variant: "destructive"
+      });
+    }
+  };
     if (selectedDates.length === 0) {
       toast({
         title: "Aucune date sélectionnée",
