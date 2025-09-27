@@ -2599,7 +2599,11 @@ const MonProfil = () => {
           <div className="profile-section">
             <h2>Sécurité du compte</h2>
             <div className="security-options">
-              <Button variant="outline" data-testid="change-password-btn">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowPasswordModal(true)}
+                data-testid="change-password-btn"
+              >
                 🔒 Changer le mot de passe
               </Button>
               {user.role === 'admin' && (
