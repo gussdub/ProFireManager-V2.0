@@ -838,12 +838,13 @@ const Rapports = () => {
 };
 
 const Parametres = () => {
-  const { user } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('types-garde');
-  const [typesGarde, setTypesGarde] = useState([]);
-  const [formations, setFormations] = useState([]);
-  const [users, setUsers] = useState([]);
+  return (
+    <div className="parametres">
+      <h1>Paramètres</h1>
+      <p>Module en cours de développement</p>
+    </div>
+  );
+};
   
   // Modals states
   const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
