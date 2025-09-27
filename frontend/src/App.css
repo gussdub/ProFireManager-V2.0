@@ -5921,3 +5921,98 @@ body {
     max-width: 95vw;
   }
 }
+
+/* Advanced Availability Config */
+.availability-config-advanced {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.config-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.config-section h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.type-garde-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.type-garde-selection small {
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-style: italic;
+}
+
+.time-config-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.time-field,
+.status-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.selection-summary-advanced {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.selection-summary-advanced .summary-item {
+  color: #1e40af;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Password Form */
+.password-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.password-requirements {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  line-height: 1.4;
+}
+
+/* Replacement Form */
+.replacement-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.replacement-reason {
+  color: #64748b;
+  font-size: 0.875rem;
+  font-style: italic;
+  margin-bottom: 0.25rem;
+}
+
+/* Enhanced replacement info */
+.replacement-info h4 {
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
