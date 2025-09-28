@@ -4432,12 +4432,421 @@ const MonProfil = () => {
   );
 };
 
-const Rapports = () => (
-  <div className="page-content">
-    <h1 data-testid="rapports-title">Rapports et analyses</h1>
-    <p>Module Rapports - Fonctionnel</p>
-  </div>
-);
+// Rapports Component optimisé - Analytics et exports avancés
+const Rapports = () => {
+  const { user } = useAuth();
+  const [statistiques, setStatistiques] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [activeSection, setActiveSection] = useState('vue-ensemble');
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      fetchStatistiques();
+    }
+  }, [user]);
+
+  const fetchStatistiques = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`${API}/rapports/statistiques-avancees`);
+      setStatistiques(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des statistiques:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les statistiques",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportPDF = async (typeRapport = "general", userId = null) => {
+    try {
+      const params = new URLSearchParams({ type_rapport: typeRapport });
+      if (userId) params.append('user_id', userId);
+      
+      const response = await axios.get(`${API}/rapports/export-pdf?${params}`);
+      
+      // Décoder le base64 et créer le téléchargement
+      const binaryString = atob(response.data.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = response.data.filename;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export PDF réussi",
+        description: `Rapport ${typeRapport} téléchargé`,
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur export PDF",
+        description: "Impossible de générer le rapport PDF",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleExportExcel = async (typeRapport = "general") => {
+    try {
+      const response = await axios.get(`${API}/rapports/export-excel?type_rapport=${typeRapport}`);
+      
+      // Décoder le base64 et créer le téléchargement
+      const binaryString = atob(response.data.data);
+      const bytes = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = response.data.filename;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Export Excel réussi",
+        description: `Rapport ${typeRapport} téléchargé`,
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur export Excel",
+        description: "Impossible de générer le rapport Excel",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (user?.role !== 'admin') {
+    return (
+      <div className="access-denied">
+        <h1>Accès refusé</h1>
+        <p>Cette section est réservée aux administrateurs.</p>
+      </div>
+    );
+  }
+
+  if (loading) return <div className="loading" data-testid="rapports-loading">Chargement des rapports...</div>;
+
+  return (
+    <div className="rapports-optimized">
+      <div className="rapports-header">
+        <div>
+          <h1 data-testid="rapports-title">Rapports et analyses</h1>
+          <p>Statistiques détaillées, indicateurs de performance et exports</p>
+        </div>
+        <div className="export-actions-header">
+          <Button 
+            variant="default" 
+            onClick={() => handleExportPDF('general')}
+            data-testid="export-pdf-general-btn"
+          >
+            📄 Export PDF
+          </Button>
+          <Button 
+            variant="outline" 
+            onClick={() => handleExportExcel('general')}
+            data-testid="export-excel-general-btn"
+          >
+            📊 Export Excel
+          </Button>
+        </div>
+      </div>
+
+      {/* Navigation sections */}
+      <div className="rapports-sections">
+        <button
+          className={`section-button ${activeSection === 'vue-ensemble' ? 'active' : ''}`}
+          onClick={() => setActiveSection('vue-ensemble')}
+          data-testid="section-vue-ensemble"
+        >
+          📊 Vue d'ensemble
+        </button>
+        <button
+          className={`section-button ${activeSection === 'par-role' ? 'active' : ''}`}
+          onClick={() => setActiveSection('par-role')}
+          data-testid="section-par-role"
+        >
+          👥 Par rôle
+        </button>
+        <button
+          className={`section-button ${activeSection === 'par-employe' ? 'active' : ''}`}
+          onClick={() => setActiveSection('par-employe')}
+          data-testid="section-par-employe"
+        >
+          👤 Par employé
+        </button>
+        <button
+          className={`section-button ${activeSection === 'analytics' ? 'active' : ''}`}
+          onClick={() => setActiveSection('analytics')}
+          data-testid="section-analytics"
+        >
+          📈 Analytics
+        </button>
+      </div>
+
+      {/* Contenu des sections */}
+      <div className="rapports-content">
+        {activeSection === 'vue-ensemble' && statistiques && (
+          <div className="vue-ensemble">
+            <h2>📊 Vue d'ensemble générale</h2>
+            
+            {/* KPI Cards */}
+            <div className="kpi-grid">
+              <div className="kpi-card personnel">
+                <div className="kpi-icon">👥</div>
+                <div className="kpi-content">
+                  <span className="kpi-value">{statistiques.statistiques_generales.personnel_actif}</span>
+                  <span className="kpi-label">Personnel actif</span>
+                  <span className="kpi-detail">sur {statistiques.statistiques_generales.personnel_total} total</span>
+                </div>
+              </div>
+
+              <div className="kpi-card assignations">
+                <div className="kpi-icon">📅</div>
+                <div className="kpi-content">
+                  <span className="kpi-value">{statistiques.statistiques_generales.assignations_mois}</span>
+                  <span className="kpi-label">Assignations ce mois</span>
+                  <span className="kpi-detail">Septembre 2025</span>
+                </div>
+              </div>
+
+              <div className="kpi-card couverture">
+                <div className="kpi-icon">📊</div>
+                <div className="kpi-content">
+                  <span className="kpi-value">{statistiques.statistiques_generales.taux_couverture}%</span>
+                  <span className="kpi-label">Taux de couverture</span>
+                  <span className="kpi-detail">Efficacité planning</span>
+                </div>
+              </div>
+
+              <div className="kpi-card formations">
+                <div className="kpi-icon">📚</div>
+                <div className="kpi-content">
+                  <span className="kpi-value">{statistiques.statistiques_generales.formations_disponibles}</span>
+                  <span className="kpi-label">Formations disponibles</span>
+                  <span className="kpi-detail">Compétences actives</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Export options */}
+            <div className="export-section">
+              <h3>📤 Options d'export</h3>
+              <div className="export-grid">
+                <div className="export-option">
+                  <h4>📄 Rapport PDF</h4>
+                  <p>Rapport complet avec graphiques et analyses</p>
+                  <Button onClick={() => handleExportPDF('general')} data-testid="export-pdf-vue-ensemble">
+                    Télécharger PDF
+                  </Button>
+                </div>
+                <div className="export-option">
+                  <h4>📊 Rapport Excel</h4>
+                  <p>Données détaillées pour analyse personnalisée</p>
+                  <Button onClick={() => handleExportExcel('general')} data-testid="export-excel-vue-ensemble">
+                    Télécharger Excel
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'par-role' && statistiques && (
+          <div className="par-role">
+            <h2>👥 Statistiques par rôle</h2>
+            
+            <div className="roles-grid">
+              {Object.entries(statistiques.statistiques_par_role).map(([role, stats]) => (
+                <div key={role} className={`role-card ${role}`}>
+                  <div className="role-header">
+                    <h3>
+                      {role === 'admin' ? '👑 Administrateurs' : 
+                       role === 'superviseur' ? '🎖️ Superviseurs' : '👤 Employés'}
+                    </h3>
+                    <span className="role-count">{stats.nombre_utilisateurs}</span>
+                  </div>
+                  <div className="role-stats">
+                    <div className="role-stat">
+                      <span className="stat-label">Assignations</span>
+                      <span className="stat-value">{stats.assignations_totales}</span>
+                    </div>
+                    <div className="role-stat">
+                      <span className="stat-label">Heures moy.</span>
+                      <span className="stat-value">{stats.heures_moyennes}h</span>
+                    </div>
+                    <div className="role-stat">
+                      <span className="stat-label">Formations</span>
+                      <span className="stat-value">{stats.formations_completees}</span>
+                    </div>
+                  </div>
+                  <div className="role-actions">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleExportPDF('role', role)}
+                      data-testid={`export-role-${role}`}
+                    >
+                      📄 Export {role}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'par-employe' && statistiques && (
+          <div className="par-employe">
+            <h2>👤 Statistiques par employé</h2>
+            
+            <div className="employee-selector">
+              <Label>Sélectionner un employé pour export individuel :</Label>
+              <select
+                value={selectedEmployee}
+                onChange={(e) => setSelectedEmployee(e.target.value)}
+                className="form-select"
+                data-testid="employee-select"
+              >
+                <option value="">Choisir un employé...</option>
+                {statistiques.statistiques_par_employe.map(emp => (
+                  <option key={emp.id} value={emp.id}>
+                    {emp.nom} ({emp.grade} - {emp.role})
+                  </option>
+                ))}
+              </select>
+              {selectedEmployee && (
+                <div className="individual-export">
+                  <Button 
+                    variant="default"
+                    onClick={() => handleExportPDF('employe', selectedEmployee)}
+                    data-testid="export-individual-pdf"
+                  >
+                    📄 Export PDF individuel
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Tableau employés */}
+            <div className="employees-table">
+              <div className="table-header">
+                <div className="header-cell">EMPLOYÉ</div>
+                <div className="header-cell">RÔLE</div>
+                <div className="header-cell">ASSIGNATIONS</div>
+                <div className="header-cell">DISPONIBILITÉS</div>
+                <div className="header-cell">FORMATIONS</div>
+                <div className="header-cell">HEURES</div>
+                <div className="header-cell">ACTIONS</div>
+              </div>
+              
+              {statistiques.statistiques_par_employe.map(emp => (
+                <div key={emp.id} className="employee-row" data-testid={`employee-${emp.id}`}>
+                  <div className="employee-cell">
+                    <span className="employee-name">{emp.nom}</span>
+                    <span className="employee-grade">{emp.grade}</span>
+                  </div>
+                  <div className="role-cell">
+                    <span className={`role-badge ${emp.role}`}>
+                      {emp.role === 'admin' ? '👑' : emp.role === 'superviseur' ? '🎖️' : '👤'}
+                    </span>
+                  </div>
+                  <div className="stat-cell">
+                    <span className="stat-number">{emp.assignations_count}</span>
+                  </div>
+                  <div className="stat-cell">
+                    <span className="stat-number">{emp.disponibilites_count}</span>
+                  </div>
+                  <div className="stat-cell">
+                    <span className="stat-number">{emp.formations_count}</span>
+                  </div>
+                  <div className="stat-cell">
+                    <span className="stat-number">{emp.heures_estimees}h</span>
+                  </div>
+                  <div className="actions-cell">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleExportPDF('employe', emp.id)}
+                      data-testid={`export-employee-${emp.id}`}
+                    >
+                      📄
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeSection === 'analytics' && (
+          <div className="analytics">
+            <h2>📈 Analytics avancées</h2>
+            
+            <div className="charts-section">
+              <div className="chart-container">
+                <h3>Évolution des assignations</h3>
+                <div className="chart-placeholder">
+                  <div className="chart-mock">
+                    <div className="chart-bar" style={{height: '60%'}}>Jan</div>
+                    <div className="chart-bar" style={{height: '75%'}}>Fév</div>
+                    <div className="chart-bar" style={{height: '85%'}}>Mar</div>
+                    <div className="chart-bar" style={{height: '90%'}}>Avr</div>
+                    <div className="chart-bar" style={{height: '95%'}}>Sep</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="chart-container">
+                <h3>Distribution par grade</h3>
+                <div className="pie-chart-mock">
+                  <div className="pie-segment directeur">Directeur 35%</div>
+                  <div className="pie-segment capitaine">Capitaine 28%</div>
+                  <div className="pie-segment lieutenant">Lieutenant 22%</div>
+                  <div className="pie-segment pompier">Pompier 15%</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="analytics-exports">
+              <Button 
+                variant="outline"
+                onClick={() => handleExportPDF('analytics')}
+                data-testid="export-analytics-pdf"
+              >
+                📄 Export Analytics PDF
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => handleExportExcel('analytics')}
+                data-testid="export-analytics-excel"
+              >
+                📊 Export Analytics Excel
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Main Application Layout
 const AppLayout = () => {
