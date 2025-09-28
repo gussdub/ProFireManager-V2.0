@@ -1332,9 +1332,24 @@ const Planning = () => {
     return date;
   });
 
+  // Générer les dates du mois pour la vue mois
+  const monthDates = (() => {
+    if (viewMode !== 'mois') return [];
+    
+    const [year, month] = currentMonth.split('-').map(Number);
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const dates = [];
+    
+    for (let day = 1; day <= lastDay.getDate(); day++) {
+      dates.push(new Date(year, month - 1, day));
+    }
+    return dates;
+  })();
+
   useEffect(() => {
     fetchPlanningData();
-  }, [currentWeek]);
+  }, [currentWeek, currentMonth, viewMode]);
 
   const fetchPlanningData = async () => {
     setLoading(true);
