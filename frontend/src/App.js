@@ -1463,23 +1463,46 @@ const Planning = () => {
           <p>Affectation manuelle privilégiée et attribution automatique</p>
         </div>
         <div className="planning-controls">
-          <Button variant="outline" data-testid="week-view-btn">Vue semaine</Button>
-          <Button 
-            variant="default" 
-            disabled={user.role === 'employe'}
-            onClick={handleAttributionAuto}
-            data-testid="auto-assign-btn"
-          >
-            ✨ Attribution auto
-          </Button>
-          <Button 
-            variant="destructive" 
-            disabled={user.role === 'employe'}
-            onClick={() => alert('Sélectionnez une cellule vide dans le planning pour assigner manuellement')}
-            data-testid="manual-assign-btn"
-          >
-            👤 Assignation manuelle
-          </Button>
+          <div className="view-controls">
+            <Button 
+              variant={viewMode === 'semaine' ? 'default' : 'outline'}
+              onClick={() => setViewMode('semaine')}
+              data-testid="week-view-btn"
+            >
+              📅 Vue semaine
+            </Button>
+            <Button 
+              variant={viewMode === 'mois' ? 'default' : 'outline'}
+              onClick={() => setViewMode('mois')}
+              data-testid="month-view-btn"
+            >
+              📊 Vue mois
+            </Button>
+          </div>
+          <div className="action-controls">
+            <Button 
+              variant="default" 
+              disabled={user.role === 'employe'}
+              onClick={handleAttributionAuto}
+              data-testid="auto-assign-btn"
+            >
+              ✨ Attribution auto
+            </Button>
+            <Button 
+              variant="destructive" 
+              disabled={user.role === 'employe'}
+              onClick={() => {
+                toast({
+                  title: "Assignation manuelle",
+                  description: "Cliquez sur une cellule vide dans le planning pour assigner manuellement",
+                  variant: "default"
+                });
+              }}
+              data-testid="manual-assign-btn"
+            >
+              👤 Assignation manuelle
+            </Button>
+          </div>
         </div>
       </div>
 
