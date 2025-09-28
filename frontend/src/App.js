@@ -2064,7 +2064,21 @@ const Remplacements = () => {
               ) : (
                 <div className="empty-state">
                   <h3>Aucune demande de congé</h3>
-                  <p>Les demandes de congé apparaîtront ici.</p>
+                  <p>
+                    {user.role !== 'employe' 
+                      ? 'Les demandes de congé des employés apparaîtront ici pour approbation.' 
+                      : 'Vos demandes de congé apparaîtront ici.'}
+                  </p>
+                  {user.role !== 'employe' && (
+                    <div className="management-tips">
+                      <h4>💡 Conseils de gestion :</h4>
+                      <ul>
+                        <li>Les demandes urgentes nécessitent un traitement immédiat</li>
+                        <li>Vérifiez l'impact sur le planning avant d'approuver</li>
+                        <li>Ajoutez des commentaires pour justifier vos décisions</li>
+                      </ul>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
