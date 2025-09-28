@@ -1547,7 +1547,7 @@ const Planning = () => {
               onClick={() => {
                 toast({
                   title: "Assignation manuelle",
-                  description: "Cliquez sur une cellule vide dans le planning pour assigner manuellement",
+                  description: "Cliquez sur une cellule vide pour assigner manuellement",
                   variant: "default"
                 });
               }}
