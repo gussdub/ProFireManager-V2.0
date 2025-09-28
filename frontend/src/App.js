@@ -1300,7 +1300,7 @@ const Personnel = () => {
   );
 };
 
-// Planning Component complet avec attribution automatique
+// Planning Component optimisé - Vue semaine/mois + jours d'application respectés
 const Planning = () => {
   const { user } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(() => {
@@ -1308,15 +1308,20 @@ const Planning = () => {
     const monday = new Date(today.setDate(today.getDate() - today.getDay() + 1));
     return monday.toISOString().split('T')[0];
   });
+  const [viewMode, setViewMode] = useState('semaine'); // 'semaine' ou 'mois'
   const [typesGarde, setTypesGarde] = useState([]);
   const [assignations, setAssignations] = useState([]);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showGardeDetailsModal, setShowGardeDetailsModal] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [selectedGardeDetails, setSelectedGardeDetails] = useState(null);
   const { toast } = useToast();
 
   const weekDays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+  const weekDaysEn = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+  
   const weekDates = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(currentWeek);
     date.setDate(date.getDate() + i);
