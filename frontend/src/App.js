@@ -1500,6 +1500,12 @@ const Planning = () => {
     setCurrentWeek(newDate.toISOString().split('T')[0]);
   };
 
+  const navigateMonth = (direction) => {
+    const [year, month] = currentMonth.split('-').map(Number);
+    const newDate = new Date(year, month - 1 + direction, 1);
+    setCurrentMonth(`${newDate.getFullYear()}-${String(newDate.getMonth() + 1).padStart(2, '0')}`);
+  };
+
   if (loading) return <div className="loading" data-testid="planning-loading">Chargement du planning...</div>;
 
   return (
