@@ -1549,88 +1549,103 @@ const Planning = () => {
           ))}
         </div>
 
-        {typesGarde.map(typeGarde => (
-          <div key={typeGarde.id} className="grid-row">
-            <div className="time-cell">
-              <div className="time-label">{typeGarde.nom}</div>
-              <div className="time-range">
-                {typeGarde.heure_debut} - {typeGarde.heure_fin}
-              </div>
-              <div className="time-details">
-                👥 {typeGarde.personnel_requis} personnel requis
-                {typeGarde.officier_obligatoire && <div className="officier-required">🎖️ Officier requis</div>}
-                {typeGarde.jours_application?.length > 0 && (
-                  <div className="jours-application">
-                    📅 {typeGarde.jours_application.map(j => j.charAt(0).toUpperCase() + j.slice(1)).join(', ')}
+        {/* Tri des types de garde par heure de début pour optimiser l'affichage */}
+        {typesGarde
+          .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
+          .map(typeGarde => {
+            // Calculer quels jours afficher ce type de garde
+            const joursApplicables = weekDates.map((date, dayIndex) => 
+              shouldShowTypeGardeForDay(typeGarde, dayIndex)
+            );
+            
+            // Si aucun jour applicable, ne pas afficher cette ligne
+            if (!joursApplicables.some(Boolean)) {
+              return null;
+            }
+
+            return (
+              <div key={typeGarde.id} className="grid-row">
+                <div className="time-cell">
+                  <div className="time-label">{typeGarde.nom}</div>
+                  <div className="time-range">
+                    {typeGarde.heure_debut} - {typeGarde.heure_fin}
                   </div>
-                )}
-              </div>
-            </div>
-
-            {weekDates.map((date, dayIndex) => {
-              // Vérifier si ce type de garde s'applique à ce jour
-              if (!shouldShowTypeGardeForDay(typeGarde, dayIndex)) {
-                return (
-                  <div 
-                    key={dayIndex} 
-                    className="planning-cell disabled"
-                    data-testid={`planning-cell-disabled-${dayIndex}-${typeGarde.id}`}
-                  >
-                    <div className="disabled-content">
-                      <div className="disabled-text">Non applicable</div>
-                      <div className="disabled-reason">Jour non configuré</div>
-                    </div>
+                  <div className="time-details">
+                    👥 {typeGarde.personnel_requis} personnel requis
+                    {typeGarde.officier_obligatoire && <div className="officier-required">🎖️ Officier requis</div>}
+                    {typeGarde.jours_application?.length > 0 && (
+                      <div className="jours-application">
+                        📅 {typeGarde.jours_application.map(j => j.charAt(0).toUpperCase() + j.slice(1)).join(', ')}
+                      </div>
+                    )}
                   </div>
-                );
-              }
-
-              const assignation = getAssignationForSlot(date, typeGarde.id);
-              const assignedUser = assignation ? getUserById(assignation.user_id) : null;
-
-              return (
-                <div 
-                  key={dayIndex} 
-                  className={`planning-cell ${assignation ? 'assigned' : 'vacant'} ${user.role !== 'employe' ? 'clickable' : ''}`}
-                  style={{ borderLeftColor: typeGarde.couleur }}
-                  onClick={() => {
-                    if (assignation) {
-                      openGardeDetails(date, typeGarde);
-                    } else {
-                      openAssignModal(date, typeGarde);
-                    }
-                  }}
-                  data-testid={`planning-cell-${dayIndex}-${typeGarde.id}`}
-                >
-                  {assignedUser ? (
-                    <div className="assignment-content">
-                      <div className="assigned-user">
-                        {assignedUser.prenom} {assignedUser.nom}
-                      </div>
-                      <div className="user-grade" style={{ backgroundColor: typeGarde.couleur }}>
-                        {assignedUser.grade}
-                      </div>
-                      <div className={`assignment-type ${assignation.assignation_type}`}>
-                        {assignation.assignation_type === 'auto' ? '🤖 Auto' : '👤 Manuel'}
-                      </div>
-                      {typeGarde.personnel_requis > 1 && (
-                        <div className="more-personnel">+{typeGarde.personnel_requis - 1} autres</div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="vacant-content">
-                      <div className="vacant-icon">🚫</div>
-                      <div className="vacant-label">Garde vacante</div>
-                      <div className="personnel-needed">{typeGarde.personnel_requis} personnel requis</div>
-                      {user.role !== 'employe' && (
-                        <div className="click-hint">👆 Cliquer pour assigner</div>
-                      )}
-                    </div>
-                  )}
                 </div>
-              );
-            })}
-          </div>
-        ))}
+
+                {weekDates.map((date, dayIndex) => {
+                  // Vérifier si ce type de garde s'applique à ce jour
+                  if (!shouldShowTypeGardeForDay(typeGarde, dayIndex)) {
+                    return (
+                      <div 
+                        key={dayIndex} 
+                        className="planning-cell empty-cell"
+                        data-testid={`planning-cell-empty-${dayIndex}-${typeGarde.id}`}
+                      >
+                        {/* Cellule vide pour l'alignement */}
+                      </div>
+                    );
+                  }
+
+                  const assignation = getAssignationForSlot(date, typeGarde.id);
+                  const assignedUser = assignation ? getUserById(assignation.user_id) : null;
+
+                  return (
+                    <div 
+                      key={dayIndex} 
+                      className={`planning-cell ${assignation ? 'assigned' : 'vacant'} ${user.role !== 'employe' ? 'clickable' : ''}`}
+                      style={{ borderLeftColor: typeGarde.couleur }}
+                      onClick={() => {
+                        if (assignation && assignedUser) {
+                          openGardeDetails(date, typeGarde);
+                        } else if (user.role !== 'employe') {
+                          openAssignModal(date, typeGarde);
+                        }
+                      }}
+                      data-testid={`planning-cell-${dayIndex}-${typeGarde.id}`}
+                    >
+                      {assignedUser ? (
+                        <div className="assignment-content">
+                          <div className="assigned-user">
+                            {assignedUser.prenom} {assignedUser.nom}
+                          </div>
+                          <div className="user-grade" style={{ backgroundColor: typeGarde.couleur }}>
+                            {assignedUser.grade}
+                          </div>
+                          <div className={`assignment-type ${assignation.assignation_type}`}>
+                            {assignation.assignation_type === 'auto' ? '🤖 Auto' : '👤 Manuel'}
+                          </div>
+                          {typeGarde.personnel_requis > 1 && (
+                            <div className="more-personnel">+{typeGarde.personnel_requis - 1} autres</div>
+                          )}
+                          <div className="click-hint-view">👁️ Cliquer pour voir détails</div>
+                        </div>
+                      ) : (
+                        <div className="vacant-content">
+                          <div className="vacant-icon">🚫</div>
+                          <div className="vacant-label">Garde vacante</div>
+                          <div className="personnel-needed">{typeGarde.personnel_requis} personnel requis</div>
+                          {user.role !== 'employe' && (
+                            <div className="click-hint">👆 Cliquer pour assigner</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })
+          .filter(Boolean) // Supprimer les lignes null
+        }
       </div>
 
       {/* Assignment Modal */}
