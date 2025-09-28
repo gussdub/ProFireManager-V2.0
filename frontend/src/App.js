@@ -1851,7 +1851,11 @@ const Remplacements = () => {
                 <div className="stat-icon">📊</div>
                 <div className="stat-content">
                   <h3>Taux de couverture</h3>
-                  <p className="stat-number">94%</p>
+                  <p className="stat-number">
+                    {demandes.length > 0 
+                      ? Math.round((demandes.filter(d => d.statut === 'approuve' && d.remplacant_id).length / demandes.length) * 100)
+                      : 0}%
+                  </p>
                   <p className="stat-label">Remplacements trouvés</p>
                 </div>
               </div>
