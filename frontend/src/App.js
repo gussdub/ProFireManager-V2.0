@@ -2200,6 +2200,204 @@ const Remplacements = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de demande de remplacement avec priorité */}
+      {showCreateRemplacementModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateRemplacementModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-replacement-modal">
+            <div className="modal-header">
+              <h3>🔄 Nouvelle demande de remplacement</h3>
+              <Button variant="ghost" onClick={() => setShowCreateRemplacementModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="priority-section">
+                <h4>🎯 Niveau de priorité</h4>
+                <div className="priority-options">
+                  {niveauxPriorite.map(priorite => (
+                    <label key={priorite.value} className="priority-option">
+                      <input
+                        type="radio"
+                        name="priorite"
+                        value={priorite.value}
+                        checked={newDemande.priorite === priorite.value}
+                        onChange={(e) => setNewDemande({...newDemande, priorite: e.target.value})}
+                      />
+                      <div className="priority-content" style={{ borderColor: priorite.color }}>
+                        <span className="priority-label" style={{ color: priorite.color }}>{priorite.label}</span>
+                        <span className="priority-description">{priorite.description}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-field">
+                <Label>Type de garde *</Label>
+                <select
+                  value={newDemande.type_garde_id}
+                  onChange={(e) => setNewDemande({...newDemande, type_garde_id: e.target.value})}
+                  className="form-select"
+                  data-testid="replacement-type-garde-select"
+                >
+                  <option value="">Sélectionner un type de garde</option>
+                  {typesGarde.map(type => (
+                    <option key={type.id} value={type.id}>
+                      {type.nom} ({type.heure_debut} - {type.heure_fin})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-field">
+                <Label>Date de la garde *</Label>
+                <Input
+                  type="date"
+                  value={newDemande.date}
+                  onChange={(e) => setNewDemande({...newDemande, date: e.target.value})}
+                  min={new Date().toISOString().split('T')[0]}
+                  data-testid="replacement-date-input"
+                />
+              </div>
+
+              <div className="form-field">
+                <Label>Raison du remplacement *</Label>
+                <textarea
+                  value={newDemande.raison}
+                  onChange={(e) => setNewDemande({...newDemande, raison: e.target.value})}
+                  placeholder="Expliquez la raison (maladie, urgence familiale, conflit horaire...)"
+                  rows="3"
+                  className="form-textarea"
+                  data-testid="replacement-reason-input"
+                />
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateRemplacementModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleCreateRemplacement} data-testid="submit-replacement-btn">
+                  Créer la demande
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de demande de congé avec priorité */}
+      {showCreateCongeModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateCongeModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-conge-modal">
+            <div className="modal-header">
+              <h3>🏖️ Nouvelle demande de congé</h3>
+              <Button variant="ghost" onClick={() => setShowCreateCongeModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="priority-section">
+                <h4>🎯 Niveau de priorité</h4>
+                <div className="priority-options">
+                  {niveauxPriorite.map(priorite => (
+                    <label key={priorite.value} className="priority-option">
+                      <input
+                        type="radio"
+                        name="priorite-conge"
+                        value={priorite.value}
+                        checked={newConge.priorite === priorite.value}
+                        onChange={(e) => setNewConge({...newConge, priorite: e.target.value})}
+                      />
+                      <div className="priority-content" style={{ borderColor: priorite.color }}>
+                        <span className="priority-label" style={{ color: priorite.color }}>{priorite.label}</span>
+                        <span className="priority-description">{priorite.description}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-field">
+                <Label>Type de congé *</Label>
+                <div className="conge-type-options">
+                  {typesConge.map(type => (
+                    <label key={type.value} className="conge-type-option">
+                      <input
+                        type="radio"
+                        name="type-conge"
+                        value={type.value}
+                        checked={newConge.type_conge === type.value}
+                        onChange={(e) => setNewConge({...newConge, type_conge: e.target.value})}
+                      />
+                      <div className="conge-type-content">
+                        <span className="conge-type-label">{type.label}</span>
+                        <span className="conge-type-description">{type.description}</span>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-field">
+                  <Label>Date de début *</Label>
+                  <Input
+                    type="date"
+                    value={newConge.date_debut}
+                    onChange={(e) => setNewConge({...newConge, date_debut: e.target.value})}
+                    min={new Date().toISOString().split('T')[0]}
+                    data-testid="conge-date-debut-input"
+                  />
+                </div>
+                <div className="form-field">
+                  <Label>Date de fin *</Label>
+                  <Input
+                    type="date"
+                    value={newConge.date_fin}
+                    onChange={(e) => setNewConge({...newConge, date_fin: e.target.value})}
+                    min={newConge.date_debut || new Date().toISOString().split('T')[0]}
+                    data-testid="conge-date-fin-input"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <Label>Raison du congé *</Label>
+                <textarea
+                  value={newConge.raison}
+                  onChange={(e) => setNewConge({...newConge, raison: e.target.value})}
+                  placeholder="Décrivez la raison de votre demande de congé..."
+                  rows="3"
+                  className="form-textarea"
+                  data-testid="conge-reason-input"
+                />
+              </div>
+
+              <div className="workflow-info">
+                <h4>📋 Processus d'approbation</h4>
+                <div className="workflow-steps">
+                  <div className="workflow-step">
+                    <span className="step-number">1</span>
+                    <span>Soumission de la demande</span>
+                  </div>
+                  <div className="workflow-step">
+                    <span className="step-number">2</span>
+                    <span>
+                      {user.role === 'employe' ? 'Approbation superviseur' : 'Approbation administrateur'}
+                    </span>
+                  </div>
+                  <div className="workflow-step">
+                    <span className="step-number">3</span>
+                    <span>Notification et mise à jour planning</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowCreateCongeModal(false)}>Annuler</Button>
+                <Button variant="default" onClick={handleCreateConge} data-testid="submit-conge-btn">
+                  Soumettre la demande
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
