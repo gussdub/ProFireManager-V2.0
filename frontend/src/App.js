@@ -1768,6 +1768,64 @@ const Remplacements = () => {
     return typeGarde ? typeGarde.nom : 'Type non spécifié';
   };
 
+  const handleFilterUrgentConges = () => {
+    const congesUrgents = demandesConge.filter(d => d.priorite === 'urgente' && d.statut === 'en_attente');
+    if (congesUrgents.length > 0) {
+      toast({
+        title: "Congés urgents",
+        description: `${congesUrgents.length} demande(s) urgente(s) nécessite(nt) un traitement immédiat`,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Aucun congé urgent",
+        description: "Aucune demande urgente en attente",
+        variant: "default"
+      });
+    }
+  };
+
+  const handleExportConges = () => {
+    try {
+      // Simuler l'export (en production, ça générerait un fichier Excel/CSV)
+      const exportData = demandesConge.map(conge => ({
+        Demandeur: getUserName(conge.demandeur_id),
+        Type: conge.type_conge,
+        'Date début': conge.date_debut,
+        'Date fin': conge.date_fin,
+        'Nombre jours': conge.nombre_jours,
+        Priorité: conge.priorite,
+        Statut: conge.statut,
+        Raison: conge.raison
+      }));
+      
+      console.log('Export data:', exportData);
+      
+      toast({
+        title: "Export réussi",
+        description: `${demandesConge.length} demande(s) de congé exportée(s)`,
+        variant: "success"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter les données",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handlePlanningImpact = () => {
+    const congesApprouves = demandesConge.filter(d => d.statut === 'approuve');
+    const joursImpactes = congesApprouves.reduce((total, conge) => total + conge.nombre_jours, 0);
+    
+    toast({
+      title: "Impact sur le planning",
+      description: `${congesApprouves.length} congé(s) approuvé(s) = ${joursImpactes} jour(s) à remplacer dans le planning`,
+      variant: "default"
+    });
+  };
+
   const getUserName = (userId) => {
     const foundUser = users.find(u => u.id === userId);
     return foundUser ? `${foundUser.prenom} ${foundUser.nom}` : `Employé #${userId?.slice(-4)}`;
