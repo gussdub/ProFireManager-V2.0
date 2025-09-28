@@ -1415,6 +1415,38 @@ const Planning = () => {
     return users.find(u => u.id === userId);
   };
 
+  const shouldShowTypeGardeForDay = (typeGarde, dayIndex) => {
+    // Si pas de jours d'application spécifiés, afficher tous les jours
+    if (!typeGarde.jours_application || typeGarde.jours_application.length === 0) {
+      return true;
+    }
+    
+    // Vérifier si le jour de la semaine est dans les jours d'application
+    const dayNameEn = weekDaysEn[dayIndex];
+    return typeGarde.jours_application.includes(dayNameEn);
+  };
+
+  const openGardeDetails = (date, typeGarde) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const gardeAssignations = assignations.filter(a => 
+      a.date === dateStr && a.type_garde_id === typeGarde.id
+    );
+    
+    setSelectedGardeDetails({
+      date: date,
+      typeGarde: typeGarde,
+      assignations: gardeAssignations,
+      personnelAssigne: gardeAssignations.map(a => getUserById(a.user_id)).filter(Boolean)
+    });
+    setShowGardeDetailsModal(true);
+  };
+
+  const openAssignModal = (date, typeGarde) => {
+    if (user.role === 'employe') return;
+    setSelectedSlot({ date, typeGarde });
+    setShowAssignModal(true);
+  };
+
   const navigateWeek = (direction) => {
     const newDate = new Date(currentWeek);
     newDate.setDate(newDate.getDate() + (direction * 7));
