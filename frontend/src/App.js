@@ -201,9 +201,10 @@ const Login = () => {
   );
 };
 
-// Sidebar Navigation
+// Sidebar Navigation avec menu hamburger mobile
 const Sidebar = ({ currentPage, setCurrentPage }) => {
   const { user, logout } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const menuItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'superviseur', 'employe'] },
@@ -230,57 +231,84 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
   });
 
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <div className="sidebar-logo">
-          <div className="logo-flame">
-            <div className="flame-container">
-              <i className="fas fa-fire flame-icon"></i>
+    <>
+      {/* Mobile hamburger button */}
+      <button 
+        className="mobile-menu-toggle"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        data-testid="mobile-menu-toggle"
+      >
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+        <span className="hamburger-line"></span>
+      </button>
+
+      {/* Mobile overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="mobile-overlay"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
+
+      <div className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <div className="logo-flame">
+              <div className="flame-container">
+                <i className="fas fa-fire flame-icon"></i>
+              </div>
+            </div>
+            <div>
+              <h2>ProFireManager</h2>
+              <p className="version">v2.0 Avancé</p>
             </div>
           </div>
-          <div>
-            <h2>ProFireManager</h2>
-            <p className="version">v2.0 Avancé</p>
-          </div>
         </div>
-      </div>
 
-      <nav className="sidebar-nav">
-        {filteredMenuItems.map(item => (
-          <button
-            key={item.id}
-            className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
-            onClick={() => setCurrentPage(item.id)}
-            data-testid={`nav-${item.id}-btn`}
+        <nav className="sidebar-nav">
+          {filteredMenuItems.map(item => (
+            <button
+              key={item.id}
+              className={`nav-item ${currentPage === item.id ? 'active' : ''}`}
+              onClick={() => {
+                setCurrentPage(item.id);
+                setIsMobileMenuOpen(false); // Fermer menu mobile après clic
+              }}
+              data-testid={`nav-${item.id}-btn`}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="sidebar-user">
+          <div className="user-info">
+            <div className="user-avatar">
+              <span className="user-icon">👤</span>
+            </div>
+            <div className="user-details">
+              <p className="user-name">{user?.prenom} {user?.nom}</p>
+              <p className="user-role">{user?.role === 'admin' ? 'Administrateur' : 
+                                      user?.role === 'superviseur' ? 'Superviseur' : 'Employé'}</p>
+              <p className="user-grade">{user?.grade}</p>
+            </div>
+          </div>
+          <Button 
+            variant="ghost" 
+            onClick={() => {
+              logout();
+              setIsMobileMenuOpen(false);
+            }}
+            className="logout-btn"
+            data-testid="logout-btn"
           >
-            <span className="nav-icon">{item.icon}</span>
-            {item.label}
-          </button>
-        ))}
-      </nav>
-
-      <div className="sidebar-user">
-        <div className="user-info">
-          <div className="user-avatar">
-            <span className="user-icon">👤</span>
-          </div>
-          <div className="user-details">
-            <p className="user-name">{user?.prenom} {user?.nom}</p>
-            <p className="user-role">{user?.role === 'admin' ? 'Administrateur' : 
-                                    user?.role === 'superviseur' ? 'Superviseur' : 'Employé'}</p>
-            <p className="user-grade">{user?.grade}</p>
-          </div>
+            🚪 Déconnexion
+          </Button>
         </div>
-        <Button 
-          variant="ghost" 
-          onClick={logout} 
-          className="logout-btn"
-          data-testid="logout-btn"
-        >
-          🚪 Déconnexion
-        </Button>
       </div>
-    </div>
+    </>
   );
 };
 
