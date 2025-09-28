@@ -1300,7 +1300,7 @@ const Personnel = () => {
   );
 };
 
-// Planning Component optimisé - Vue semaine/mois + jours d'application respectés
+// Planning Component optimisé - Vue moderne avec code couleur
 const Planning = () => {
   const { user } = useAuth();
   const [currentWeek, setCurrentWeek] = useState(() => {
@@ -1308,7 +1308,11 @@ const Planning = () => {
     const monday = new Date(today.setDate(today.getDate() - today.getDay() + 1));
     return monday.toISOString().split('T')[0];
   });
-  const [viewMode, setViewMode] = useState('semaine'); // 'semaine' ou 'mois'
+  const [currentMonth, setCurrentMonth] = useState(() => {
+    const today = new Date();
+    return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+  });
+  const [viewMode, setViewMode] = useState('semaine');
   const [typesGarde, setTypesGarde] = useState([]);
   const [assignations, setAssignations] = useState([]);
   const [users, setUsers] = useState([]);
