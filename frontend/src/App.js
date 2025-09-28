@@ -1453,12 +1453,6 @@ const Planning = () => {
     setCurrentWeek(newDate.toISOString().split('T')[0]);
   };
 
-  const openAssignModal = (date, typeGarde) => {
-    if (user.role === 'employe') return;
-    setSelectedSlot({ date, typeGarde });
-    setShowAssignModal(true);
-  };
-
   if (loading) return <div className="loading" data-testid="planning-loading">Chargement du planning...</div>;
 
   return (
