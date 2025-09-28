@@ -4650,18 +4650,6 @@ const MonProfil = () => {
               </div>
             </div>
           </div>
-
-          {user.role === 'admin' && (
-            <div className="admin-actions">
-              <h3>Actions administrateur</h3>
-              <Button variant="outline" className="w-full" data-testid="manage-all-profiles-btn">
-                👥 Gérer tous les profils
-              </Button>
-              <Button variant="outline" className="w-full" data-testid="system-settings-btn">
-                ⚙️ Paramètres système
-              </Button>
-            </div>
-          )}
         </div>
       </div>
 
