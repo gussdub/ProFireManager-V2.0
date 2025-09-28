@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "./components/ui/button";
@@ -8,8 +8,18 @@ import { Label } from "./components/ui/label";
 import { Calendar } from "./components/ui/calendar";
 import { useToast } from "./hooks/use-toast";
 import { Toaster } from "./components/ui/toaster";
-import Parametres from "./components/Parametres";
 import "./App.css";
+
+// Lazy loading pour optimiser les performances
+const Parametres = lazy(() => import("./components/Parametres"));
+
+// Composant de chargement
+const LoadingComponent = () => (
+  <div className="loading-component">
+    <div className="loading-spinner"></div>
+    <p>Chargement du module...</p>
+  </div>
+);
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
