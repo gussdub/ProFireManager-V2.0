@@ -1669,6 +1669,128 @@ const Planning = () => {
           </div>
         </div>
       )}
+
+      {/* Modal détails d'une garde - Voir tout le personnel */}
+      {showGardeDetailsModal && selectedGardeDetails && (
+        <div className="modal-overlay" onClick={() => setShowGardeDetailsModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="garde-details-modal">
+            <div className="modal-header">
+              <h3>🚒 Détails de la garde - {selectedGardeDetails.date.toLocaleDateString('fr-FR')}</h3>
+              <Button variant="ghost" onClick={() => setShowGardeDetailsModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="garde-info-header">
+                <div className="garde-type-info">
+                  <h4>{selectedGardeDetails.typeGarde.nom}</h4>
+                  <div className="garde-details-meta">
+                    <span>⏰ {selectedGardeDetails.typeGarde.heure_debut} - {selectedGardeDetails.typeGarde.heure_fin}</span>
+                    <span>👥 {selectedGardeDetails.typeGarde.personnel_requis} personnel requis</span>
+                    {selectedGardeDetails.typeGarde.officier_obligatoire && (
+                      <span>🎖️ Officier obligatoire</span>
+                    )}
+                  </div>
+                </div>
+                <div className="coverage-indicator">
+                  <span className="coverage-ratio">
+                    {selectedGardeDetails.personnelAssigne.length}/{selectedGardeDetails.typeGarde.personnel_requis}
+                  </span>
+                  <span className="coverage-label">Personnel assigné</span>
+                </div>
+              </div>
+
+              <div className="personnel-assigned">
+                <h4>👥 Personnel assigné</h4>
+                {selectedGardeDetails.personnelAssigne.length > 0 ? (
+                  <div className="personnel-list">
+                    {selectedGardeDetails.personnelAssigne.map((person, index) => (
+                      <div key={person.id} className="personnel-item">
+                        <div className="personnel-info">
+                          <div className="personnel-avatar">
+                            <span className="avatar-icon">👤</span>
+                          </div>
+                          <div className="personnel-details">
+                            <span className="personnel-name">{person.prenom} {person.nom}</span>
+                            <span className="personnel-grade">{person.grade}</span>
+                            <span className="personnel-type">{person.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}</span>
+                          </div>
+                        </div>
+                        <div className="personnel-actions">
+                          <span className="assignment-method">
+                            {selectedGardeDetails.assignations[index]?.assignation_type === 'auto' ? '🤖 Auto' : '👤 Manuel'}
+                          </span>
+                          {user.role !== 'employe' && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => {
+                                // TODO: Retirer cette personne de la garde
+                                toast({
+                                  title: "Fonctionnalité en développement",
+                                  description: "Retirer une personne de la garde",
+                                  variant: "default"
+                                });
+                              }}
+                              data-testid={`remove-person-${person.id}`}
+                            >
+                              ❌ Retirer
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-personnel">
+                    <p>Aucun personnel assigné à cette garde</p>
+                    {user.role !== 'employe' && (
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setShowGardeDetailsModal(false);
+                          openAssignModal(selectedGardeDetails.date, selectedGardeDetails.typeGarde);
+                        }}
+                        data-testid="assign-personnel-btn"
+                      >
+                        Assigner du personnel
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="garde-actions">
+                {user.role !== 'employe' && (
+                  <>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowGardeDetailsModal(false);
+                        openAssignModal(selectedGardeDetails.date, selectedGardeDetails.typeGarde);
+                      }}
+                      data-testid="add-more-personnel-btn"
+                    >
+                      ➕ Ajouter personnel
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => {
+                        toast({
+                          title: "Annuler la garde",
+                          description: "Fonctionnalité en développement",
+                          variant: "default"
+                        });
+                      }}
+                      data-testid="cancel-garde-btn"
+                    >
+                      🚫 Annuler garde
+                    </Button>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
