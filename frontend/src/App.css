@@ -7097,7 +7097,295 @@ body {
   gap: 1rem;
 }
 
-/* Responsive planning */
+/* Planning Moderne Styles */
+.time-navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.period-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.coverage-legend {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.coverage-legend h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.legend-items {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+.legend-color.complete {
+  background-color: #10B981;
+}
+
+.legend-color.partielle {
+  background-color: #F59E0B;
+}
+
+.legend-color.vacante {
+  background-color: #EF4444;
+}
+
+/* Vue semaine moderne */
+.planning-moderne {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.garde-row-moderne {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.garde-info-moderne {
+  margin-bottom: 1rem;
+}
+
+.garde-info-moderne h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.garde-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.jours-garde-moderne {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.jour-garde-card {
+  background: white;
+  border: 2px solid;
+  border-radius: 12px;
+  padding: 1rem;
+  min-width: 120px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jour-garde-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.jour-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.jour-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.jour-date {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.garde-content {
+  margin-bottom: 0.75rem;
+}
+
+.assigned-info {
+  text-align: center;
+}
+
+.assigned-name {
+  display: block;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.assigned-grade {
+  display: block;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 0.25rem;
+}
+
+.more-count {
+  font-size: 0.625rem;
+  color: #9ca3af;
+}
+
+.vacant-info {
+  text-align: center;
+}
+
+.vacant-text {
+  display: block;
+  font-weight: 500;
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.personnel-need {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.coverage-indicator {
+  text-align: center;
+}
+
+.coverage-badge {
+  font-size: 1.25rem;
+}
+
+/* Vue mois */
+.planning-mois {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mois-header h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.calendrier-mois {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1rem;
+}
+
+.jour-mois {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem;
+  min-height: 100px;
+}
+
+.jour-mois-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.jour-mois-name {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.jour-mois-date {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.gardes-jour-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.garde-mois-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.garde-mois-item:hover {
+  transform: scale(1.05);
+}
+
+.garde-initiale {
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.coverage-icon {
+  font-size: 0.875rem;
+}
+
+/* Responsive planning moderne */
+@media (max-width: 1024px) {
+  .jours-garde-moderne {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+  
+  .calendrier-mois {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .planning-controls {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
 @media (max-width: 1024px) {
   .planning-controls {
     flex-direction: column;
