@@ -511,7 +511,9 @@ const Dashboard = () => {
             </div>
             <div className="quick-stat-item">
               <span className="quick-stat-label">Types de garde configurés</span>
-              <span className="quick-stat-value">{total_assignations_required?.length || 0} types actifs</span>
+              <span className="quick-stat-value">
+                {statistiquesDetaillees?.statistiques_generales?.formations_disponibles ? '3' : '0'} types actifs
+              </span>
             </div>
           </div>
         </div>
