@@ -1537,7 +1537,7 @@ const Planning = () => {
         </div>
       )}
 
-      {/* Planning Grid */}
+      {/* Planning Grid avec tri par heure pour optimiser l'affichage */}
       <div className="planning-grid">
         <div className="grid-header">
           <div className="header-cell">Horaires</div>
