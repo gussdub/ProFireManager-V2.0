@@ -840,121 +840,210 @@ const Personnel = () => {
       </div>
 
       <div className="personnel-table">
-        <div className="table-header">
-          <div className="header-cell">POMPIER</div>
-          <div className="header-cell">GRADE / N° EMPLOYÉ</div>
-          <div className="header-cell">CONTACT</div>
-          <div className="header-cell">STATUT</div>
-          <div className="header-cell">TYPE D'EMPLOI</div>
-          <div className="header-cell">FORMATIONS</div>
-          <div className="header-cell">ACTIONS</div>
+        {/* Vue desktop */}
+        <div className="personnel-table-desktop">
+          <div className="table-header">
+            <div className="header-cell">POMPIER</div>
+            <div className="header-cell">GRADE / N° EMPLOYÉ</div>
+            <div className="header-cell">CONTACT</div>
+            <div className="header-cell">STATUT</div>
+            <div className="header-cell">TYPE D'EMPLOI</div>
+            <div className="header-cell">FORMATIONS</div>
+            <div className="header-cell">ACTIONS</div>
+          </div>
+
+          {users.map(user => (
+            <div key={user.id} className="table-row" data-testid={`user-row-${user.id}`}>
+              <div className="user-cell">
+                <div className="user-avatar">
+                  <span className="avatar-icon">👤</span>
+                </div>
+                <div>
+                  <p className="user-name">{user.prenom} {user.nom}</p>
+                  <p className="user-hire-date">Embauché le {user.date_embauche}</p>
+                </div>
+              </div>
+
+              <div className="grade-cell">
+                <span className="grade" style={{ backgroundColor: getGradeColor(user.grade) }}>
+                  {user.grade}
+                  {user.fonction_superieur && <span className="fonction-sup">+</span>}
+                </span>
+                <p className="employee-id">#{user.numero_employe}</p>
+                {user.fonction_superieur && (
+                  <p className="fonction-superieur-indicator">🎖️ Fonction supérieur</p>
+                )}
+              </div>
+
+              <div className="contact-cell">
+                <p className="user-email">{user.email}</p>
+                <p className="user-phone">{user.telephone}</p>
+                {user.contact_urgence && (
+                  <p className="user-emergency">🚨 {user.contact_urgence}</p>
+                )}
+              </div>
+
+              <div className="status-cell">
+                <span 
+                  className="status-badge" 
+                  style={{ backgroundColor: getStatusColor(user.statut) }}
+                >
+                  {user.statut}
+                </span>
+              </div>
+
+              <div className="employment-cell">
+                <span className={`employment-type ${user.type_emploi}`}>
+                  {user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
+                </span>
+                {user.type_emploi === 'temps_partiel' && (
+                  <div className="temps-partiel-info">
+                    <div className="heures-max-info">
+                      <span className="heures-max-label">Max :</span>
+                      <span className="heures-max-value">{user.heures_max_semaine || 40}h/sem</span>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleViewDisponibilites(user)}
+                      className="mt-1"
+                      data-testid={`view-availability-${user.id}`}
+                    >
+                      📅 Disponibilités
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              <div className="formations-cell">
+                {user.formations?.map((formationId, index) => (
+                  <span key={index} className="formation-badge">
+                    {getFormationName(formationId)}
+                  </span>
+                ))}
+                {user.formations?.length > 0 && (
+                  <p className="formations-count">+{user.formations.length} certifications</p>
+                )}
+              </div>
+
+              <div className="actions-cell">
+                <Button 
+                  variant="ghost" 
+                  className="action-btn" 
+                  onClick={() => handleViewUser(user)}
+                  data-testid={`view-user-${user.id}`}
+                  title="Visualiser"
+                >
+                  👁️
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="action-btn" 
+                  onClick={() => handleEditUser(user)}
+                  data-testid={`edit-user-${user.id}`}
+                  title="Modifier"
+                >
+                  ✏️
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  className="action-btn danger" 
+                  onClick={() => handleDeleteUser(user.id)}
+                  data-testid={`delete-user-${user.id}`}
+                  title="Supprimer"
+                >
+                  ❌
+                </Button>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {users.map(user => (
-          <div key={user.id} className="table-row" data-testid={`user-row-${user.id}`}>
-            <div className="user-cell">
-              <div className="user-avatar">
-                <span className="avatar-icon">👤</span>
-              </div>
-              <div>
-                <p className="user-name">{user.prenom} {user.nom}</p>
-                <p className="user-hire-date">Embauché le {user.date_embauche}</p>
-              </div>
-            </div>
-
-            <div className="grade-cell">
-              <span className="grade" style={{ backgroundColor: getGradeColor(user.grade) }}>
-                {user.grade}
-                {user.fonction_superieur && <span className="fonction-sup">+</span>}
-              </span>
-              <p className="employee-id">#{user.numero_employe}</p>
-              {user.fonction_superieur && (
-                <p className="fonction-superieur-indicator">🎖️ Fonction supérieur</p>
-              )}
-            </div>
-
-            <div className="contact-cell">
-              <p className="user-email">{user.email}</p>
-              <p className="user-phone">{user.telephone}</p>
-              {user.contact_urgence && (
-                <p className="user-emergency">🚨 {user.contact_urgence}</p>
-              )}
-            </div>
-
-            <div className="status-cell">
-              <span 
-                className="status-badge" 
-                style={{ backgroundColor: getStatusColor(user.statut) }}
-              >
-                {user.statut}
-              </span>
-            </div>
-
-            <div className="employment-cell">
-              <span className={`employment-type ${user.type_emploi}`}>
-                {user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
-              </span>
-              {user.type_emploi === 'temps_partiel' && (
-                <div className="temps-partiel-info">
-                  <div className="heures-max-info">
-                    <span className="heures-max-label">Max :</span>
-                    <span className="heures-max-value">{user.heures_max_semaine || 40}h/sem</span>
+        {/* Vue mobile - Cartes */}
+        <div className="personnel-cards-mobile">
+          {users.map(user => (
+            <div key={user.id} className="personnel-card-mobile" data-testid={`user-card-mobile-${user.id}`}>
+              <div className="card-header-mobile">
+                <div className="user-info-mobile">
+                  <div className="user-avatar">
+                    <span className="avatar-icon">👤</span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => handleViewDisponibilites(user)}
-                    className="mt-1"
-                    data-testid={`view-availability-${user.id}`}
-                  >
-                    📅 Disponibilités
-                  </Button>
+                  <div className="user-details-mobile">
+                    <h3>{user.prenom} {user.nom}</h3>
+                    <p className="user-grade-mobile">
+                      {user.grade} #{user.numero_employe}
+                      {user.fonction_superieur && <span className="fonction-sup-mobile">+ Fonction sup.</span>}
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
+                <div className="status-mobile">
+                  <span 
+                    className="status-badge-mobile" 
+                    style={{ backgroundColor: getStatusColor(user.statut) }}
+                  >
+                    {user.statut}
+                  </span>
+                </div>
+              </div>
 
-            <div className="formations-cell">
-              {user.formations?.map((formationId, index) => (
-                <span key={index} className="formation-badge">
-                  {getFormationName(formationId)}
-                </span>
-              ))}
-              {user.formations?.length > 0 && (
-                <p className="formations-count">+{user.formations.length} certifications</p>
-              )}
-            </div>
+              <div className="card-details-mobile">
+                <div className="detail-row-mobile">
+                  <span className="detail-label">📧</span>
+                  <span className="detail-value">{user.email}</span>
+                </div>
+                <div className="detail-row-mobile">
+                  <span className="detail-label">📞</span>
+                  <span className="detail-value">{user.telephone}</span>
+                </div>
+                {user.contact_urgence && (
+                  <div className="detail-row-mobile">
+                    <span className="detail-label">🚨</span>
+                    <span className="detail-value">{user.contact_urgence}</span>
+                  </div>
+                )}
+                <div className="detail-row-mobile">
+                  <span className="detail-label">💼</span>
+                  <span className="detail-value">
+                    {user.type_emploi === 'temps_plein' ? 'Temps plein' : `Temps partiel (${user.heures_max_semaine}h/sem)`}
+                  </span>
+                </div>
+                <div className="detail-row-mobile">
+                  <span className="detail-label">🎓</span>
+                  <span className="detail-value">{user.formations?.length || 0} formation(s)</span>
+                </div>
+              </div>
 
-            <div className="actions-cell">
-              <Button 
-                variant="ghost" 
-                className="action-btn" 
-                onClick={() => handleViewUser(user)}
-                data-testid={`view-user-${user.id}`}
-                title="Visualiser"
-              >
-                👁️
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="action-btn" 
-                onClick={() => handleEditUser(user)}
-                data-testid={`edit-user-${user.id}`}
-                title="Modifier"
-              >
-                ✏️
-              </Button>
-              <Button 
-                variant="ghost" 
-                className="action-btn danger" 
-                onClick={() => handleDeleteUser(user.id)}
-                data-testid={`delete-user-${user.id}`}
-                title="Supprimer"
-              >
-                ❌
-              </Button>
+              <div className="card-actions-mobile">
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleViewUser(user)}
+                  data-testid={`view-user-mobile-${user.id}`}
+                >
+                  👁️ Voir
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => handleEditUser(user)}
+                  data-testid={`edit-user-mobile-${user.id}`}
+                >
+                  ✏️ Modifier
+                </Button>
+                {user.type_emploi === 'temps_partiel' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewDisponibilites(user)}
+                    data-testid={`availability-mobile-${user.id}`}
+                  >
+                    📅 Dispo
+                  </Button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Create User Modal - Version optimisée */}
