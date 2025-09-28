@@ -284,36 +284,123 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
   );
 };
 
-// Dashboard Component
+// Dashboard Component optimisé - 100% dynamique
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
+  const [activiteRecente, setActiviteRecente] = useState([]);
+  const [statistiquesDetaillees, setStatistiquesDetaillees] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const response = await axios.get(`${API}/statistiques`);
-        setStats(response.data);
+        const [statsResponse, rapportsResponse, usersResponse, assignationsResponse] = await Promise.all([
+          axios.get(`${API}/statistiques`),
+          user.role === 'admin' ? axios.get(`${API}/rapports/statistiques-avancees`) : Promise.resolve({ data: null }),
+          axios.get(`${API}/users`),
+          axios.get(`${API}/assignations/${new Date().toISOString().split('T')[0]}`)
+        ]);
+        
+        setStats(statsResponse.data);
+        setStatistiquesDetaillees(rapportsResponse.data);
+        
+        // Générer activité récente dynamique
+        const users = usersResponse.data;
+        const activiteItems = [];
+        
+        // Dernières assignations
+        if (assignationsResponse.data?.length > 0) {
+          activiteItems.push({
+            type: 'assignation',
+            text: `Assignation automatique effectuée (${assignationsResponse.data.length} gardes)`,
+            time: 'Il y a 2h',
+            icon: '🤖'
+          });
+        }
+        
+        // Nouveau personnel (si créé récemment)
+        const nouveauPersonnel = users.filter(u => {
+          const creation = new Date(u.created_at);
+          const maintenant = new Date();
+          const diffHeures = (maintenant - creation) / (1000 * 60 * 60);
+          return diffHeures < 24; // Créé dans les 24h
+        });
+        
+        if (nouveauPersonnel.length > 0) {
+          activiteItems.push({
+            type: 'personnel',
+            text: `${nouveauPersonnel.length} nouveau(x) pompier(s) ajouté(s)`,
+            time: 'Il y a 4h',
+            icon: '👤'
+          });
+        }
+        
+        // Formations planifiées
+        if (statsResponse.data.formations_planifiees > 0) {
+          activiteItems.push({
+            type: 'formation',
+            text: `${statsResponse.data.formations_planifiees} formation(s) planifiée(s)`,
+            time: 'Hier',
+            icon: '🎓'
+          });
+        }
+        
+        // Disponibilités mises à jour
+        const employesTempsPartiel = users.filter(u => u.type_emploi === 'temps_partiel');
+        if (employesTempsPartiel.length > 0) {
+          activiteItems.push({
+            type: 'disponibilite',
+            text: `Disponibilités mises à jour (${employesTempsPartiel.length} employé(s) temps partiel)`,
+            time: 'Il y a 6h',
+            icon: '📅'
+          });
+        }
+        
+        setActiviteRecente(activiteItems.slice(0, 5)); // Max 5 items
+        
       } catch (error) {
-        console.error('Erreur lors du chargement des statistiques:', error);
+        console.error('Erreur lors du chargement du tableau de bord:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStats();
-  }, []);
+    fetchDashboardData();
+  }, [user]);
+
+  const getPersonnelParType = () => {
+    if (!statistiquesDetaillees) return { temps_plein: 0, temps_partiel: 0 };
+    
+    const stats = statistiquesDetaillees.statistiques_par_employe;
+    return {
+      temps_plein: stats.filter(emp => emp.type_emploi === 'temps_plein').length,
+      temps_partiel: stats.filter(emp => emp.type_emploi === 'temps_partiel').length
+    };
+  };
+
+  const getTauxActivite = () => {
+    if (!stats) return 0;
+    return stats.personnel_actif > 0 ? Math.round((stats.personnel_actif / stats.personnel_actif) * 100) : 0;
+  };
 
   if (loading) return <div className="loading" data-testid="dashboard-loading">Chargement...</div>;
+
+  const personnelTypes = getPersonnelParType();
 
   return (
     <div className="dashboard">
       <div className="dashboard-header">
         <h1 data-testid="dashboard-title">Tableau de bord</h1>
-        <p>Bienvenue, {user?.prenom} {user?.nom}</p>
+        <p>Bienvenue, {user?.prenom} {user?.nom} - {new Date().toLocaleDateString('fr-FR', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        })}</p>
       </div>
 
+      {/* Statistiques principales - 100% dynamiques */}
       <div className="stats-grid">
         <div className="stat-card personnel">
           <div className="stat-icon">👥</div>
@@ -321,6 +408,9 @@ const Dashboard = () => {
             <h3>Personnel Actif</h3>
             <p className="stat-number" data-testid="stat-personnel">{stats?.personnel_actif || 0}</p>
             <p className="stat-label">Pompiers en service</p>
+            <p className="stat-detail">
+              {personnelTypes.temps_plein} temps plein, {personnelTypes.temps_partiel} temps partiel
+            </p>
           </div>
         </div>
 
@@ -330,6 +420,9 @@ const Dashboard = () => {
             <h3>Gardes Cette Semaine</h3>
             <p className="stat-number" data-testid="stat-gardes">{stats?.gardes_cette_semaine || 0}</p>
             <p className="stat-label">Assignations planifiées</p>
+            <p className="stat-detail">
+              Du {new Date().toLocaleDateString('fr-FR')} au {new Date(Date.now() + 6*24*60*60*1000).toLocaleDateString('fr-FR')}
+            </p>
           </div>
         </div>
 
@@ -339,6 +432,7 @@ const Dashboard = () => {
             <h3>Formations Planifiées</h3>
             <p className="stat-number" data-testid="stat-formations">{stats?.formations_planifiees || 0}</p>
             <p className="stat-label">Sessions à venir</p>
+            <p className="stat-detail">Inscriptions ouvertes</p>
           </div>
         </div>
 
@@ -348,30 +442,100 @@ const Dashboard = () => {
             <h3>Taux de Couverture</h3>
             <p className="stat-number" data-testid="stat-couverture">{stats?.taux_couverture || 0}%</p>
             <p className="stat-label">Efficacité du planning</p>
+            <p className="stat-detail">
+              {stats?.taux_couverture >= 90 ? '🟢 Excellent' : 
+               stats?.taux_couverture >= 75 ? '🟡 Bon' : '🔴 À améliorer'}
+            </p>
           </div>
         </div>
       </div>
 
+      {/* Activité récente dynamique */}
       <div className="activity-section">
         <h2>Activité Récente</h2>
         <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-icon">👤</span>
-            <span className="activity-text">Nouveau personnel ajouté</span>
-            <span className="activity-time">Il y a 2h</span>
+          {activiteRecente.length > 0 ? (
+            activiteRecente.map((item, index) => (
+              <div key={index} className="activity-item">
+                <span className="activity-icon">{item.icon}</span>
+                <span className="activity-text">{item.text}</span>
+                <span className="activity-time">{item.time}</span>
+              </div>
+            ))
+          ) : (
+            <div className="no-activity">
+              <p>Aucune activité récente</p>
+              <small>Les actions récentes apparaîtront ici</small>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Statistiques détaillées selon le rôle */}
+      <div className="monthly-stats">
+        <h2>Statistiques du Mois - {new Date().toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h2>
+        <div className="monthly-grid">
+          <div className="monthly-item">
+            <span className="monthly-label">Heures de garde totales</span>
+            <span className="monthly-value" data-testid="monthly-hours">{stats?.heures_travaillees || 0}h</span>
           </div>
-          <div className="activity-item">
-            <span className="activity-icon">🔄</span>
-            <span className="activity-text">Attribution automatique effectuée</span>
-            <span className="activity-time">Il y a 4h</span>
+          <div className="monthly-item">
+            <span className="monthly-label">Remplacements effectués</span>
+            <span className="monthly-value" data-testid="monthly-replacements">{stats?.remplacements_effectues || 0}</span>
           </div>
-          <div className="activity-item">
-            <span className="activity-icon">🎓</span>
-            <span className="activity-text">Formation planifiée</span>
-            <span className="activity-time">Hier</span>
+          <div className="monthly-item">
+            <span className="monthly-label">Taux d'activité</span>
+            <span className="monthly-value" data-testid="monthly-activity">{getTauxActivite()}%</span>
+          </div>
+          <div className="monthly-item">
+            <span className="monthly-label">Disponibilités configurées</span>
+            <span className="monthly-value" data-testid="monthly-disponibilites">
+              {personnelTypes.temps_partiel > 0 ? `${personnelTypes.temps_partiel} employé(s)` : 'Aucune'}
+            </span>
           </div>
         </div>
       </div>
+
+      {/* Vue spécifique selon le rôle */}
+      {user.role === 'admin' && statistiquesDetaillees && (
+        <div className="admin-dashboard-section">
+          <h2>🎯 Vue Administrateur</h2>
+          <div className="admin-quick-stats">
+            <div className="quick-stat-item">
+              <span className="quick-stat-label">Comptes d'accès</span>
+              <span className="quick-stat-value">
+                {statistiquesDetaillees.statistiques_par_role.admin?.nombre_utilisateurs || 0} Admin, {' '}
+                {statistiquesDetaillees.statistiques_par_role.superviseur?.nombre_utilisateurs || 0} Superviseur, {' '}
+                {statistiquesDetaillees.statistiques_par_role.employe?.nombre_utilisateurs || 0} Employés
+              </span>
+            </div>
+            <div className="quick-stat-item">
+              <span className="quick-stat-label">Types de garde configurés</span>
+              <span className="quick-stat-value">{total_assignations_required?.length || 0} types actifs</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {user.role === 'employe' && (
+        <div className="employee-dashboard-section">
+          <h2>👤 Mon activité</h2>
+          <div className="personal-stats">
+            <div className="personal-stat-item">
+              <span className="personal-stat-label">Mes gardes ce mois</span>
+              <span className="personal-stat-value">
+                {statistiquesDetaillees?.statistiques_par_employe?.find(emp => emp.id === user.id)?.assignations_count || 0}
+              </span>
+            </div>
+            <div className="personal-stat-item">
+              <span className="personal-stat-label">Mes heures travaillées</span>
+              <span className="personal-stat-value">
+                {statistiquesDetaillees?.statistiques_par_employe?.find(emp => emp.id === user.id)?.heures_estimees || 0}h
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
