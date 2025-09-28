@@ -553,6 +553,35 @@ const Dashboard = () => {
                 {statistiquesDetaillees?.statistiques_generales?.formations_disponibles ? '3' : '0'} types actifs
               </span>
             </div>
+            
+            {/* Bouton pour initialiser données démo */}
+            <div className="demo-data-section">
+              <h4>🎪 Données de démonstration</h4>
+              <p>Créer des données réalistes pour démonstrations client</p>
+              <Button 
+                variant="outline" 
+                onClick={async () => {
+                  try {
+                    await axios.post(`${API}/init-demo-client-data`);
+                    toast({
+                      title: "Données démo créées",
+                      description: "15 pompiers + historique + formations créés pour démonstration",
+                      variant: "success"
+                    });
+                    window.location.reload();
+                  } catch (error) {
+                    toast({
+                      title: "Erreur",
+                      description: "Impossible de créer les données démo",
+                      variant: "destructive"
+                    });
+                  }
+                }}
+                data-testid="init-demo-data-btn"
+              >
+                🚒 Créer données démo client (15 pompiers)
+              </Button>
+            </div>
           </div>
         </div>
       )}
