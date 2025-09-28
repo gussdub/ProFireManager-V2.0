@@ -14,8 +14,16 @@ import jwt
 import json
 import hashlib
 import re
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.enums import TA_CENTER, TA_LEFT
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from io import BytesIO
+import base64
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
