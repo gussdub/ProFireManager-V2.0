@@ -1503,31 +1503,83 @@ async def get_user_monthly_stats(user_id: str, current_user: User = Depends(get_
 # Statistics routes
 @api_router.get("/statistiques", response_model=Statistiques)
 async def get_statistiques(current_user: User = Depends(get_current_user)):
-    # Calculate statistics
-    personnel_count = await db.users.count_documents({"statut": "Actif"})
-    
-    # Get current week assignments
-    today = datetime.now(timezone.utc).date()
-    start_week = today - timedelta(days=today.weekday())
-    end_week = start_week + timedelta(days=6)
-    
-    gardes_count = await db.assignations.count_documents({
-        "date": {
-            "$gte": start_week.strftime("%Y-%m-%d"),
-            "$lte": end_week.strftime("%Y-%m-%d")
-        }
-    })
-    
-    remplacements_count = await db.demandes_remplacement.count_documents({"statut": "approuve"})
-    
-    return Statistiques(
-        personnel_actif=personnel_count,
-        gardes_cette_semaine=gardes_count,
-        formations_planifiees=3,  # Mock data
-        taux_couverture=94.0,
-        heures_travaillees=2340,
-        remplacements_effectues=remplacements_count
-    )
+    try:
+        # 1. Personnel actif (100% dynamique)
+        personnel_count = await db.users.count_documents({"statut": "Actif"})
+        
+        # 2. Gardes cette semaine (100% dynamique)
+        today = datetime.now(timezone.utc).date()
+        start_week = today - timedelta(days=today.weekday())
+        end_week = start_week + timedelta(days=6)
+        
+        gardes_count = await db.assignations.count_documents({
+            "date": {
+                "$gte": start_week.strftime("%Y-%m-%d"),
+                "$lte": end_week.strftime("%Y-%m-%d")
+            }
+        })
+        
+        # 3. Formations planifiées (100% dynamique)
+        formations_count = await db.sessions_formation.count_documents({"statut": "planifie"})
+        
+        # 4. Taux de couverture dynamique
+        total_assignations_required = await db.types_garde.find().to_list(1000)
+        total_required_this_week = 0
+        total_assigned_this_week = gardes_count
+        
+        # Calculer le besoin total basé sur les types de garde et jours d'application
+        for type_garde in total_assignations_required:
+            jours_app = type_garde.get("jours_application", [])
+            if not jours_app:  # Si pas spécifié, 7 jours
+                total_required_this_week += 7
+            else:
+                total_required_this_week += len(jours_app)
+        
+        taux_couverture = (total_assigned_this_week / total_required_this_week * 100) if total_required_this_week > 0 else 0
+        
+        # 5. Heures travaillées ce mois (100% dynamique)
+        start_month = today.replace(day=1)
+        end_month = (start_month + timedelta(days=32)).replace(day=1) - timedelta(days=1)
+        
+        assignations_mois = await db.assignations.find({
+            "date": {
+                "$gte": start_month.strftime("%Y-%m-%d"),
+                "$lte": end_month.strftime("%Y-%m-%d")
+            }
+        }).to_list(1000)
+        
+        # Calculer les heures basées sur les types de garde
+        heures_totales = 0
+        types_garde_dict = {tg["id"]: tg for tg in total_assignations_required}
+        
+        for assignation in assignations_mois:
+            type_garde = types_garde_dict.get(assignation["type_garde_id"])
+            if type_garde:
+                heures_totales += type_garde.get("duree_heures", 8)
+        
+        # 6. Remplacements effectués (100% dynamique)
+        remplacements_count = await db.demandes_remplacement.count_documents({"statut": "approuve"})
+        
+        return Statistiques(
+            personnel_actif=personnel_count,
+            gardes_cette_semaine=gardes_count,
+            formations_planifiees=formations_count,
+            taux_couverture=round(taux_couverture, 1),
+            heures_travaillees=heures_totales,
+            remplacements_effectues=remplacements_count
+        )
+        
+    except Exception as e:
+        # Fallback en cas d'erreur
+        print(f"Erreur calcul statistiques: {str(e)}")
+        return Statistiques(
+            personnel_actif=0,
+            gardes_cette_semaine=0,
+            formations_planifiees=0,
+            taux_couverture=0.0,
+            heures_travaillees=0,
+            remplacements_effectues=0
+        )
 
 # Fix all demo passwords endpoint
 @api_router.post("/fix-all-passwords")
