@@ -5074,7 +5074,11 @@ const AppLayout = () => {
       case 'rapports':
         return <Rapports />;
       case 'parametres':
-        return <Parametres user={user} />;
+        return (
+          <Suspense fallback={<LoadingComponent />}>
+            <Parametres user={user} />
+          </Suspense>
+        );
       case 'monprofil':
         return <MonProfil />;
       default:
