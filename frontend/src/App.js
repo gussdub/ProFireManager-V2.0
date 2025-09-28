@@ -1621,116 +1621,139 @@ const Planning = () => {
         </div>
       )}
 
-      {/* Planning Grid avec tri par heure pour optimiser l'affichage */}
-      <div className="planning-grid">
-        <div className="grid-header">
-          <div className="header-cell">Horaires</div>
-          {weekDays.map((day, index) => (
-            <div key={day} className="header-cell">
-              <div className="day-name">{day}</div>
-              <div className="day-date">{weekDates[index].getDate()}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tri des types de garde par heure de début pour optimiser l'affichage */}
-        {typesGarde
-          .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
-          .map(typeGarde => {
-            // Calculer quels jours afficher ce type de garde
-            const joursApplicables = weekDates.map((date, dayIndex) => 
-              shouldShowTypeGardeForDay(typeGarde, dayIndex)
-            );
-            
-            // Si aucun jour applicable, ne pas afficher cette ligne
-            if (!joursApplicables.some(Boolean)) {
-              return null;
-            }
-
-            return (
-              <div key={typeGarde.id} className="grid-row">
-                <div className="time-cell">
-                  <div className="time-label">{typeGarde.nom}</div>
-                  <div className="time-range">
-                    {typeGarde.heure_debut} - {typeGarde.heure_fin}
-                  </div>
-                  <div className="time-details">
-                    👥 {typeGarde.personnel_requis} personnel requis
-                    {typeGarde.officier_obligatoire && <div className="officier-required">🎖️ Officier requis</div>}
-                    {typeGarde.jours_application?.length > 0 && (
-                      <div className="jours-application">
-                        📅 {typeGarde.jours_application.map(j => j.charAt(0).toUpperCase() + j.slice(1)).join(', ')}
-                      </div>
-                    )}
+      {/* Planning moderne avec code couleur */}
+      {viewMode === 'semaine' ? (
+        <div className="planning-moderne">
+          {typesGarde
+            .filter(typeGarde => {
+              // Afficher seulement les types qui ont au moins un jour applicable cette semaine
+              return weekDates.some((date, dayIndex) => 
+                shouldShowTypeGardeForDay(typeGarde, dayIndex)
+              );
+            })
+            .sort((a, b) => a.heure_debut.localeCompare(b.heure_debut))
+            .map(typeGarde => (
+              <div key={typeGarde.id} className="garde-row-moderne">
+                <div className="garde-info-moderne">
+                  <h3>{typeGarde.nom}</h3>
+                  <div className="garde-meta">
+                    <span>⏰ {typeGarde.heure_debut} - {typeGarde.heure_fin}</span>
+                    <span>👥 {typeGarde.personnel_requis} requis</span>
+                    {typeGarde.officier_obligatoire && <span>🎖️ Officier</span>}
                   </div>
                 </div>
+                
+                <div className="jours-garde-moderne">
+                  {weekDates.map((date, dayIndex) => {
+                    if (!shouldShowTypeGardeForDay(typeGarde, dayIndex)) {
+                      return null; // Ne pas afficher du tout
+                    }
 
-                {weekDates.map((date, dayIndex) => {
-                  // Vérifier si ce type de garde s'applique à ce jour
-                  if (!shouldShowTypeGardeForDay(typeGarde, dayIndex)) {
+                    const coverage = getGardeCoverage(date, typeGarde);
+                    const assignation = getAssignationForSlot(date, typeGarde.id);
+                    const assignedUser = assignation ? getUserById(assignation.user_id) : null;
+
                     return (
-                      <div 
-                        key={dayIndex} 
-                        className="planning-cell empty-cell"
-                        data-testid={`planning-cell-empty-${dayIndex}-${typeGarde.id}`}
+                      <div
+                        key={dayIndex}
+                        className={`jour-garde-card ${coverage}`}
+                        style={{
+                          backgroundColor: getCoverageColor(coverage) + '20',
+                          borderColor: getCoverageColor(coverage)
+                        }}
+                        onClick={() => {
+                          if (assignation && assignedUser) {
+                            openGardeDetails(date, typeGarde);
+                          } else if (user.role !== 'employe') {
+                            openAssignModal(date, typeGarde);
+                          }
+                        }}
+                        data-testid={`garde-card-${dayIndex}-${typeGarde.id}`}
                       >
-                        {/* Cellule vide pour l'alignement */}
+                        <div className="jour-header">
+                          <span className="jour-name">{weekDays[dayIndex]}</span>
+                          <span className="jour-date">{date.getDate()}</span>
+                        </div>
+                        
+                        <div className="garde-content">
+                          {assignedUser ? (
+                            <div className="assigned-info">
+                              <span className="assigned-name">{assignedUser.prenom} {assignedUser.nom.charAt(0)}.</span>
+                              <span className="assigned-grade">{assignedUser.grade}</span>
+                              {typeGarde.personnel_requis > 1 && (
+                                <span className="more-count">+{typeGarde.personnel_requis - 1}</span>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="vacant-info">
+                              <span className="vacant-text">Vacant</span>
+                              <span className="personnel-need">{typeGarde.personnel_requis}p</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="coverage-indicator">
+                          <span className={`coverage-badge ${coverage}`}>
+                            {coverage === 'complete' ? '✅' : coverage === 'partielle' ? '⚠️' : '❌'}
+                          </span>
+                        </div>
                       </div>
                     );
-                  }
-
-                  const assignation = getAssignationForSlot(date, typeGarde.id);
-                  const assignedUser = assignation ? getUserById(assignation.user_id) : null;
-
-                  return (
-                    <div 
-                      key={dayIndex} 
-                      className={`planning-cell ${assignation ? 'assigned' : 'vacant'} ${user.role !== 'employe' ? 'clickable' : ''}`}
-                      style={{ borderLeftColor: typeGarde.couleur }}
-                      onClick={() => {
-                        if (assignation && assignedUser) {
-                          openGardeDetails(date, typeGarde);
-                        } else if (user.role !== 'employe') {
-                          openAssignModal(date, typeGarde);
-                        }
-                      }}
-                      data-testid={`planning-cell-${dayIndex}-${typeGarde.id}`}
-                    >
-                      {assignedUser ? (
-                        <div className="assignment-content">
-                          <div className="assigned-user">
-                            {assignedUser.prenom} {assignedUser.nom}
-                          </div>
-                          <div className="user-grade" style={{ backgroundColor: typeGarde.couleur }}>
-                            {assignedUser.grade}
-                          </div>
-                          <div className={`assignment-type ${assignation.assignation_type}`}>
-                            {assignation.assignation_type === 'auto' ? '🤖 Auto' : '👤 Manuel'}
-                          </div>
-                          {typeGarde.personnel_requis > 1 && (
-                            <div className="more-personnel">+{typeGarde.personnel_requis - 1} autres</div>
-                          )}
-                          <div className="click-hint-view">👁️ Cliquer pour voir détails</div>
-                        </div>
-                      ) : (
-                        <div className="vacant-content">
-                          <div className="vacant-icon">🚫</div>
-                          <div className="vacant-label">Garde vacante</div>
-                          <div className="personnel-needed">{typeGarde.personnel_requis} personnel requis</div>
-                          {user.role !== 'employe' && (
-                            <div className="click-hint">👆 Cliquer pour assigner</div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                  }).filter(Boolean)}
+                </div>
               </div>
-            );
-          })
-          .filter(Boolean) // Supprimer les lignes null
-        }
-      </div>
+            ))}
+        </div>
+      ) : (
+        <div className="planning-mois">
+          <div className="mois-header">
+            <h3>📅 Planning mensuel - {new Date(currentMonth + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</h3>
+          </div>
+          
+          <div className="calendrier-mois">
+            {monthDates.map(date => {
+              const dayName = date.toLocaleDateString('fr-FR', { weekday: 'short' });
+              const dayIndex = date.getDay() === 0 ? 6 : date.getDay() - 1; // Lundi = 0
+              
+              const gardesJour = typesGarde.filter(typeGarde => 
+                shouldShowTypeGardeForDay(typeGarde, dayIndex)
+              );
+
+              return (
+                <div key={date.toISOString().split('T')[0]} className="jour-mois">
+                  <div className="jour-mois-header">
+                    <span className="jour-mois-name">{dayName}</span>
+                    <span className="jour-mois-date">{date.getDate()}</span>
+                  </div>
+                  
+                  <div className="gardes-jour-list">
+                    {gardesJour.map(typeGarde => {
+                      const coverage = getGardeCoverage(date, typeGarde);
+                      return (
+                        <div
+                          key={typeGarde.id}
+                          className={`garde-mois-item ${coverage}`}
+                          style={{
+                            backgroundColor: getCoverageColor(coverage),
+                            opacity: coverage === 'vacante' ? 0.7 : 1
+                          }}
+                          onClick={() => openGardeDetails(date, typeGarde)}
+                          data-testid={`garde-mois-${date.getDate()}-${typeGarde.id}`}
+                        >
+                          <span className="garde-initiale">{typeGarde.nom.charAt(0)}</span>
+                          <span className="coverage-icon">
+                            {coverage === 'complete' ? '✅' : coverage === 'partielle' ? '⚠️' : '❌'}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Assignment Modal */}
       {showAssignModal && selectedSlot && user.role !== 'employe' && (
