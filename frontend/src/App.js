@@ -1589,20 +1589,45 @@ const Planning = () => {
   );
 };
 
-// Remplacements Component complet
+// Remplacements Component optimisé - Gestion complète remplacements et congés
 const Remplacements = () => {
   const { user } = useAuth();
   const [demandes, setDemandes] = useState([]);
+  const [demandesConge, setDemandesConge] = useState([]);
   const [users, setUsers] = useState([]);
   const [typesGarde, setTypesGarde] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('remplacements');
+  const [showCreateRemplacementModal, setShowCreateRemplacementModal] = useState(false);
+  const [showCreateCongeModal, setShowCreateCongeModal] = useState(false);
   const [newDemande, setNewDemande] = useState({
     type_garde_id: '',
     date: '',
-    raison: ''
+    raison: '',
+    priorite: 'normale'
+  });
+  const [newConge, setNewConge] = useState({
+    type_conge: '',
+    date_debut: '',
+    date_fin: '',
+    raison: '',
+    priorite: 'normale'
   });
   const { toast } = useToast();
+
+  const typesConge = [
+    { value: 'maladie', label: '🏥 Maladie', description: 'Arrêt maladie avec justificatif' },
+    { value: 'vacances', label: '🏖️ Vacances', description: 'Congés payés annuels' },
+    { value: 'parental', label: '👶 Parental', description: 'Congé maternité/paternité' },
+    { value: 'personnel', label: '👤 Personnel', description: 'Congé exceptionnel sans solde' }
+  ];
+
+  const niveauxPriorite = [
+    { value: 'urgente', label: '🚨 Urgente', color: '#EF4444', description: 'Traitement immédiat requis' },
+    { value: 'haute', label: '🔥 Haute', color: '#F59E0B', description: 'Traitement prioritaire dans 24h' },
+    { value: 'normale', label: '📋 Normale', color: '#3B82F6', description: 'Traitement dans délai standard' },
+    { value: 'faible', label: '📝 Faible', color: '#6B7280', description: 'Traitement différé possible' }
+  ];
 
   useEffect(() => {
     fetchData();
@@ -1613,6 +1638,7 @@ const Remplacements = () => {
     try {
       const promises = [
         axios.get(`${API}/remplacements`),
+        axios.get(`${API}/demandes-conge`),
         axios.get(`${API}/types-garde`)
       ];
       
@@ -1622,16 +1648,17 @@ const Remplacements = () => {
 
       const responses = await Promise.all(promises);
       setDemandes(responses[0].data);
-      setTypesGarde(responses[1].data);
+      setDemandesConge(responses[1].data);
+      setTypesGarde(responses[2].data);
       
-      if (responses[2]) {
-        setUsers(responses[2].data);
+      if (responses[3]) {
+        setUsers(responses[3].data);
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des remplacements:', error);
+      console.error('Erreur lors du chargement:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les demandes de remplacement",
+        description: "Impossible de charger les données",
         variant: "destructive"
       });
     } finally {
@@ -1639,11 +1666,11 @@ const Remplacements = () => {
     }
   };
 
-  const handleCreateDemande = async () => {
+  const handleCreateRemplacement = async () => {
     if (!newDemande.type_garde_id || !newDemande.date || !newDemande.raison.trim()) {
       toast({
         title: "Champs requis",
-        description: "Veuillez remplir tous les champs",
+        description: "Veuillez remplir tous les champs obligatoires",
         variant: "destructive"
       });
       return;
@@ -1653,11 +1680,11 @@ const Remplacements = () => {
       await axios.post(`${API}/remplacements`, newDemande);
       toast({
         title: "Demande créée",
-        description: "Votre demande de remplacement a été soumise",
+        description: "Votre demande de remplacement a été soumise et la recherche automatique va commencer",
         variant: "success"
       });
-      setShowCreateModal(false);
-      setNewDemande({ type_garde_id: '', date: '', raison: '' });
+      setShowCreateRemplacementModal(false);
+      setNewDemande({ type_garde_id: '', date: '', raison: '', priorite: 'normale' });
       fetchData();
     } catch (error) {
       toast({
@@ -1668,23 +1695,46 @@ const Remplacements = () => {
     }
   };
 
-  const handleApproveReject = async (demandeId, action) => {
+  const handleCreateConge = async () => {
+    if (!newConge.type_conge || !newConge.date_debut || !newConge.date_fin || !newConge.raison.trim()) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/demandes-conge`, newConge);
+      toast({
+        title: "Demande de congé créée",
+        description: "Votre demande a été soumise et sera examinée par votre superviseur",
+        variant: "success"
+      });
+      setShowCreateCongeModal(false);
+      setNewConge({ type_conge: '', date_debut: '', date_fin: '', raison: '', priorite: 'normale' });
+      fetchData();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer la demande de congé",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleApprouverConge = async (demandeId, action, commentaire = "") => {
     if (user.role === 'employe') return;
 
     try {
-      // For demo - just update locally and show success
+      await axios.put(`${API}/demandes-conge/${demandeId}/approuver?action=${action}&commentaire=${commentaire}`);
       toast({
-        title: action === 'approve' ? "Demande approuvée" : "Demande refusée",
-        description: `La demande a été ${action === 'approve' ? 'approuvée' : 'refusée'} avec succès`,
+        title: action === 'approuver' ? "Congé approuvé" : "Congé refusé",
+        description: `La demande de congé a été ${action === 'approuver' ? 'approuvée' : 'refusée'}`,
         variant: "success"
       });
-      
-      // Update local state
-      setDemandes(prev => prev.map(d => 
-        d.id === demandeId 
-          ? {...d, statut: action === 'approve' ? 'approuve' : 'refuse'}
-          : d
-      ));
+      fetchData();
     } catch (error) {
       toast({
         title: "Erreur",
@@ -1696,7 +1746,7 @@ const Remplacements = () => {
 
   const getStatutColor = (statut) => {
     switch (statut) {
-      case 'en_cours': return '#F59E0B';
+      case 'en_cours': case 'en_attente': return '#F59E0B';
       case 'approuve': return '#10B981';
       case 'refuse': return '#EF4444';
       default: return '#6B7280';
@@ -1706,6 +1756,7 @@ const Remplacements = () => {
   const getStatutLabel = (statut) => {
     switch (statut) {
       case 'en_cours': return 'En cours';
+      case 'en_attente': return 'En attente';
       case 'approuve': return 'Approuvé';
       case 'refuse': return 'Refusé';
       default: return statut;
@@ -1722,191 +1773,250 @@ const Remplacements = () => {
     return foundUser ? `${foundUser.prenom} ${foundUser.nom}` : `Employé #${userId?.slice(-4)}`;
   };
 
-  if (loading) return <div className="loading" data-testid="replacements-loading">Chargement des remplacements...</div>;
+  const getPrioriteColor = (priorite) => {
+    const prioriteObj = niveauxPriorite.find(p => p.value === priorite);
+    return prioriteObj ? prioriteObj.color : '#6B7280';
+  };
+
+  if (loading) return <div className="loading" data-testid="replacements-loading">Chargement...</div>;
 
   return (
-    <div className="remplacements">
+    <div className="remplacements-optimized">
       <div className="remplacements-header">
         <div>
-          <h1 data-testid="replacements-title">Gestion des remplacements</h1>
-          <p>Demandes de remplacement et validation automatisée</p>
+          <h1 data-testid="replacements-title">Gestion des remplacements et congés</h1>
+          <p>Demandes de remplacement avec recherche automatique et gestion des congés</p>
         </div>
-        <div className="remplacements-controls">
+        <div className="header-actions">
           <Button 
             variant="default" 
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => setShowCreateRemplacementModal(true)}
             data-testid="create-replacement-btn"
           >
-            + Nouvelle demande
+            🔄 Demande de remplacement
           </Button>
-          {user.role !== 'employe' && (
-            <Button variant="outline" data-testid="validate-replacements-btn">
-              ✅ Valider les demandes
-            </Button>
-          )}
+          <Button 
+            variant="outline" 
+            onClick={() => setShowCreateCongeModal(true)}
+            data-testid="create-conge-btn"
+          >
+            🏖️ Demande de congé
+          </Button>
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="replacement-stats">
-        <div className="stat-card pending">
-          <div className="stat-icon">⏳</div>
-          <div className="stat-content">
-            <h3>En cours</h3>
-            <p className="stat-number">{demandes.filter(d => d.statut === 'en_cours').length}</p>
-            <p className="stat-label">Demandes en attente</p>
-          </div>
-        </div>
-
-        <div className="stat-card approved">
-          <div className="stat-icon">✅</div>
-          <div className="stat-content">
-            <h3>Approuvées</h3>
-            <p className="stat-number">{demandes.filter(d => d.statut === 'approuve').length}</p>
-            <p className="stat-label">Ce mois</p>
-          </div>
-        </div>
-
-        <div className="stat-card refused">
-          <div className="stat-icon">❌</div>
-          <div className="stat-content">
-            <h3>Refusées</h3>
-            <p className="stat-number">{demandes.filter(d => d.statut === 'refuse').length}</p>
-            <p className="stat-label">Ce mois</p>
-          </div>
-        </div>
-
-        <div className="stat-card coverage">
-          <div className="stat-icon">📊</div>
-          <div className="stat-content">
-            <h3>Taux de couverture</h3>
-            <p className="stat-number">94%</p>
-            <p className="stat-label">Remplacements trouvés</p>
-          </div>
-        </div>
+      {/* Onglets Remplacements / Congés */}
+      <div className="replacement-tabs">
+        <button
+          className={`tab-button ${activeTab === 'remplacements' ? 'active' : ''}`}
+          onClick={() => setActiveTab('remplacements')}
+          data-testid="tab-remplacements"
+        >
+          🔄 Remplacements ({demandes.length})
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'conges' ? 'active' : ''}`}
+          onClick={() => setActiveTab('conges')}
+          data-testid="tab-conges"
+        >
+          🏖️ Congés ({demandesConge.length})
+        </button>
       </div>
 
-      {/* Replacements List */}
-      <div className="replacements-list">
-        <div className="list-header">
-          <h2>Toutes les demandes</h2>
-          <div className="filter-controls">
-            <Button variant="ghost" size="sm">Toutes</Button>
-            <Button variant="ghost" size="sm">En cours</Button>
-            <Button variant="ghost" size="sm">Approuvées</Button>
-          </div>
-        </div>
-
-        <div className="replacements-table">
-          <div className="table-header">
-            <div className="header-cell">DEMANDEUR</div>
-            <div className="header-cell">TYPE DE GARDE</div>
-            <div className="header-cell">DATE</div>
-            <div className="header-cell">RAISON</div>
-            <div className="header-cell">STATUT</div>
-            <div className="header-cell">REMPLAÇANT</div>
-            <div className="header-cell">ACTIONS</div>
-          </div>
-
-          {demandes.map(demande => (
-            <div key={demande.id} className="table-row" data-testid={`replacement-row-${demande.id}`}>
-              <div className="demandeur-cell">
-                <div className="user-avatar">
-                  <span className="avatar-icon">👤</span>
-                </div>
-                <div>
-                  <p className="user-name">{getUserName(demande.demandeur_id)}</p>
-                  <p className="request-date">
-                    Demandé le {new Date(demande.created_at).toLocaleDateString('fr-FR')}
-                  </p>
+      {/* Contenu des onglets */}
+      <div className="tab-content">
+        {activeTab === 'remplacements' && (
+          <div className="remplacements-content">
+            {/* Statistics Cards pour remplacements */}
+            <div className="replacement-stats">
+              <div className="stat-card pending">
+                <div className="stat-icon">⏳</div>
+                <div className="stat-content">
+                  <h3>En cours</h3>
+                  <p className="stat-number">{demandes.filter(d => d.statut === 'en_cours').length}</p>
+                  <p className="stat-label">Demandes en attente</p>
                 </div>
               </div>
 
-              <div className="type-garde-cell">
-                <span className="type-garde-name">
-                  {getTypeGardeName(demande.type_garde_id)}
-                </span>
+              <div className="stat-card approved">
+                <div className="stat-icon">✅</div>
+                <div className="stat-content">
+                  <h3>Approuvées</h3>
+                  <p className="stat-number">{demandes.filter(d => d.statut === 'approuve').length}</p>
+                  <p className="stat-label">Ce mois</p>
+                </div>
               </div>
 
-              <div className="date-cell">
-                <span className="garde-date">
-                  {new Date(demande.date).toLocaleDateString('fr-FR')}
-                </span>
-              </div>
-
-              <div className="raison-cell">
-                <p className="raison-text">{demande.raison}</p>
-              </div>
-
-              <div className="statut-cell">
-                <span 
-                  className="statut-badge" 
-                  style={{ backgroundColor: getStatutColor(demande.statut) }}
-                  data-testid={`status-${demande.id}`}
-                >
-                  {getStatutLabel(demande.statut)}
-                </span>
-              </div>
-
-              <div className="remplacant-cell">
-                {demande.remplacant_id ? (
-                  <span className="remplacant-name">
-                    {getUserName(demande.remplacant_id)}
-                  </span>
-                ) : (
-                  <span className="no-remplacant">En recherche...</span>
-                )}
-              </div>
-
-              <div className="actions-cell">
-                <Button variant="ghost" className="action-btn" data-testid={`view-replacement-${demande.id}`}>👁️</Button>
-                {user.role !== 'employe' && demande.statut === 'en_cours' && (
-                  <>
-                    <Button 
-                      variant="ghost" 
-                      className="action-btn" 
-                      onClick={() => handleApproveReject(demande.id, 'approve')}
-                      data-testid={`approve-replacement-${demande.id}`}
-                    >
-                      ✅
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="action-btn danger" 
-                      onClick={() => handleApproveReject(demande.id, 'reject')}
-                      data-testid={`reject-replacement-${demande.id}`}
-                    >
-                      ❌
-                    </Button>
-                  </>
-                )}
+              <div className="stat-card coverage">
+                <div className="stat-icon">📊</div>
+                <div className="stat-content">
+                  <h3>Taux de couverture</h3>
+                  <p className="stat-number">94%</p>
+                  <p className="stat-label">Remplacements trouvés</p>
+                </div>
               </div>
             </div>
-          ))}
 
-          {demandes.length === 0 && (
-            <div className="empty-state">
-              <h3>Aucune demande de remplacement</h3>
-              <p>Les demandes de remplacement apparaîtront ici.</p>
-              <Button 
-                variant="outline" 
-                onClick={() => setShowCreateModal(true)}
-                className="mt-4"
-              >
-                Créer ma première demande
-              </Button>
+            {/* Liste des demandes de remplacement */}
+            <div className="demandes-list">
+              {demandes.length > 0 ? (
+                demandes.map(demande => (
+                  <div key={demande.id} className="demande-card" data-testid={`replacement-${demande.id}`}>
+                    <div className="demande-header">
+                      <div className="demande-info">
+                        <h3>{getTypeGardeName(demande.type_garde_id)}</h3>
+                        <span className="demande-date">{new Date(demande.date).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                      <div className="demande-status">
+                        <span 
+                          className="status-badge" 
+                          style={{ backgroundColor: getStatutColor(demande.statut) }}
+                        >
+                          {getStatutLabel(demande.statut)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="demande-details">
+                      <p className="demande-raison">{demande.raison}</p>
+                      <div className="demande-meta">
+                        <span>Demandé par: {getUserName(demande.demandeur_id)}</span>
+                        <span>Le: {new Date(demande.created_at).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    </div>
+                    {user.role !== 'employe' && demande.statut === 'en_cours' && (
+                      <div className="demande-actions">
+                        <Button variant="outline" size="sm" data-testid={`search-replacement-${demande.id}`}>
+                          🔍 Recherche auto
+                        </Button>
+                        <Button variant="ghost" size="sm" data-testid={`approve-replacement-${demande.id}`}>✅</Button>
+                        <Button variant="ghost" size="sm" className="danger" data-testid={`reject-replacement-${demande.id}`}>❌</Button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <h3>Aucune demande de remplacement</h3>
+                  <p>Les demandes apparaîtront ici.</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {activeTab === 'conges' && (
+          <div className="conges-content">
+            {/* Statistics Cards pour congés */}
+            <div className="conge-stats">
+              <div className="stat-card-conge pending">
+                <div className="stat-icon">⏳</div>
+                <div className="stat-content">
+                  <h3>En attente</h3>
+                  <p className="stat-number">{demandesConge.filter(d => d.statut === 'en_attente').length}</p>
+                  <p className="stat-label">À approuver</p>
+                </div>
+              </div>
+
+              <div className="stat-card-conge approved">
+                <div className="stat-icon">✅</div>
+                <div className="stat-content">
+                  <h3>Approuvés</h3>
+                  <p className="stat-number">{demandesConge.filter(d => d.statut === 'approuve').length}</p>
+                  <p className="stat-label">Ce mois</p>
+                </div>
+              </div>
+
+              <div className="stat-card-conge total">
+                <div className="stat-icon">📊</div>
+                <div className="stat-content">
+                  <h3>Total jours</h3>
+                  <p className="stat-number">{demandesConge.reduce((total, d) => total + (d.nombre_jours || 0), 0)}</p>
+                  <p className="stat-label">Jours de congé</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Liste des demandes de congé */}
+            <div className="conges-list">
+              {demandesConge.length > 0 ? (
+                demandesConge.map(conge => (
+                  <div key={conge.id} className="conge-card" data-testid={`conge-${conge.id}`}>
+                    <div className="conge-header">
+                      <div className="conge-type">
+                        <span className="type-badge">
+                          {typesConge.find(t => t.value === conge.type_conge)?.label || conge.type_conge}
+                        </span>
+                        <span 
+                          className="priorite-badge" 
+                          style={{ backgroundColor: getPrioriteColor(conge.priorite) }}
+                        >
+                          {niveauxPriorite.find(p => p.value === conge.priorite)?.label || conge.priorite}
+                        </span>
+                      </div>
+                      <div className="conge-status">
+                        <span 
+                          className="status-badge" 
+                          style={{ backgroundColor: getStatutColor(conge.statut) }}
+                        >
+                          {getStatutLabel(conge.statut)}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="conge-details">
+                      <div className="conge-dates">
+                        <span className="date-range">
+                          {new Date(conge.date_debut).toLocaleDateString('fr-FR')} - {new Date(conge.date_fin).toLocaleDateString('fr-FR')}
+                        </span>
+                        <span className="jours-count">({conge.nombre_jours} jour{conge.nombre_jours > 1 ? 's' : ''})</span>
+                      </div>
+                      <p className="conge-raison">{conge.raison}</p>
+                      <div className="conge-meta">
+                        <span>Demandé par: {getUserName(conge.demandeur_id)}</span>
+                        <span>Le: {new Date(conge.created_at).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    </div>
+
+                    {user.role !== 'employe' && conge.statut === 'en_attente' && (
+                      <div className="conge-actions">
+                        <Button 
+                          variant="default" 
+                          size="sm" 
+                          onClick={() => handleApprouverConge(conge.id, 'approuver')}
+                          data-testid={`approve-conge-${conge.id}`}
+                        >
+                          ✅ Approuver
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleApprouverConge(conge.id, 'refuser')}
+                          data-testid={`reject-conge-${conge.id}`}
+                        >
+                          ❌ Refuser
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="empty-state">
+                  <h3>Aucune demande de congé</h3>
+                  <p>Les demandes de congé apparaîtront ici.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Create Replacement Modal */}
-      {showCreateModal && (
-        <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
+      {showCreateRemplacementModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateRemplacementModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="create-replacement-modal">
             <div className="modal-header">
               <h3>Nouvelle demande de remplacement</h3>
-              <Button variant="ghost" onClick={() => setShowCreateModal(false)}>✕</Button>
+              <Button variant="ghost" onClick={() => setShowCreateRemplacementModal(false)}>✕</Button>
             </div>
             <div className="modal-body">
               <div className="form-field">
@@ -1940,6 +2050,23 @@ const Remplacements = () => {
               </div>
 
               <div className="form-field">
+                <Label htmlFor="priorite">Priorité</Label>
+                <select
+                  id="priorite"
+                  value={newDemande.priorite}
+                  onChange={(e) => setNewDemande({...newDemande, priorite: e.target.value})}
+                  className="form-select"
+                  data-testid="select-priority"
+                >
+                  {niveauxPriorite.map(niveau => (
+                    <option key={niveau.value} value={niveau.value}>
+                      {niveau.label} - {niveau.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-field">
                 <Label htmlFor="raison">Raison du remplacement *</Label>
                 <textarea
                   id="raison"
@@ -1955,14 +2082,116 @@ const Remplacements = () => {
               <div className="modal-actions">
                 <Button 
                   variant="outline" 
-                  onClick={() => setShowCreateModal(false)}
+                  onClick={() => setShowCreateRemplacementModal(false)}
                 >
                   Annuler
                 </Button>
                 <Button 
                   variant="default" 
-                  onClick={handleCreateDemande}
+                  onClick={handleCreateRemplacement}
                   data-testid="submit-replacement-btn"
+                >
+                  Créer la demande
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Conge Modal */}
+      {showCreateCongeModal && (
+        <div className="modal-overlay" onClick={() => setShowCreateCongeModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="create-conge-modal">
+            <div className="modal-header">
+              <h3>Nouvelle demande de congé</h3>
+              <Button variant="ghost" onClick={() => setShowCreateCongeModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-field">
+                <Label htmlFor="type-conge">Type de congé *</Label>
+                <select
+                  id="type-conge"
+                  value={newConge.type_conge}
+                  onChange={(e) => setNewConge({...newConge, type_conge: e.target.value})}
+                  className="form-select"
+                  data-testid="select-conge-type"
+                >
+                  <option value="">Sélectionner un type de congé</option>
+                  {typesConge.map(type => (
+                    <option key={type.value} value={type.value}>
+                      {type.label} - {type.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-row">
+                <div className="form-field">
+                  <Label htmlFor="date-debut">Date de début *</Label>
+                  <Input
+                    id="date-debut"
+                    type="date"
+                    value={newConge.date_debut}
+                    onChange={(e) => setNewConge({...newConge, date_debut: e.target.value})}
+                    min={new Date().toISOString().split('T')[0]}
+                    data-testid="select-date-debut"
+                  />
+                </div>
+                <div className="form-field">
+                  <Label htmlFor="date-fin">Date de fin *</Label>
+                  <Input
+                    id="date-fin"
+                    type="date"
+                    value={newConge.date_fin}
+                    onChange={(e) => setNewConge({...newConge, date_fin: e.target.value})}
+                    min={newConge.date_debut || new Date().toISOString().split('T')[0]}
+                    data-testid="select-date-fin"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="priorite-conge">Priorité</Label>
+                <select
+                  id="priorite-conge"
+                  value={newConge.priorite}
+                  onChange={(e) => setNewConge({...newConge, priorite: e.target.value})}
+                  className="form-select"
+                  data-testid="select-conge-priority"
+                >
+                  {niveauxPriorite.map(niveau => (
+                    <option key={niveau.value} value={niveau.value}>
+                      {niveau.label} - {niveau.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="form-field">
+                <Label htmlFor="raison-conge">Raison du congé *</Label>
+                <textarea
+                  id="raison-conge"
+                  value={newConge.raison}
+                  onChange={(e) => setNewConge({...newConge, raison: e.target.value})}
+                  placeholder="Expliquez la raison de votre demande de congé..."
+                  rows="4"
+                  className="form-textarea"
+                  data-testid="conge-reason"
+                />
+              </div>
+
+              <div className="modal-actions">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowCreateCongeModal(false)}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleCreateConge}
+                  data-testid="submit-conge-btn"
                 >
                   Créer la demande
                 </Button>
