@@ -1910,6 +1910,24 @@ const Remplacements = () => {
 
         {activeTab === 'conges' && (
           <div className="conges-content">
+            {/* En-tête spécial pour admin/superviseur */}
+            {user.role !== 'employe' && (
+              <div className="management-header">
+                <div className="management-info">
+                  <h3>👑 Gestion des demandes de congé</h3>
+                  <p>
+                    {user.role === 'admin' ? 
+                      'Vous pouvez approuver toutes les demandes de congé' : 
+                      'Vous pouvez approuver les demandes des employés uniquement'}
+                  </p>
+                </div>
+                <div className="pending-indicator">
+                  <span className="pending-count">{demandesConge.filter(d => d.statut === 'en_attente').length}</span>
+                  <span className="pending-label">en attente d'approbation</span>
+                </div>
+              </div>
+            )}
+
             {/* Statistics Cards pour congés */}
             <div className="conge-stats">
               <div className="stat-card-conge pending">
