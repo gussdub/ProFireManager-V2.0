@@ -1379,11 +1379,35 @@ const Planning = () => {
     }
   };
 
+  const getGardeCoverage = (date, typeGarde) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const gardeAssignations = assignations.filter(a => 
+      a.date === dateStr && a.type_garde_id === typeGarde.id
+    );
+    
+    const assigned = gardeAssignations.length;
+    const required = typeGarde.personnel_requis;
+    
+    if (assigned === 0) return 'vacante';
+    if (assigned >= required) return 'complete';
+    return 'partielle';
+  };
+
+  const getCoverageColor = (coverage) => {
+    switch (coverage) {
+      case 'complete': return '#10B981'; // Vert
+      case 'partielle': return '#F59E0B'; // Jaune
+      case 'vacante': return '#EF4444'; // Rouge
+      default: return '#6B7280';
+    }
+  };
+
   const handleAttributionAuto = async () => {
     if (user.role === 'employe') return;
 
     try {
-      const response = await axios.post(`${API}/planning/attribution-auto?semaine_debut=${currentWeek}`);
+      const targetDate = viewMode === 'mois' ? `${currentMonth}-01` : currentWeek;
+      const response = await axios.post(`${API}/planning/attribution-auto?semaine_debut=${targetDate}`);
       
       toast({
         title: "Attribution automatique réussie",
