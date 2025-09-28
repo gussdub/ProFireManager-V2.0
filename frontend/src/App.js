@@ -1559,10 +1559,31 @@ const Planning = () => {
               <div className="time-details">
                 👥 {typeGarde.personnel_requis} personnel requis
                 {typeGarde.officier_obligatoire && <div className="officier-required">🎖️ Officier requis</div>}
+                {typeGarde.jours_application?.length > 0 && (
+                  <div className="jours-application">
+                    📅 {typeGarde.jours_application.map(j => j.charAt(0).toUpperCase() + j.slice(1)).join(', ')}
+                  </div>
+                )}
               </div>
             </div>
 
             {weekDates.map((date, dayIndex) => {
+              // Vérifier si ce type de garde s'applique à ce jour
+              if (!shouldShowTypeGardeForDay(typeGarde, dayIndex)) {
+                return (
+                  <div 
+                    key={dayIndex} 
+                    className="planning-cell disabled"
+                    data-testid={`planning-cell-disabled-${dayIndex}-${typeGarde.id}`}
+                  >
+                    <div className="disabled-content">
+                      <div className="disabled-text">Non applicable</div>
+                      <div className="disabled-reason">Jour non configuré</div>
+                    </div>
+                  </div>
+                );
+              }
+
               const assignation = getAssignationForSlot(date, typeGarde.id);
               const assignedUser = assignation ? getUserById(assignation.user_id) : null;
 
@@ -1571,7 +1592,13 @@ const Planning = () => {
                   key={dayIndex} 
                   className={`planning-cell ${assignation ? 'assigned' : 'vacant'} ${user.role !== 'employe' ? 'clickable' : ''}`}
                   style={{ borderLeftColor: typeGarde.couleur }}
-                  onClick={() => openAssignModal(date, typeGarde)}
+                  onClick={() => {
+                    if (assignation) {
+                      openGardeDetails(date, typeGarde);
+                    } else {
+                      openAssignModal(date, typeGarde);
+                    }
+                  }}
                   data-testid={`planning-cell-${dayIndex}-${typeGarde.id}`}
                 >
                   {assignedUser ? (
@@ -1585,6 +1612,9 @@ const Planning = () => {
                       <div className={`assignment-type ${assignation.assignation_type}`}>
                         {assignation.assignation_type === 'auto' ? '🤖 Auto' : '👤 Manuel'}
                       </div>
+                      {typeGarde.personnel_requis > 1 && (
+                        <div className="more-personnel">+{typeGarde.personnel_requis - 1} autres</div>
+                      )}
                     </div>
                   ) : (
                     <div className="vacant-content">
@@ -1592,7 +1622,7 @@ const Planning = () => {
                       <div className="vacant-label">Garde vacante</div>
                       <div className="personnel-needed">{typeGarde.personnel_requis} personnel requis</div>
                       {user.role !== 'employe' && (
-                        <div className="click-hint">👆 Cliquer pour assigner manuellement</div>
+                        <div className="click-hint">👆 Cliquer pour assigner</div>
                       )}
                     </div>
                   )}
