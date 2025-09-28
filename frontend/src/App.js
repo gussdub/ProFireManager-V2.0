@@ -1999,6 +1999,31 @@ const Remplacements = () => {
                         >
                           ❌ Refuser
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          data-testid={`comment-conge-${conge.id}`}
+                        >
+                          💬 Commenter
+                        </Button>
+                      </div>
+                    )}
+
+                    {/* Affichage des infos d'approbation si déjà traitée */}
+                    {conge.statut !== 'en_attente' && conge.approuve_par && (
+                      <div className="approval-info">
+                        <div className="approval-details">
+                          <span className="approval-by">
+                            {conge.statut === 'approuve' ? '✅' : '❌'} 
+                            {conge.statut === 'approuve' ? 'Approuvé' : 'Refusé'} par {getUserName(conge.approuve_par)}
+                          </span>
+                          <span className="approval-date">le {conge.date_approbation}</span>
+                        </div>
+                        {conge.commentaire_approbation && (
+                          <div className="approval-comment">
+                            <strong>Commentaire :</strong> {conge.commentaire_approbation}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
