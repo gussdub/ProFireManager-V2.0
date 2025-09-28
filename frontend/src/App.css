@@ -627,6 +627,27 @@ body {
   font-size: 1rem;
 }
 
+/* Demo data section */
+.demo-data-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+}
+
+.demo-data-section h4 {
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.demo-data-section p {
+  color: #78350f;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
 /* Activity list fix */
 .activity-list {
   display: flex;
