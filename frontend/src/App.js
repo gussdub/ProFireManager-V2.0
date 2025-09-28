@@ -535,6 +535,62 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Section données démo toujours visible pour admin */}
+      {user.role === 'admin' && (
+        <div className="demo-data-section-always">
+          <h2>🎪 Données de démonstration</h2>
+          <p>Créez des données réalistes pour vos démonstrations client</p>
+          <div className="demo-actions">
+            <Button 
+              variant="default" 
+              onClick={async () => {
+                try {
+                  await axios.post(`${API}/init-demo-client-data`);
+                  toast({
+                    title: "Données démo créées",
+                    description: "15 pompiers + historique + formations créés pour démonstration",
+                    variant: "success"
+                  });
+                  setTimeout(() => window.location.reload(), 2000);
+                } catch (error) {
+                  toast({
+                    title: "Erreur",
+                    description: "Impossible de créer les données démo",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              data-testid="init-demo-data-btn"
+            >
+              🚒 Créer données démo client (15 pompiers)
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={async () => {
+                try {
+                  await axios.post(`${API}/init-demo-data`);
+                  toast({
+                    title: "Données de base créées",
+                    description: "4 comptes de base + types de garde créés",
+                    variant: "success"
+                  });
+                  setTimeout(() => window.location.reload(), 2000);
+                } catch (error) {
+                  toast({
+                    title: "Erreur",
+                    description: "Impossible de créer les données de base",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              data-testid="init-basic-data-btn"
+            >
+              ⚙️ Créer données de base (4 comptes)
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Vue spécifique selon le rôle */}
       {user.role === 'admin' && statistiquesDetaillees && (
         <div className="admin-dashboard-section">
