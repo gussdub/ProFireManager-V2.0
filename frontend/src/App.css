@@ -6900,3 +6900,163 @@ body {
     gap: 0.5rem;
   }
 }
+
+/* Priority Options Alignment Fix */
+.priority-section {
+  margin-bottom: 2rem;
+}
+
+.priority-section h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.priority-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.priority-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.priority-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.125rem;
+  accent-color: #dc2626;
+  flex-shrink: 0;
+}
+
+.priority-content {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.priority-option:has(input:checked) .priority-content {
+  background: #fef2f2;
+  border-width: 2px;
+}
+
+.priority-content:hover {
+  background: #f8fafc;
+}
+
+.priority-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.priority-description {
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Conge Type Options */
+.conge-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.conge-type-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.conge-type-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.125rem;
+  accent-color: #dc2626;
+  flex-shrink: 0;
+}
+
+.conge-type-content {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.conge-type-option:has(input:checked) .conge-type-content {
+  background: #f0fdf4;
+  border-color: #10b981;
+}
+
+.conge-type-content:hover {
+  background: #f8fafc;
+}
+
+.conge-type-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 0.25rem;
+  color: #1e293b;
+}
+
+.conge-type-description {
+  font-size: 0.75rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Workflow Info */
+.workflow-info {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.workflow-info h4 {
+  color: #374151;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.workflow-steps {
+  display: flex;
+  gap: 1rem;
+}
+
+.workflow-step {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.step-number {
+  width: 20px;
+  height: 20px;
+  background: #3B82F6;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.625rem;
+}
