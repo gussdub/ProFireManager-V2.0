@@ -627,6 +627,36 @@ body {
   font-size: 1rem;
 }
 
+/* Demo data section always visible */
+.demo-data-section-always {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 2px solid #fcd34d;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.demo-data-section-always h2 {
+  color: #92400e;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.demo-data-section-always p {
+  color: #78350f;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+.demo-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 /* Demo data section */
 .demo-data-section {
   margin-top: 2rem;
