@@ -184,7 +184,7 @@ body {
   display: none;
   position: fixed;
   top: 0;
-  left: 0;
+  left: 280px;
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.3);
@@ -192,7 +192,7 @@ body {
   pointer-events: auto;
 }
 
-/* Responsive Sidebar - Correction z-index et clics */
+/* Responsive Sidebar - Correction complète clics mobile */
 @media (max-width: 768px) {
   .mobile-menu-toggle {
     display: flex;
@@ -200,6 +200,7 @@ body {
   
   .mobile-overlay {
     display: block;
+    left: 280px;
   }
   
   .sidebar {
@@ -220,10 +221,23 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   }
   
-  .sidebar .nav-item {
-    pointer-events: auto;
+  .sidebar.mobile-open .nav-item {
+    pointer-events: auto !important;
     z-index: 1001;
     position: relative;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  
+  .sidebar.mobile-open .nav-item:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+    color: white !important;
+  }
+  
+  .sidebar.mobile-open .nav-item.active {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
   }
   
   .main-content {
