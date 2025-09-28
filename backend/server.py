@@ -800,6 +800,40 @@ class InscriptionFormation(BaseModel):
     date_inscription: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     statut: str = "inscrit"  # inscrit, present, absent, annule
 
+class DemandeCongé(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    demandeur_id: str
+    type_conge: str  # maladie, vacances, parental, personnel
+    date_debut: str  # YYYY-MM-DD
+    date_fin: str  # YYYY-MM-DD
+    nombre_jours: int
+    raison: str
+    documents: List[str] = []  # URLs des documents justificatifs
+    priorite: str = "normale"  # urgente, haute, normale, faible
+    statut: str = "en_attente"  # en_attente, approuve, refuse
+    approuve_par: Optional[str] = None  # ID du superviseur/admin qui approuve
+    date_approbation: Optional[str] = None
+    commentaire_approbation: str = ""
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class DemandeCongeCreate(BaseModel):
+    type_conge: str
+    date_debut: str
+    date_fin: str
+    raison: str
+    priorite: str = "normale"
+    documents: List[str] = []
+
+class NotificationRemplacement(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    demande_remplacement_id: str
+    destinataire_id: str
+    message: str
+    type_notification: str = "remplacement_disponible"  # remplacement_disponible, approbation_requise
+    statut: str = "envoye"  # envoye, lu, accepte, refuse
+    date_envoi: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    date_reponse: Optional[datetime] = None
+
 # Sessions de formation routes
 @api_router.post("/sessions-formation", response_model=SessionFormation)
 async def create_session_formation(session: SessionFormationCreate, current_user: User = Depends(get_current_user)):
