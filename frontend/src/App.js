@@ -1584,6 +1584,25 @@ const Planning = () => {
         </Button>
       </div>
 
+      {/* Légende des couleurs */}
+      <div className="coverage-legend">
+        <h3>📊 Légende de couverture</h3>
+        <div className="legend-items">
+          <div className="legend-item">
+            <span className="legend-color complete"></span>
+            <span>Garde complète</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color partielle"></span>
+            <span>Garde partielle</span>
+          </div>
+          <div className="legend-item">
+            <span className="legend-color vacante"></span>
+            <span>Garde vacante</span>
+          </div>
+        </div>
+      </div>
+
       {/* Instructions for manual assignment */}
       {user.role !== 'employe' && (
         <div className="planning-instructions">
