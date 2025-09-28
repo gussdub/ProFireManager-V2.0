@@ -7057,13 +7057,44 @@ body {
   color: #6b7280;
 }
 
-.garde-actions {
+/* Empty cells for alignment */
+.planning-cell.empty-cell {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.click-hint-view {
+  font-size: 0.625rem;
+  color: #3B82F6;
+  margin-top: 0.25rem;
+  font-weight: 500;
+}
+
+/* Enhanced planning controls */
+.planning-controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-controls {
+  display: flex;
+  gap: 0.5rem;
+  background: #f8fafc;
+  padding: 0.25rem;
+  border-radius: 8px;
+}
+
+.action-controls {
+  display: flex;
   gap: 1rem;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e2e8f0;
 }
 
 /* Responsive planning */
