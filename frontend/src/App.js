@@ -1989,13 +1989,28 @@ const Remplacements = () => {
             {/* Boutons d'actions rapides pour admin/superviseur */}
             {user.role !== 'employe' && (
               <div className="management-actions">
-                <Button variant="outline" size="sm" data-testid="filter-urgent-conges">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleFilterUrgentConges}
+                  data-testid="filter-urgent-conges"
+                >
                   🚨 Congés urgents
                 </Button>
-                <Button variant="outline" size="sm" data-testid="export-conges">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleExportConges}
+                  data-testid="export-conges"
+                >
                   📊 Exporter congés
                 </Button>
-                <Button variant="outline" size="sm" data-testid="planning-impact">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handlePlanningImpact}
+                  data-testid="planning-impact"
+                >
                   📅 Impact planning
                 </Button>
               </div>
