@@ -329,6 +329,7 @@ const Dashboard = () => {
   const [statistiquesDetaillees, setStatistiquesDetaillees] = useState(null);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
