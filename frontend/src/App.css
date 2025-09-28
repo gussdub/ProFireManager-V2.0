@@ -300,9 +300,10 @@ body {
   min-height: 100vh;
 }
 
-/* Dashboard Styles */
-.dashboard-header {
-  margin-bottom: 2rem;
+.dashboard {
+  animation: fadeIn 0.3s ease-out;
+  padding-bottom: 2rem;
+  min-height: calc(100vh - 4rem);
 }
 
 .dashboard-header h1 {
