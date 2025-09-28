@@ -1758,7 +1758,439 @@ body {
   font-weight: 500;
 }
 
-/* Responsive Planning */
+/* Rapports Optimized Styles - Fixed Layout */
+.rapports-optimized {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.rapports-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.rapports-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.rapports-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+.export-actions-header {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Navigation sections */
+.rapports-sections {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  overflow-x: auto;
+}
+
+.section-button {
+  padding: 1rem 1.5rem;
+  background: none;
+  border: none;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-size: 0.875rem;
+}
+
+.section-button:hover {
+  color: #1e293b;
+  background-color: #f8fafc;
+}
+
+.section-button.active {
+  color: #dc2626;
+  border-bottom-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+/* Vue d'ensemble */
+.vue-ensemble {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.vue-ensemble h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: transform 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.kpi-icon {
+  font-size: 3rem;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  background-color: #f1f5f9;
+}
+
+.kpi-card.personnel .kpi-icon {
+  background-color: #dbeafe;
+}
+
+.kpi-card.assignations .kpi-icon {
+  background-color: #dcfce7;
+}
+
+.kpi-card.couverture .kpi-icon {
+  background-color: #fef3c7;
+}
+
+.kpi-card.formations .kpi-icon {
+  background-color: #ede9fe;
+}
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.kpi-value {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.kpi-detail {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+/* Export Section */
+.export-section {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.export-section h3 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.export-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.export-option {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.export-option h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.export-option p {
+  color: #64748b;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+/* Par rôle */
+.par-role {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.par-role h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.roles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.role-card {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.role-card.admin {
+  border-left: 4px solid #dc2626;
+}
+
+.role-card.superviseur {
+  border-left: 4px solid #3B82F6;
+}
+
+.role-card.employe {
+  border-left: 4px solid #10B981;
+}
+
+.role-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.role-header h3 {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.role-count {
+  background-color: #dc2626;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.role-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.role-actions {
+  text-align: center;
+}
+
+/* Par employé */
+.par-employe {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.par-employe h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.employee-selector {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.individual-export {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.employees-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.employees-table .table-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.employees-table .header-cell {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.employee-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  align-items: center;
+}
+
+.employee-row:hover {
+  background-color: #f8fafc;
+}
+
+.employee-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.employee-name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.employee-grade {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.role-cell .role-badge {
+  background-color: #dc2626;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.stat-cell {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.actions-cell {
+  text-align: center;
+}
+
+/* Analytics */
+.analytics {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.analytics h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.analytics-exports {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* Responsive rapports */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .export-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .employees-table .table-header,
+  .employee-row {
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+  }
+}
 @media (max-width: 1024px) {
   .grid-header,
   .grid-row {
