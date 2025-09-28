@@ -1354,9 +1354,13 @@ const Planning = () => {
   const fetchPlanningData = async () => {
     setLoading(true);
     try {
+      const dateRange = viewMode === 'mois' ? 
+        `${currentMonth}-01` : // Premier jour du mois
+        currentWeek;
+        
       const [typesRes, assignationsRes, usersRes] = await Promise.all([
         axios.get(`${API}/types-garde`),
-        axios.get(`${API}/planning/assignations/${currentWeek}`),
+        axios.get(`${API}/planning/assignations/${dateRange}`),
         user.role !== 'employe' ? axios.get(`${API}/users`) : Promise.resolve({ data: [] })
       ]);
       
