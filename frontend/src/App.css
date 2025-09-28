@@ -7315,3 +7315,52 @@ body {
   font-size: 0.875rem;
   line-height: 1.4;
 }
+
+/* Management Actions */
+.management-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Management Tips */
+.management-tips {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.management-tips h4 {
+  color: #1e40af;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.management-tips ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.management-tips li {
+  color: #1e40af;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.management-tips li:before {
+  content: "•";
+  color: #3B82F6;
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
