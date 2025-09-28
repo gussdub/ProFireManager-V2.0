@@ -1559,16 +1559,28 @@ const Planning = () => {
         </div>
       </div>
 
-      {/* Week Navigation */}
-      <div className="week-navigation">
-        <Button variant="ghost" onClick={() => navigateWeek(-1)} data-testid="prev-week-btn">
-          ← Semaine précédente
+      {/* Navigation temporelle */}
+      <div className="time-navigation">
+        <Button 
+          variant="ghost" 
+          onClick={() => viewMode === 'mois' ? navigateMonth(-1) : navigateWeek(-1)}
+          data-testid="prev-period-btn"
+        >
+          ← {viewMode === 'mois' ? 'Mois précédent' : 'Semaine précédente'}
         </Button>
-        <h2 className="week-title">
-          Semaine du {weekDates[0].toLocaleDateString('fr-FR')} au {weekDates[6].toLocaleDateString('fr-FR')}
+        <h2 className="period-title">
+          {viewMode === 'mois' ? (
+            new Date(currentMonth + '-01').toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })
+          ) : (
+            `Semaine du ${weekDates[0].toLocaleDateString('fr-FR')} au ${weekDates[6].toLocaleDateString('fr-FR')}`
+          )}
         </h2>
-        <Button variant="ghost" onClick={() => navigateWeek(1)} data-testid="next-week-btn">
-          Semaine suivante →
+        <Button 
+          variant="ghost" 
+          onClick={() => viewMode === 'mois' ? navigateMonth(1) : navigateWeek(1)}
+          data-testid="next-period-btn"
+        >
+          {viewMode === 'mois' ? 'Mois suivant' : 'Semaine suivante'} →
         </Button>
       </div>
 
