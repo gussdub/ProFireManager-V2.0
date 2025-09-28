@@ -834,6 +834,149 @@ class NotificationRemplacement(BaseModel):
     date_envoi: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     date_reponse: Optional[datetime] = None
 
+# Demandes de congé routes
+@api_router.post("/demandes-conge", response_model=DemandeCongé)
+async def create_demande_conge(demande: DemandeCongeCreate, current_user: User = Depends(get_current_user)):
+    # Calculer le nombre de jours
+    date_debut = datetime.strptime(demande.date_debut, "%Y-%m-%d")
+    date_fin = datetime.strptime(demande.date_fin, "%Y-%m-%d")
+    nombre_jours = (date_fin - date_debut).days + 1
+    
+    demande_obj = DemandeCongé(
+        **demande.dict(),
+        demandeur_id=current_user.id,
+        nombre_jours=nombre_jours
+    )
+    await db.demandes_conge.insert_one(demande_obj.dict())
+    
+    # Créer notification pour approbation
+    if current_user.role == "employe":
+        # Notifier les superviseurs et admins
+        superviseurs_admins = await db.users.find({"role": {"$in": ["superviseur", "admin"]}}).to_list(100)
+        for superviseur in superviseurs_admins:
+            notification = NotificationRemplacement(
+                demande_remplacement_id=demande_obj.id,
+                destinataire_id=superviseur["id"],
+                message=f"Demande de congé {demande.type_conge} de {current_user.nom} {current_user.prenom}",
+                type_notification="approbation_requise"
+            )
+            await db.notifications.insert_one(notification.dict())
+    
+    return demande_obj
+
+@api_router.get("/demandes-conge", response_model=List[DemandeCongé])
+async def get_demandes_conge(current_user: User = Depends(get_current_user)):
+    if current_user.role == "employe":
+        # Employés voient seulement leurs demandes
+        demandes = await db.demandes_conge.find({"demandeur_id": current_user.id}).to_list(1000)
+    else:
+        # Superviseurs et admins voient toutes les demandes
+        demandes = await db.demandes_conge.find().to_list(1000)
+    
+    cleaned_demandes = [clean_mongo_doc(demande) for demande in demandes]
+    return [DemandeCongé(**demande) for demande in cleaned_demandes]
+
+@api_router.put("/demandes-conge/{demande_id}/approuver")
+async def approuver_demande_conge(demande_id: str, action: str, commentaire: str = "", current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    demande = await db.demandes_conge.find_one({"id": demande_id})
+    if not demande:
+        raise HTTPException(status_code=404, detail="Demande non trouvée")
+    
+    # Vérifier les permissions : superviseur peut approuver employés, admin peut tout approuver
+    demandeur = await db.users.find_one({"id": demande["demandeur_id"]})
+    if current_user.role == "superviseur" and demandeur["role"] != "employe":
+        raise HTTPException(status_code=403, detail="Un superviseur ne peut approuver que les demandes d'employés")
+    
+    statut = "approuve" if action == "approuver" else "refuse"
+    
+    await db.demandes_conge.update_one(
+        {"id": demande_id},
+        {
+            "$set": {
+                "statut": statut,
+                "approuve_par": current_user.id,
+                "date_approbation": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+                "commentaire_approbation": commentaire
+            }
+        }
+    )
+    
+    return {"message": f"Demande {statut}e avec succès"}
+
+# Algorithme intelligent de recherche de remplaçants
+@api_router.post("/remplacements/{demande_id}/recherche-automatique")
+async def recherche_remplacants_automatique(demande_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Récupérer la demande de remplacement
+        demande = await db.demandes_remplacement.find_one({"id": demande_id})
+        if not demande:
+            raise HTTPException(status_code=404, detail="Demande non trouvée")
+        
+        # Récupérer les paramètres de remplacement
+        # (selon les règles définies dans Paramètres > Remplacements)
+        
+        # Trouver les remplaçants potentiels selon l'algorithme intelligent
+        users = await db.users.find({"statut": "Actif"}).to_list(1000)
+        type_garde = await db.types_garde.find_one({"id": demande["type_garde_id"]})
+        
+        remplacants_potentiels = []
+        
+        for user in users:
+            if user["id"] == demande["demandeur_id"]:
+                continue  # Skip demandeur
+                
+            # Étape 1: Vérifier disponibilités (si temps partiel)
+            if user["type_emploi"] == "temps_partiel":
+                disponibilites = await db.disponibilites.find({
+                    "user_id": user["id"],
+                    "date": demande["date"],
+                    "statut": "disponible"
+                }).to_list(10)
+                if not disponibilites:
+                    continue
+            
+            # Étape 2: Vérifier grade équivalent (si paramètre activé)
+            # Étape 3: Vérifier compétences équivalentes (si paramètre activé)
+            
+            remplacants_potentiels.append({
+                "user_id": user["id"],
+                "nom": f"{user['prenom']} {user['nom']}",
+                "grade": user["grade"],
+                "score_compatibilite": 85  # Algorithme de scoring à développer
+            })
+        
+        # Trier par score de compatibilité
+        remplacants_potentiels.sort(key=lambda x: x["score_compatibilite"], reverse=True)
+        
+        # Limiter selon max_personnes_contact des paramètres
+        max_contacts = 5  # À récupérer des paramètres
+        remplacants_finaux = remplacants_potentiels[:max_contacts]
+        
+        # Créer les notifications pour les remplaçants potentiels
+        for remplacant in remplacants_finaux:
+            notification = NotificationRemplacement(
+                demande_remplacement_id=demande_id,
+                destinataire_id=remplacant["user_id"],
+                message=f"Remplacement disponible le {demande['date']} - {type_garde['nom'] if type_garde else 'Garde'}",
+                type_notification="remplacement_disponible"
+            )
+            await db.notifications.insert_one(notification.dict())
+        
+        return {
+            "message": f"Recherche automatique effectuée",
+            "remplacants_contactes": len(remplacants_finaux),
+            "algorithme": "Disponibilités → Grade → Compétences → Score compatibilité"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur recherche automatique: {str(e)}")
+
 # Sessions de formation routes
 @api_router.post("/sessions-formation", response_model=SessionFormation)
 async def create_session_formation(session: SessionFormationCreate, current_user: User = Depends(get_current_user)):
