@@ -1685,6 +1685,128 @@ async def cleanup_duplicates(current_user: User = Depends(get_current_user)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur lors du nettoyage: {str(e)}")
 
+# Créer données de démonstration réalistes avec historique
+@api_router.post("/init-demo-data-realiste")
+async def init_demo_data_realiste():
+    try:
+        # Clear existing data
+        await db.users.delete_many({})
+        await db.types_garde.delete_many({})
+        await db.assignations.delete_many({})
+        await db.planning.delete_many({})
+        await db.demandes_remplacement.delete_many({})
+        await db.formations.delete_many({})
+        await db.sessions_formation.delete_many({})
+        await db.disponibilites.delete_many({})
+        
+        # Créer plus d'utilisateurs réalistes
+        demo_users = [
+            {
+                "nom": "Dupont", "prenom": "Jean", "email": "admin@firemanager.ca",
+                "telephone": "514-111-2233", "contact_urgence": "514-999-1111",
+                "grade": "Directeur", "fonction_superieur": False, "type_emploi": "temps_plein",
+                "heures_max_semaine": 40, "role": "admin", "numero_employe": "ADM001",
+                "date_embauche": "14/01/2020", "formations": [], "mot_de_passe": "admin123"
+            },
+            {
+                "nom": "Dubois", "prenom": "Sophie", "email": "superviseur@firemanager.ca",
+                "telephone": "514-444-5566", "contact_urgence": "514-888-2222",
+                "grade": "Directeur", "fonction_superieur": False, "type_emploi": "temps_plein",
+                "heures_max_semaine": 40, "role": "superviseur", "numero_employe": "POM001",
+                "date_embauche": "07/01/2022", "formations": [], "mot_de_passe": "superviseur123"
+            },
+            {
+                "nom": "Bernard", "prenom": "Pierre", "email": "employe@firemanager.ca",
+                "telephone": "418-555-9999", "contact_urgence": "418-777-3333",
+                "grade": "Capitaine", "fonction_superieur": False, "type_emploi": "temps_plein",
+                "heures_max_semaine": 40, "role": "employe", "numero_employe": "POM002",
+                "date_embauche": "21/09/2019", "formations": [], "mot_de_passe": "employe123"
+            },
+            {
+                "nom": "Garcia", "prenom": "Claire", "email": "partiel@firemanager.ca",
+                "telephone": "514-888-9900", "contact_urgence": "514-666-4444",
+                "grade": "Pompier", "fonction_superieur": False, "type_emploi": "temps_partiel",
+                "heures_max_semaine": 25, "role": "employe", "numero_employe": "POM005",
+                "date_embauche": "02/11/2020", "formations": [], "mot_de_passe": "partiel123"
+            },
+            # Nouveaux utilisateurs pour démo réaliste
+            {
+                "nom": "Tremblay", "prenom": "Marc", "email": "marc.tremblay@firemanager.ca",
+                "telephone": "418-222-3333", "contact_urgence": "418-999-4444",
+                "grade": "Lieutenant", "fonction_superieur": False, "type_emploi": "temps_plein",
+                "heures_max_semaine": 40, "role": "employe", "numero_employe": "POM003",
+                "date_embauche": "15/03/2021", "formations": [], "mot_de_passe": "TempPass123!"
+            },
+            {
+                "nom": "Martin", "prenom": "Sarah", "email": "sarah.martin@firemanager.ca",
+                "telephone": "514-333-4444", "contact_urgence": "514-777-8888",
+                "grade": "Pompier", "fonction_superieur": True, "type_emploi": "temps_partiel",
+                "heures_max_semaine": 20, "role": "employe", "numero_employe": "POM006",
+                "date_embauche": "10/08/2023", "formations": [], "mot_de_passe": "TempPass123!"
+            }
+        ]
+        
+        # Créer formations avec plus de détails
+        demo_formations = [
+            {"nom": "Classe 4A", "description": "Formation de conduite véhicules lourds", "duree_heures": 40, "validite_mois": 60, "obligatoire": False},
+            {"nom": "Désincarcération", "description": "Techniques de désincarcération", "duree_heures": 24, "validite_mois": 36, "obligatoire": True},
+            {"nom": "Pompier 1", "description": "Formation de base pompier niveau 1", "duree_heures": 200, "validite_mois": 24, "obligatoire": True},
+            {"nom": "Officier 2", "description": "Formation officier niveau 2", "duree_heures": 120, "validite_mois": 36, "obligatoire": False},
+            {"nom": "Premiers Répondants", "description": "Formation premiers secours", "duree_heures": 16, "validite_mois": 12, "obligatoire": True},
+            {"nom": "Sauvetage Aquatique", "description": "Techniques de sauvetage en milieu aquatique", "duree_heures": 32, "validite_mois": 24, "obligatoire": False}
+        ]
+        
+        formation_ids = {}
+        for formation_data in demo_formations:
+            formation_obj = Formation(**formation_data)
+            await db.formations.insert_one(formation_obj.dict())
+            formation_ids[formation_data["nom"]] = formation_obj.id
+        
+        # Assigner formations aux utilisateurs
+        demo_users[0]["formations"] = [formation_ids["Officier 2"], formation_ids["Pompier 1"]]
+        demo_users[1]["formations"] = [formation_ids["Pompier 1"], formation_ids["Premiers Répondants"]]
+        demo_users[2]["formations"] = [formation_ids["Classe 4A"], formation_ids["Désincarcération"], formation_ids["Premiers Répondants"]]
+        demo_users[3]["formations"] = [formation_ids["Pompier 1"]]
+        demo_users[4]["formations"] = [formation_ids["Désincarcération"], formation_ids["Premiers Répondants"], formation_ids["Sauvetage Aquatique"]]
+        demo_users[5]["formations"] = [formation_ids["Pompier 1"], formation_ids["Premiers Répondants"]]
+        
+        # Créer utilisateurs
+        user_ids = {}
+        for user_data in demo_users:
+            user_dict = user_data.copy()
+            user_dict["mot_de_passe_hash"] = get_password_hash(user_dict.pop("mot_de_passe"))
+            user_dict["statut"] = "Actif"
+            user_obj = User(**user_dict)
+            await db.users.insert_one(user_obj.dict())
+            user_ids[user_data["email"]] = user_obj.id
+        
+        # Créer assignations historiques (3 mois)
+        assignations_created = 0
+        for week_offset in range(-12, 1):  # 12 semaines passées + semaine courante
+            week_start = datetime.now(timezone.utc).date() + timedelta(weeks=week_offset)
+            week_start = week_start - timedelta(days=week_start.weekday())
+            
+            for day_offset in range(7):
+                date_assignation = week_start + timedelta(days=day_offset)
+                date_str = date_assignation.strftime("%Y-%m-%d")
+                
+                # Assigner quelques gardes aléatoirement
+                if assignations_created % 3 == 0:  # Environ 1/3 des jours
+                    # Garde Interne AM
+                    assignation_obj = Assignation(
+                        user_id=user_ids["employe@firemanager.ca"],
+                        type_garde_id="garde-interne-am",  # Sera créé après
+                        date=date_str,
+                        assignation_type="auto"
+                    )
+                    await db.assignations.insert_one(assignation_obj.dict())
+                    assignations_created += 1
+        
+        return {"message": f"Données de démonstration réalistes créées : {len(demo_users)} utilisateurs, {len(demo_formations)} formations, {assignations_created} assignations historiques"}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+
 # Initialize demo data
 @api_router.post("/init-demo-data")
 async def init_demo_data():
