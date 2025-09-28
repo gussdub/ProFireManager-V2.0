@@ -7231,3 +7231,87 @@ body {
   gap: 0.75rem;
   justify-content: flex-end;
 }
+
+/* Management Header for Admin/Supervisor */
+.management-header {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.management-info h3 {
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.management-info p {
+  color: #78350f;
+  font-size: 0.875rem;
+}
+
+.pending-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pending-count {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pending-label {
+  font-size: 0.75rem;
+  color: #92400e;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Approval Info */
+.approval-info {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+}
+
+.approval-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.approval-by {
+  font-weight: 600;
+  color: #166534;
+  font-size: 0.875rem;
+}
+
+.approval-date {
+  font-size: 0.75rem;
+  color: #15803d;
+}
+
+.approval-comment {
+  color: #166534;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
