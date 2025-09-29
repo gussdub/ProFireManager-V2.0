@@ -4607,7 +4607,7 @@ const MonProfil = () => {
                     <span className="heures-max-unit">heures/semaine</span>
                   </div>
                   <small className="heures-max-help">
-                    Cette limite sera respectée lors de l'attribution automatique des gardes.
+                    Indiquez le nombre maximum d'heures que vous souhaitez travailler par semaine (5-168h). Cette limite sera respectée lors de l'attribution automatique des gardes.
                   </small>
                 </div>
               )}
