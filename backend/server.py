@@ -1699,20 +1699,39 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
         # 3. Formations planifiées (100% dynamique)
         formations_count = await db.sessions_formation.count_documents({"statut": "planifie"})
         
-        # 4. Taux de couverture dynamique
+        # 4. Taux de couverture dynamique - CALCUL CORRECT
+        # Calculer le total de personnel requis pour la semaine
         total_assignations_required = await db.types_garde.find().to_list(1000)
-        total_required_this_week = 0
-        total_assigned_this_week = gardes_count
+        total_personnel_requis = 0
+        total_personnel_assigne = 0
         
-        # Calculer le besoin total basé sur les types de garde et jours d'application
-        for type_garde in total_assignations_required:
-            jours_app = type_garde.get("jours_application", [])
-            if not jours_app:  # Si pas spécifié, 7 jours
-                total_required_this_week += 7
-            else:
-                total_required_this_week += len(jours_app)
+        # Pour chaque jour de la semaine
+        for day_offset in range(7):
+            current_day = start_week + timedelta(days=day_offset)
+            day_name = current_day.strftime("%A").lower()
+            
+            # Pour chaque type de garde
+            for type_garde in total_assignations_required:
+                jours_app = type_garde.get("jours_application", [])
+                
+                # Si ce type de garde s'applique à ce jour
+                if not jours_app or day_name in jours_app:
+                    personnel_requis = type_garde.get("personnel_requis", 1)
+                    total_personnel_requis += personnel_requis
+                    
+                    # Compter combien de personnes sont assignées pour cette garde ce jour
+                    assignations_jour = await db.assignations.count_documents({
+                        "date": current_day.strftime("%Y-%m-%d"),
+                        "type_garde_id": type_garde["id"]
+                    })
+                    
+                    total_personnel_assigne += min(assignations_jour, personnel_requis)
         
-        taux_couverture = (total_assigned_this_week / total_required_this_week * 100) if total_required_this_week > 0 else 0
+        # Calcul correct : (personnel assigné / personnel requis) × 100
+        taux_couverture = (total_personnel_assigne / total_personnel_requis * 100) if total_personnel_requis > 0 else 0
+        
+        # Cap à 100% maximum
+        taux_couverture = min(taux_couverture, 100.0)
         
         # 5. Heures travaillées ce mois (100% dynamique)
         start_month = today.replace(day=1)
