@@ -1698,6 +1698,16 @@ const Planning = () => {
   const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showGardeDetailsModal, setShowGardeDetailsModal] = useState(false);
+  const [showAdvancedAssignModal, setShowAdvancedAssignModal] = useState(false);
+  const [advancedAssignConfig, setAdvancedAssignConfig] = useState({
+    user_id: '',
+    type_garde_id: '',
+    recurrence_type: 'unique', // unique, hebdomadaire, mensuel
+    jours_semaine: [], // pour récurrence hebdomadaire
+    date_debut: '',
+    date_fin: '',
+    exceptions: [] // dates d'exception
+  });
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [selectedGardeDetails, setSelectedGardeDetails] = useState(null);
   const { toast } = useToast();
