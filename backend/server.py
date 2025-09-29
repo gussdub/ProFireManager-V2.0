@@ -1957,6 +1957,79 @@ async def init_demo_data_realiste():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
 
+# Créer disponibilités pour semaine courante (démo assignation auto)
+@api_router.post("/init-disponibilites-semaine-courante")
+async def init_disponibilites_semaine_courante(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Supprimer les disponibilités existantes pour la semaine courante
+        today = datetime.now(timezone.utc).date()
+        start_week = today - timedelta(days=today.weekday())
+        end_week = start_week + timedelta(days=6)
+        
+        await db.disponibilites.delete_many({
+            "date": {
+                "$gte": start_week.strftime("%Y-%m-%d"),
+                "$lte": end_week.strftime("%Y-%m-%d")
+            }
+        })
+        
+        # Récupérer tous les employés temps partiel
+        temps_partiel_users = await db.users.find({"type_emploi": "temps_partiel"}).to_list(100)
+        types_garde = await db.types_garde.find().to_list(100)
+        
+        disponibilites_created = 0
+        
+        for user in temps_partiel_users:
+            # Créer disponibilités pour chaque jour de la semaine courante
+            for day_offset in range(7):  # Lundi à Dimanche
+                date_dispo = start_week + timedelta(days=day_offset)
+                date_str = date_dispo.strftime("%Y-%m-%d")
+                day_name = date_dispo.strftime("%A").lower()
+                
+                # Créer disponibilités selon pattern de l'employé
+                user_index = int(user["numero_employe"][-1]) if user["numero_employe"][-1].isdigit() else 0
+                
+                # Pattern différent par employé pour variété
+                if user_index % 3 == 0:  # Employé travaille Lun-Mer-Ven
+                    jours_travail = ['monday', 'wednesday', 'friday']
+                elif user_index % 3 == 1:  # Employé travaille Mar-Jeu-Sam
+                    jours_travail = ['tuesday', 'thursday', 'saturday']
+                else:  # Employé travaille Mer-Ven-Dim
+                    jours_travail = ['wednesday', 'friday', 'sunday']
+                
+                if day_name in jours_travail:
+                    # Créer disponibilités pour types de garde appropriés
+                    for type_garde in types_garde:
+                        # Vérifier si ce type de garde s'applique à ce jour
+                        if type_garde.get("jours_application") and day_name not in type_garde.get("jours_application", []):
+                            continue
+                        
+                        # 70% de chance d'être disponible pour ce type de garde
+                        if disponibilites_created % 10 < 7:
+                            dispo_obj = Disponibilite(
+                                user_id=user["id"],
+                                date=date_str,
+                                type_garde_id=type_garde["id"],
+                                heure_debut=type_garde["heure_debut"],
+                                heure_fin=type_garde["heure_fin"],
+                                statut="disponible"
+                            )
+                            await db.disponibilites.insert_one(dispo_obj.dict())
+                            disponibilites_created += 1
+        
+        return {
+            "message": f"Disponibilités semaine courante créées",
+            "semaine": f"{start_week.strftime('%Y-%m-%d')} - {end_week.strftime('%Y-%m-%d')}",
+            "disponibilites_creees": disponibilites_created,
+            "employes_temps_partiel": len(temps_partiel_users)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+
 # Créer données de démonstration OPTIMALES pour démo client
 @api_router.post("/init-demo-client-data")
 async def init_demo_client_data():
