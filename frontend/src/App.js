@@ -347,11 +347,11 @@ const Dashboard = () => {
         const users = usersResponse.data;
         const activiteItems = [];
         
-        // Dernières assignations
-        if (assignationsResponse.data?.length > 0) {
+        // Dernières assignations (estimation basée sur stats)
+        if (statsResponse.data.gardes_cette_semaine > 0) {
           activiteItems.push({
             type: 'assignation',
-            text: `Assignation automatique effectuée (${assignationsResponse.data.length} gardes)`,
+            text: `Assignation automatique effectuée (${statsResponse.data.gardes_cette_semaine} gardes)`,
             time: 'Il y a 2h',
             icon: '🤖'
           });
