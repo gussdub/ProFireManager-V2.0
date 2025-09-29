@@ -2103,34 +2103,79 @@ async def init_demo_client_data():
                             await db.assignations.insert_one(assignation_obj.dict())
                             assignations_created += 1
         
-        # 6. CRÉER DISPONIBILITÉS POUR TEMPS PARTIEL (6 semaines futures)
+        # 6. CRÉER DISPONIBILITÉS MASSIVES POUR TEMPS PARTIEL (pour démo assignation auto)
         temps_partiel_users = [
             user_ids["partiel@firemanager.ca"],
             user_ids["sarah.martin@firemanager.ca"],
             user_ids["emilie.pelletier@firemanager.ca"],
-            user_ids["thomas.bergeron@firemanager.ca"]
+            user_ids["thomas.bergeron@firemanager.ca"],
+            user_ids["jessica.rousseau@firemanager.ca"],
+            user_ids["antoine.fournier@firemanager.ca"],
+            user_ids["mathieu.leclerc@firemanager.ca"],
+            user_ids["isabelle.gauthier@firemanager.ca"],
+            user_ids["nicolas.beaulieu@firemanager.ca"],
+            user_ids["melissa.caron@firemanager.ca"],
+            user_ids["gabriel.simard@firemanager.ca"],
+            user_ids["valerie.mercier@firemanager.ca"]
         ]
         
         disponibilites_created = 0
-        for user_id in temps_partiel_users:
-            for week_offset in range(0, 6):  # 6 semaines futures
+        
+        # Pour chaque employé temps partiel, créer des disponibilités variées
+        for i, user_id in enumerate(temps_partiel_users):
+            # Patterns de disponibilité différents pour variété
+            if i % 4 == 0:  # Pattern 1: Lun-Mer-Ven
+                jours_pattern = [0, 2, 4]  # Lundi, Mercredi, Vendredi
+            elif i % 4 == 1:  # Pattern 2: Mar-Jeu-Sam
+                jours_pattern = [1, 3, 5]  # Mardi, Jeudi, Samedi
+            elif i % 4 == 2:  # Pattern 3: Mer-Ven-Dim
+                jours_pattern = [2, 4, 6]  # Mercredi, Vendredi, Dimanche
+            else:  # Pattern 4: Lun-Jeu-Sam
+                jours_pattern = [0, 3, 5]  # Lundi, Jeudi, Samedi
+            
+            # Créer disponibilités pour 8 semaines (2 mois futurs)
+            for week_offset in range(0, 8):
                 week_start = datetime.now(timezone.utc).date() + timedelta(weeks=week_offset)
                 week_start = week_start - timedelta(days=week_start.weekday())
                 
-                # Disponibilités lundi, mercredi, vendredi pour temps partiel
-                for day_offset in [0, 2, 4]:  # Lundi, Mercredi, Vendredi
+                for day_offset in jours_pattern:
                     date_dispo = week_start + timedelta(days=day_offset)
                     
-                    dispo_obj = Disponibilite(
-                        user_id=user_id,
-                        date=date_dispo.strftime("%Y-%m-%d"),
-                        type_garde_id=type_garde_ids["Garde Weekend Jour"],  # Disponible pour garde weekend
-                        heure_debut="08:00",
-                        heure_fin="16:00",
-                        statut="disponible"
-                    )
-                    await db.disponibilites.insert_one(dispo_obj.dict())
-                    disponibilites_created += 1
+                    # Créer disponibilités pour différents types de garde
+                    # 80% pour Garde Interne (semaine)
+                    if day_offset < 5:  # Lundi-Vendredi
+                        # Disponible pour garde AM ou PM (alternativement)
+                        type_garde_ids = [
+                            type_garde_ids["Garde Interne AM - Semaine"],
+                            type_garde_ids["Garde Interne PM - Semaine"]
+                        ]
+                        
+                        for type_garde_id in type_garde_ids:
+                            if disponibilites_created % 3 != 2:  # 66% de chance
+                                dispo_obj = Disponibilite(
+                                    user_id=user_id,
+                                    date=date_dispo.strftime("%Y-%m-%d"),
+                                    type_garde_id=type_garde_id,
+                                    heure_debut="06:00" if "AM" in type_garde_ids else "18:00",
+                                    heure_fin="18:00" if "AM" in type_garde_ids else "06:00",
+                                    statut="disponible"
+                                )
+                                await db.disponibilites.insert_one(dispo_obj.dict())
+                                disponibilites_created += 1
+                    else:  # Weekend
+                        # Disponible pour garde weekend
+                        if disponibilites_created % 2 == 0:  # 50% de chance
+                            type_garde_weekend = type_garde_ids["Garde Weekend Jour"]
+                            dispo_obj = Disponibilite(
+                                user_id=user_id,
+                                date=date_dispo.strftime("%Y-%m-%d"),
+                                type_garde_id=type_garde_weekend,
+                                heure_debut="08:00",
+                                heure_fin="20:00",
+                                statut="disponible"
+                            )
+                            await db.disponibilites.insert_one(dispo_obj.dict())
+                            disponibilites_created += 1
         
         # 7. CRÉER SESSIONS DE FORMATION
         demo_sessions = [
