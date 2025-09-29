@@ -1842,6 +1842,73 @@ const Planning = () => {
     }
   };
 
+  const handleAdvancedAssignment = async () => {
+    if (user.role === 'employe') return;
+
+    // Validation des champs requis
+    if (!advancedAssignConfig.user_id || !advancedAssignConfig.type_garde_id || !advancedAssignConfig.date_debut) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validation spécifique pour récurrence hebdomadaire
+    if (advancedAssignConfig.recurrence_type === 'hebdomadaire' && advancedAssignConfig.jours_semaine.length === 0) {
+      toast({
+        title: "Jours requis",
+        description: "Veuillez sélectionner au moins un jour de la semaine",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const assignmentData = {
+        user_id: advancedAssignConfig.user_id,
+        type_garde_id: advancedAssignConfig.type_garde_id,
+        recurrence_type: advancedAssignConfig.recurrence_type,
+        date_debut: advancedAssignConfig.date_debut,
+        date_fin: advancedAssignConfig.date_fin || advancedAssignConfig.date_debut,
+        jours_semaine: advancedAssignConfig.jours_semaine,
+        assignation_type: "manuel_avance"
+      };
+
+      await axios.post(`${API}/planning/assignation-avancee`, assignmentData);
+
+      const selectedUser = users.find(u => u.id === advancedAssignConfig.user_id);
+      const selectedTypeGarde = typesGarde.find(t => t.id === advancedAssignConfig.type_garde_id);
+      
+      toast({
+        title: "Assignation avancée créée",
+        description: `${selectedUser?.prenom} ${selectedUser?.nom} assigné(e) pour ${selectedTypeGarde?.nom} (${advancedAssignConfig.recurrence_type})`,
+        variant: "success"
+      });
+
+      // Reset du formulaire
+      setAdvancedAssignConfig({
+        user_id: '',
+        type_garde_id: '',
+        recurrence_type: 'unique',
+        jours_semaine: [],
+        date_debut: '',
+        date_fin: '',
+        exceptions: []
+      });
+
+      setShowAdvancedAssignModal(false);
+      fetchPlanningData();
+    } catch (error) {
+      toast({
+        title: "Erreur d'assignation",
+        description: error.response?.data?.detail || "Impossible de créer l'assignation avancée",
+        variant: "destructive"
+      });
+    }
+  };
+
   const getAssignationForSlot = (date, typeGardeId) => {
     const dateStr = date.toISOString().split('T')[0];
     return assignations.find(a => a.date === dateStr && a.type_garde_id === typeGardeId);
