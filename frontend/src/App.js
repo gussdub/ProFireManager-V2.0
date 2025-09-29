@@ -2355,14 +2355,7 @@ const Planning = () => {
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              onClick={() => {
-                                // TODO: Retirer cette personne de la garde
-                                toast({
-                                  title: "Fonctionnalité en développement",
-                                  description: "Retirer une personne de la garde",
-                                  variant: "default"
-                                });
-                              }}
+                              onClick={() => handleRemovePersonFromGarde(person.id, selectedGardeDetails.typeGarde.nom)}
                               data-testid={`remove-person-${person.id}`}
                             >
                               ❌ Retirer
