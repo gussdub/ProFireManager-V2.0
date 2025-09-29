@@ -465,6 +465,44 @@ async def get_user(user_id: str, current_user: User = Depends(get_current_user))
     user = clean_mongo_doc(user)
     return User(**user)
 
+@api_router.put("/users/mon-profil")
+async def update_mon_profil(
+    prenom: str, 
+    nom: str, 
+    email: str, 
+    telephone: str = "", 
+    contact_urgence: str = "",
+    heures_max_semaine: int = 25,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Permet à un utilisateur de modifier son propre profil
+    """
+    try:
+        # L'utilisateur peut modifier son propre profil
+        result = await db.users.update_one(
+            {"id": current_user.id}, 
+            {"$set": {
+                "prenom": prenom,
+                "nom": nom,
+                "email": email,
+                "telephone": telephone,
+                "contact_urgence": contact_urgence,
+                "heures_max_semaine": heures_max_semaine
+            }}
+        )
+        
+        if result.modified_count == 0:
+            raise HTTPException(status_code=400, detail="Impossible de mettre à jour le profil")
+        
+        # Récupérer le profil mis à jour
+        updated_user = await db.users.find_one({"id": current_user.id})
+        updated_user = clean_mongo_doc(updated_user)
+        return User(**updated_user)
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur mise à jour profil: {str(e)}")
+
 @api_router.put("/users/{user_id}", response_model=User)
 async def update_user(user_id: str, user_update: UserCreate, current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
