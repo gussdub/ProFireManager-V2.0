@@ -4455,17 +4455,44 @@ const MonProfil = () => {
 
   const handleSaveProfile = async () => {
     try {
-      // For demo purposes, we'll just show success message
+      // Vraie sauvegarde avec appel API
+      const updateData = {
+        nom: profileData.nom,
+        prenom: profileData.prenom,
+        email: profileData.email,
+        telephone: profileData.telephone,
+        contact_urgence: profileData.contact_urgence,
+        heures_max_semaine: profileData.heures_max_semaine,
+        // Préserver les autres champs
+        grade: userProfile.grade,
+        fonction_superieur: userProfile.fonction_superieur,
+        type_emploi: userProfile.type_emploi,
+        role: userProfile.role,
+        numero_employe: userProfile.numero_employe,
+        date_embauche: userProfile.date_embauche,
+        formations: userProfile.formations,
+        mot_de_passe: 'unchanged' // Ne pas changer le mot de passe
+      };
+
+      await axios.put(`${API}/users/${user.id}`, updateData);
+      
+      // Mettre à jour le profil local
+      setUserProfile(prev => ({
+        ...prev,
+        ...profileData
+      }));
+      
       toast({
         title: "Profil mis à jour",
-        description: "Vos informations ont été sauvegardées avec succès.",
+        description: "Vos informations ont été sauvegardées avec succès et sont visibles dans Personnel.",
         variant: "success"
       });
       setIsEditing(false);
     } catch (error) {
+      console.error('Erreur sauvegarde profil:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder les modifications.",
+        description: error.response?.data?.detail || "Impossible de sauvegarder les modifications.",
         variant: "destructive"
       });
     }
