@@ -2010,42 +2010,29 @@ async def init_disponibilites_semaine_courante(current_user: User = Depends(get_
         disponibilites_created = 0
         
         for user in temps_partiel_users:
-            # Créer disponibilités pour chaque jour de la semaine courante
+            # Créer disponibilités MASSIVES pour chaque jour de la semaine courante
             for day_offset in range(7):  # Lundi à Dimanche
                 date_dispo = start_week + timedelta(days=day_offset)
                 date_str = date_dispo.strftime("%Y-%m-%d")
                 day_name = date_dispo.strftime("%A").lower()
                 
-                # Créer disponibilités selon pattern de l'employé
-                user_index = int(user["numero_employe"][-1]) if user["numero_employe"][-1].isdigit() else 0
-                
-                # Pattern différent par employé pour variété
-                if user_index % 3 == 0:  # Employé travaille Lun-Mer-Ven
-                    jours_travail = ['monday', 'wednesday', 'friday']
-                elif user_index % 3 == 1:  # Employé travaille Mar-Jeu-Sam
-                    jours_travail = ['tuesday', 'thursday', 'saturday']
-                else:  # Employé travaille Mer-Ven-Dim
-                    jours_travail = ['wednesday', 'friday', 'sunday']
-                
-                if day_name in jours_travail:
-                    # Créer disponibilités pour types de garde appropriés
-                    for type_garde in types_garde:
-                        # Vérifier si ce type de garde s'applique à ce jour
-                        if type_garde.get("jours_application") and day_name not in type_garde.get("jours_application", []):
-                            continue
-                        
-                        # 70% de chance d'être disponible pour ce type de garde
-                        if disponibilites_created % 10 < 7:
-                            dispo_obj = Disponibilite(
-                                user_id=user["id"],
-                                date=date_str,
-                                type_garde_id=type_garde["id"],
-                                heure_debut=type_garde["heure_debut"],
-                                heure_fin=type_garde["heure_fin"],
-                                statut="disponible"
-                            )
-                            await db.disponibilites.insert_one(dispo_obj.dict())
-                            disponibilites_created += 1
+                # Créer disponibilités pour TOUS les types de garde applicables
+                for type_garde in types_garde:
+                    # Vérifier si ce type de garde s'applique à ce jour
+                    if type_garde.get("jours_application") and day_name not in type_garde.get("jours_application", []):
+                        continue
+                    
+                    # TOUJOURS disponible (100% pour démo impressionnante)
+                    dispo_obj = Disponibilite(
+                        user_id=user["id"],
+                        date=date_str,
+                        type_garde_id=type_garde["id"],
+                        heure_debut=type_garde["heure_debut"],
+                        heure_fin=type_garde["heure_fin"],
+                        statut="disponible"
+                    )
+                    await db.disponibilites.insert_one(dispo_obj.dict())
+                    disponibilites_created += 1
         
         return {
             "message": f"Disponibilités semaine courante créées",
