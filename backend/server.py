@@ -465,14 +465,17 @@ async def get_user(user_id: str, current_user: User = Depends(get_current_user))
     user = clean_mongo_doc(user)
     return User(**user)
 
-@api_router.put("/users/mon-profil")
+class ProfileUpdate(BaseModel):
+    prenom: str
+    nom: str
+    email: str
+    telephone: str = ""
+    contact_urgence: str = ""
+    heures_max_semaine: int = 25
+
+@api_router.put("/users/mon-profil", response_model=User)
 async def update_mon_profil(
-    prenom: str, 
-    nom: str, 
-    email: str, 
-    telephone: str = "", 
-    contact_urgence: str = "",
-    heures_max_semaine: int = 25,
+    profile_data: ProfileUpdate,
     current_user: User = Depends(get_current_user)
 ):
     """
@@ -482,14 +485,7 @@ async def update_mon_profil(
         # L'utilisateur peut modifier son propre profil
         result = await db.users.update_one(
             {"id": current_user.id}, 
-            {"$set": {
-                "prenom": prenom,
-                "nom": nom,
-                "email": email,
-                "telephone": telephone,
-                "contact_urgence": contact_urgence,
-                "heures_max_semaine": heures_max_semaine
-            }}
+            {"$set": profile_data.dict()}
         )
         
         if result.modified_count == 0:
