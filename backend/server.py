@@ -268,11 +268,12 @@ class PlanningCreate(BaseModel):
     assignations: Dict[str, Any] = {}
 
 class Assignation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
     type_garde_id: str
     date: str
     statut: str = "planifie"  # planifie, confirme, remplacement_demande
-    assignation_type: str = "auto"  # auto, manuel
+    assignation_type: str = "auto"  # auto, manuel, manuel_avance
 
 class AssignationCreate(BaseModel):
     user_id: str
