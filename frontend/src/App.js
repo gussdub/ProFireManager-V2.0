@@ -1836,6 +1836,55 @@ const Planning = () => {
     }
   };
 
+  const handleAdvancedAssignment = async () => {
+    // TODO: Implémenter l'assignation avancée avec récurrence
+    toast({
+      title: "Assignation avancée",
+      description: "Fonctionnalité en développement - assignation avec récurrence",
+      variant: "default"
+    });
+    setShowAdvancedAssignModal(false);
+  };
+
+  const handleRemovePersonFromGarde = async (personId, gardeName) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir retirer cette personne de la garde ${gardeName} ?`)) {
+      return;
+    }
+
+    try {
+      // Trouver l'assignation à supprimer
+      const assignationToRemove = selectedGardeDetails.assignations.find(a => a.user_id === personId);
+      
+      if (!assignationToRemove) {
+        toast({
+          title: "Erreur",
+          description: "Assignation non trouvée",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      await axios.delete(`${API}/planning/assignation/${assignationToRemove.id}`);
+      
+      toast({
+        title: "Personne retirée",
+        description: "La personne a été retirée de cette garde avec succès",
+        variant: "success"
+      });
+
+      // Fermer le modal et recharger les données
+      setShowGardeDetailsModal(false);
+      fetchPlanningData();
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible de retirer la personne",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleAssignUser = async (userId, typeGardeId, date) => {
     if (user.role === 'employe') return;
 
