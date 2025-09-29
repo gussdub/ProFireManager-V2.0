@@ -2515,7 +2515,152 @@ body {
   margin-top: 2rem;
 }
 
-/* Responsive rapports */
+/* Advanced Assignment Modal */
+.advanced-assign-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.assign-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.assign-section h4 {
+  color: #1e293b;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+/* Recurrence Options */
+.recurrence-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.recurrence-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recurrence-option:hover {
+  border-color: #3B82F6;
+}
+
+.recurrence-option:has(input:checked) {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.recurrence-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 0.125rem;
+  accent-color: #dc2626;
+}
+
+.recurrence-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.recurrence-title {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.recurrence-description {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+
+/* Days selection */
+.jours-selection {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.jour-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.jour-checkbox:hover {
+  border-color: #3B82F6;
+}
+
+.jour-checkbox:has(input:checked) {
+  border-color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.jour-checkbox input[type="checkbox"] {
+  accent-color: #dc2626;
+}
+
+/* Assignment Summary */
+.assignment-summary {
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.summary-row:last-child {
+  margin-bottom: 0;
+}
+
+.summary-label {
+  font-weight: 500;
+  color: #1e40af;
+  font-size: 0.875rem;
+}
+
+.summary-value {
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* Responsive advanced assignment */
+@media (max-width: 1024px) {
+  .jours-selection {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .recurrence-options {
+    gap: 0.75rem;
+  }
+}
 @media (max-width: 1024px) {
   .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
