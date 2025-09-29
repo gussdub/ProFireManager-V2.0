@@ -2201,7 +2201,8 @@ async def init_demo_client_data():
                     "admins": 1,
                     "superviseurs": 3,
                     "employes_temps_plein": 7,
-                    "employes_temps_partiel": 4
+                    "employes_temps_partiel": 12,
+                    "total_personnel": 23
                 }
             }
         }
