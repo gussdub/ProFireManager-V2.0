@@ -685,6 +685,32 @@ async def get_planning(semaine_debut: str, current_user: User = Depends(get_curr
     
     return planning
 
+@api_router.delete("/planning/assignation/{assignation_id}")
+async def retirer_assignation(assignation_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Trouver l'assignation
+        assignation = await db.assignations.find_one({"id": assignation_id})
+        if not assignation:
+            raise HTTPException(status_code=404, detail="Assignation non trouvée")
+        
+        # Supprimer l'assignation
+        result = await db.assignations.delete_one({"id": assignation_id})
+        if result.deleted_count == 0:
+            raise HTTPException(status_code=400, detail="Impossible de retirer l'assignation")
+        
+        return {
+            "message": "Assignation retirée avec succès",
+            "assignation_supprimee": assignation_id,
+            "date": assignation["date"],
+            "user_id": assignation["user_id"]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur suppression assignation: {str(e)}")
+
 @api_router.post("/planning/assignation")
 async def create_assignation(assignation: AssignationCreate, current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "superviseur"]:
