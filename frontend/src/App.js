@@ -4455,36 +4455,24 @@ const MonProfil = () => {
 
   const handleSaveProfile = async () => {
     try {
-      // Vraie sauvegarde avec appel API
+      // Utiliser l'endpoint spécial pour modification de son propre profil
       const updateData = {
-        nom: profileData.nom,
         prenom: profileData.prenom,
+        nom: profileData.nom,
         email: profileData.email,
         telephone: profileData.telephone,
         contact_urgence: profileData.contact_urgence,
-        heures_max_semaine: profileData.heures_max_semaine,
-        // Préserver les autres champs
-        grade: userProfile.grade,
-        fonction_superieur: userProfile.fonction_superieur,
-        type_emploi: userProfile.type_emploi,
-        role: userProfile.role,
-        numero_employe: userProfile.numero_employe,
-        date_embauche: userProfile.date_embauche,
-        formations: userProfile.formations,
-        mot_de_passe: 'unchanged' // Ne pas changer le mot de passe
+        heures_max_semaine: profileData.heures_max_semaine || 25
       };
 
-      await axios.put(`${API}/users/${user.id}`, updateData);
+      const response = await axios.put(`${API}/users/mon-profil`, updateData);
       
-      // Mettre à jour le profil local
-      setUserProfile(prev => ({
-        ...prev,
-        ...profileData
-      }));
+      // Mettre à jour le profil local avec la réponse
+      setUserProfile(response.data);
       
       toast({
         title: "Profil mis à jour",
-        description: "Vos informations ont été sauvegardées avec succès et sont visibles dans Personnel.",
+        description: "Vos informations ont été sauvegardées et sont maintenant visibles dans Personnel.",
         variant: "success"
       });
       setIsEditing(false);
