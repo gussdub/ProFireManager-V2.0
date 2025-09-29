@@ -2145,23 +2145,34 @@ async def init_demo_client_data():
                     # 80% pour Garde Interne (semaine)
                     if day_offset < 5:  # Lundi-Vendredi
                         # Disponible pour garde AM ou PM (alternativement)
-                        type_garde_ids = [
-                            type_garde_ids["Garde Interne AM - Semaine"],
-                            type_garde_ids["Garde Interne PM - Semaine"]
-                        ]
+                        type_garde_am = type_garde_ids["Garde Interne AM - Semaine"]
+                        type_garde_pm = type_garde_ids["Garde Interne PM - Semaine"]
                         
-                        for type_garde_id in type_garde_ids:
-                            if disponibilites_created % 3 != 2:  # 66% de chance
-                                dispo_obj = Disponibilite(
-                                    user_id=user_id,
-                                    date=date_dispo.strftime("%Y-%m-%d"),
-                                    type_garde_id=type_garde_id,
-                                    heure_debut="06:00" if "AM" in type_garde_ids else "18:00",
-                                    heure_fin="18:00" if "AM" in type_garde_ids else "06:00",
-                                    statut="disponible"
-                                )
-                                await db.disponibilites.insert_one(dispo_obj.dict())
-                                disponibilites_created += 1
+                        # Disponible pour garde AM
+                        if disponibilites_created % 3 != 2:  # 66% de chance
+                            dispo_obj = Disponibilite(
+                                user_id=user_id,
+                                date=date_dispo.strftime("%Y-%m-%d"),
+                                type_garde_id=type_garde_am,
+                                heure_debut="06:00",
+                                heure_fin="18:00",
+                                statut="disponible"
+                            )
+                            await db.disponibilites.insert_one(dispo_obj.dict())
+                            disponibilites_created += 1
+                        
+                        # Disponible pour garde PM
+                        if disponibilites_created % 4 != 3:  # 75% de chance
+                            dispo_obj = Disponibilite(
+                                user_id=user_id,
+                                date=date_dispo.strftime("%Y-%m-%d"),
+                                type_garde_id=type_garde_pm,
+                                heure_debut="18:00",
+                                heure_fin="06:00",
+                                statut="disponible"
+                            )
+                            await db.disponibilites.insert_one(dispo_obj.dict())
+                            disponibilites_created += 1
                     else:  # Weekend
                         # Disponible pour garde weekend
                         if disponibilites_created % 2 == 0:  # 50% de chance
