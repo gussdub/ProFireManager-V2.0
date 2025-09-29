@@ -4598,7 +4598,7 @@ const MonProfil = () => {
                     <Input
                       type="number"
                       min="5"
-                      max="35"
+                      max="168"
                       value={profileData.heures_max_semaine || userProfile?.heures_max_semaine || 25}
                       onChange={(e) => setProfileData({...profileData, heures_max_semaine: parseInt(e.target.value)})}
                       disabled={!isEditing}
