@@ -2296,6 +2296,224 @@ const Planning = () => {
           </div>
         </div>
       )}
+
+      {/* Modal d'assignation manuelle avancée avec récurrence */}
+      {showAdvancedAssignModal && user.role !== 'employe' && (
+        <div className="modal-overlay" onClick={() => setShowAdvancedAssignModal(false)}>
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="advanced-assign-modal">
+            <div className="modal-header">
+              <h3>👤 Assignation manuelle avancée</h3>
+              <Button variant="ghost" onClick={() => setShowAdvancedAssignModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="advanced-assign-form">
+                {/* Section 1: Sélection personnel */}
+                <div className="assign-section">
+                  <h4>👥 Sélection du personnel</h4>
+                  <div className="form-field">
+                    <Label>Pompier à assigner *</Label>
+                    <select
+                      value={advancedAssignConfig.user_id}
+                      onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, user_id: e.target.value})}
+                      className="form-select"
+                      data-testid="advanced-user-select"
+                    >
+                      <option value="">Sélectionner un pompier</option>
+                      {users.map(user => (
+                        <option key={user.id} value={user.id}>
+                          {user.prenom} {user.nom} ({user.grade} - {user.type_emploi === 'temps_plein' ? 'TP' : 'Part.'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Section 2: Type de garde */}
+                <div className="assign-section">
+                  <h4>🚒 Type de garde</h4>
+                  <div className="form-field">
+                    <Label>Type de garde *</Label>
+                    <select
+                      value={advancedAssignConfig.type_garde_id}
+                      onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, type_garde_id: e.target.value})}
+                      className="form-select"
+                      data-testid="advanced-type-garde-select"
+                    >
+                      <option value="">Sélectionner un type de garde</option>
+                      {typesGarde.map(type => (
+                        <option key={type.id} value={type.id}>
+                          {type.nom} ({type.heure_debut} - {type.heure_fin})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Section 3: Configuration récurrence */}
+                <div className="assign-section">
+                  <h4>🔄 Type d'assignation</h4>
+                  <div className="recurrence-options">
+                    <label className="recurrence-option">
+                      <input
+                        type="radio"
+                        name="recurrence"
+                        value="unique"
+                        checked={advancedAssignConfig.recurrence_type === 'unique'}
+                        onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, recurrence_type: e.target.value})}
+                      />
+                      <div className="recurrence-content">
+                        <span className="recurrence-title">📅 Assignation unique</span>
+                        <span className="recurrence-description">Une seule date spécifique</span>
+                      </div>
+                    </label>
+
+                    <label className="recurrence-option">
+                      <input
+                        type="radio"
+                        name="recurrence"
+                        value="hebdomadaire"
+                        checked={advancedAssignConfig.recurrence_type === 'hebdomadaire'}
+                        onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, recurrence_type: e.target.value})}
+                      />
+                      <div className="recurrence-content">
+                        <span className="recurrence-title">🔁 Récurrence hebdomadaire</span>
+                        <span className="recurrence-description">Répéter chaque semaine sur des jours choisis</span>
+                      </div>
+                    </label>
+
+                    <label className="recurrence-option">
+                      <input
+                        type="radio"
+                        name="recurrence"
+                        value="mensuel"
+                        checked={advancedAssignConfig.recurrence_type === 'mensuel'}
+                        onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, recurrence_type: e.target.value})}
+                      />
+                      <div className="recurrence-content">
+                        <span className="recurrence-title">📆 Récurrence mensuelle</span>
+                        <span className="recurrence-description">Répéter chaque mois aux mêmes dates</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Section 4: Configuration dates */}
+                <div className="assign-section">
+                  <h4>📅 Période d'assignation</h4>
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Date de début *</Label>
+                      <Input
+                        type="date"
+                        value={advancedAssignConfig.date_debut}
+                        onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, date_debut: e.target.value})}
+                        min={new Date().toISOString().split('T')[0]}
+                        data-testid="advanced-date-debut"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Date de fin *</Label>
+                      <Input
+                        type="date"
+                        value={advancedAssignConfig.date_fin}
+                        onChange={(e) => setAdvancedAssignConfig({...advancedAssignConfig, date_fin: e.target.value})}
+                        min={advancedAssignConfig.date_debut || new Date().toISOString().split('T')[0]}
+                        data-testid="advanced-date-fin"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section 5: Jours de semaine (si récurrence hebdomadaire) */}
+                {advancedAssignConfig.recurrence_type === 'hebdomadaire' && (
+                  <div className="assign-section">
+                    <h4>📋 Jours de la semaine</h4>
+                    <div className="jours-selection">
+                      {[
+                        { value: 'monday', label: 'Lundi' },
+                        { value: 'tuesday', label: 'Mardi' },
+                        { value: 'wednesday', label: 'Mercredi' },
+                        { value: 'thursday', label: 'Jeudi' },
+                        { value: 'friday', label: 'Vendredi' },
+                        { value: 'saturday', label: 'Samedi' },
+                        { value: 'sunday', label: 'Dimanche' }
+                      ].map(jour => (
+                        <label key={jour.value} className="jour-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={advancedAssignConfig.jours_semaine.includes(jour.value)}
+                            onChange={(e) => {
+                              const updatedJours = e.target.checked
+                                ? [...advancedAssignConfig.jours_semaine, jour.value]
+                                : advancedAssignConfig.jours_semaine.filter(j => j !== jour.value);
+                              setAdvancedAssignConfig({...advancedAssignConfig, jours_semaine: updatedJours});
+                            }}
+                          />
+                          <span>{jour.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Section 6: Résumé de l'assignation */}
+                <div className="assign-section">
+                  <h4>📊 Résumé de l'assignation</h4>
+                  <div className="assignment-summary">
+                    <div className="summary-row">
+                      <span className="summary-label">Personnel :</span>
+                      <span className="summary-value">
+                        {advancedAssignConfig.user_id ? 
+                          users.find(u => u.id === advancedAssignConfig.user_id)?.prenom + ' ' + 
+                          users.find(u => u.id === advancedAssignConfig.user_id)?.nom 
+                          : 'Non sélectionné'}
+                      </span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Type de garde :</span>
+                      <span className="summary-value">
+                        {advancedAssignConfig.type_garde_id ?
+                          typesGarde.find(t => t.id === advancedAssignConfig.type_garde_id)?.nom
+                          : 'Non sélectionné'}
+                      </span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Récurrence :</span>
+                      <span className="summary-value">
+                        {advancedAssignConfig.recurrence_type === 'unique' ? 'Assignation unique' :
+                         advancedAssignConfig.recurrence_type === 'hebdomadaire' ? `Chaque semaine (${advancedAssignConfig.jours_semaine.length} jour(s))` :
+                         'Récurrence mensuelle'}
+                      </span>
+                    </div>
+                    <div className="summary-row">
+                      <span className="summary-label">Période :</span>
+                      <span className="summary-value">
+                        {advancedAssignConfig.date_debut && advancedAssignConfig.date_fin ?
+                          `Du ${new Date(advancedAssignConfig.date_debut).toLocaleDateString('fr-FR')} au ${new Date(advancedAssignConfig.date_fin).toLocaleDateString('fr-FR')}`
+                          : 'Période non définie'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowAdvancedAssignModal(false)}>
+                  Annuler
+                </Button>
+                <Button 
+                  variant="default" 
+                  onClick={handleAdvancedAssignment}
+                  data-testid="create-advanced-assignment-btn"
+                  disabled={!advancedAssignConfig.user_id || !advancedAssignConfig.type_garde_id || !advancedAssignConfig.date_debut}
+                >
+                  🚒 Créer l'assignation
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
