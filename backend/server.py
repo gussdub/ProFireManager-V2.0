@@ -1348,6 +1348,114 @@ async def delete_disponibilite(disponibilite_id: str, current_user: User = Depen
     
     return {"message": "Disponibilité supprimée avec succès"}
 
+# Assignation manuelle avancée avec récurrence
+@api_router.post("/planning/assignation-avancee")
+async def assignation_manuelle_avancee(
+    assignation_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        user_id = assignation_data.get("user_id")
+        type_garde_id = assignation_data.get("type_garde_id")
+        recurrence_type = assignation_data.get("recurrence_type", "unique")
+        date_debut = datetime.strptime(assignation_data.get("date_debut"), "%Y-%m-%d").date()
+        date_fin = datetime.strptime(assignation_data.get("date_fin", assignation_data.get("date_debut")), "%Y-%m-%d").date()
+        jours_semaine = assignation_data.get("jours_semaine", [])
+        
+        assignations_creees = []
+        
+        if recurrence_type == "unique":
+            # Assignation unique
+            assignation_obj = Assignation(
+                user_id=user_id,
+                type_garde_id=type_garde_id,
+                date=date_debut.strftime("%Y-%m-%d"),
+                assignation_type="manuel_avance"
+            )
+            await db.assignations.insert_one(assignation_obj.dict())
+            assignations_creees.append(assignation_obj.dict())
+            
+        elif recurrence_type == "hebdomadaire":
+            # Récurrence hebdomadaire
+            current_date = date_debut
+            jours_semaine_index = {
+                'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+                'friday': 4, 'saturday': 5, 'sunday': 6
+            }
+            
+            while current_date <= date_fin:
+                day_name = current_date.strftime("%A").lower()
+                
+                if day_name in jours_semaine:
+                    # Vérifier qu'il n'y a pas déjà une assignation
+                    existing = await db.assignations.find_one({
+                        "user_id": user_id,
+                        "type_garde_id": type_garde_id,
+                        "date": current_date.strftime("%Y-%m-%d")
+                    })
+                    
+                    if not existing:
+                        assignation_obj = Assignation(
+                            user_id=user_id,
+                            type_garde_id=type_garde_id,
+                            date=current_date.strftime("%Y-%m-%d"),
+                            assignation_type="manuel_avance"
+                        )
+                        await db.assignations.insert_one(assignation_obj.dict())
+                        assignations_creees.append(assignation_obj.dict())
+                
+                current_date += timedelta(days=1)
+                
+        elif recurrence_type == "mensuel":
+            # Récurrence mensuelle (même jour du mois)
+            jour_mois = date_debut.day
+            current_month = date_debut.replace(day=1)
+            
+            while current_month <= date_fin:
+                try:
+                    # Essayer de créer la date pour ce mois
+                    target_date = current_month.replace(day=jour_mois)
+                    
+                    if date_debut <= target_date <= date_fin:
+                        existing = await db.assignations.find_one({
+                            "user_id": user_id,
+                            "type_garde_id": type_garde_id,
+                            "date": target_date.strftime("%Y-%m-%d")
+                        })
+                        
+                        if not existing:
+                            assignation_obj = Assignation(
+                                user_id=user_id,
+                                type_garde_id=type_garde_id,
+                                date=target_date.strftime("%Y-%m-%d"),
+                                assignation_type="manuel_avance"
+                            )
+                            await db.assignations.insert_one(assignation_obj.dict())
+                            assignations_creees.append(assignation_obj.dict())
+                            
+                except ValueError:
+                    # Jour n'existe pas dans ce mois (ex: 31 février)
+                    pass
+                
+                # Passer au mois suivant
+                if current_month.month == 12:
+                    current_month = current_month.replace(year=current_month.year + 1, month=1)
+                else:
+                    current_month = current_month.replace(month=current_month.month + 1)
+        
+        return {
+            "message": f"Assignation avancée créée avec succès",
+            "assignations_creees": len(assignations_creees),
+            "recurrence": recurrence_type,
+            "periode": f"{date_debut.strftime('%Y-%m-%d')} à {date_fin.strftime('%Y-%m-%d')}"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur assignation avancée: {str(e)}")
+
 # Attribution automatique intelligente avec rotation équitable et ancienneté
 @api_router.post("/planning/attribution-auto")
 async def attribution_automatique(semaine_debut: str, current_user: User = Depends(get_current_user)):
