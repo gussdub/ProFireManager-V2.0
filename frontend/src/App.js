@@ -587,6 +587,28 @@ const Dashboard = () => {
             >
               ⚙️ Créer données de base (4 comptes)
             </Button>
+            <Button 
+              variant="outline" 
+              onClick={async () => {
+                try {
+                  await axios.post(`${API}/init-disponibilites-semaine-courante`);
+                  toast({
+                    title: "Disponibilités créées",
+                    description: "Disponibilités pour la semaine courante créées - l'assignation auto va maintenant fonctionner !",
+                    variant: "success"
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Erreur",
+                    description: "Impossible de créer les disponibilités",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              data-testid="init-current-week-availability-btn"
+            >
+              📅 Créer disponibilités semaine courante
+            </Button>
           </div>
         </div>
       )}
