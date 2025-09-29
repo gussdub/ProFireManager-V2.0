@@ -959,13 +959,21 @@ async def recherche_remplacants_automatique(demande_id: str, current_user: User 
                 
             # Étape 1: Vérifier disponibilités (si temps partiel)
             if user["type_emploi"] == "temps_partiel":
-                disponibilites = await db.disponibilites.find({
+                # Get user disponibilités pour cette date exacte
+                user_dispos = await db.disponibilites.find({
                     "user_id": user["id"],
                     "date": demande["date"],
                     "statut": "disponible"
                 }).to_list(10)
-                if not disponibilites:
-                    continue
+                
+                # Vérifier si disponible pour ce type de garde spécifiquement
+                type_garde_compatible = any(
+                    d.get("type_garde_id") == type_garde["id"] or d.get("type_garde_id") is None 
+                    for d in user_dispos
+                )
+                
+                if not type_garde_compatible:
+                    continue  # Skip si pas disponible pour ce type de garde
             
             # Étape 2: Vérifier grade équivalent (si paramètre activé)
             # Étape 3: Vérifier compétences équivalentes (si paramètre activé)
