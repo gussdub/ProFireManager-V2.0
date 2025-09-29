@@ -1836,16 +1836,6 @@ const Planning = () => {
     }
   };
 
-  const handleAdvancedAssignment = async () => {
-    // TODO: Implémenter l'assignation avancée avec récurrence
-    toast({
-      title: "Assignation avancée",
-      description: "Fonctionnalité en développement - assignation avec récurrence",
-      variant: "default"
-    });
-    setShowAdvancedAssignModal(false);
-  };
-
   const handleRemovePersonFromGarde = async (personId, gardeName) => {
     if (!window.confirm(`Êtes-vous sûr de vouloir retirer cette personne de la garde ${gardeName} ?`)) {
       return;
