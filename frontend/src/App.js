@@ -334,11 +334,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [statsResponse, rapportsResponse, usersResponse, assignationsResponse] = await Promise.all([
+        const [statsResponse, rapportsResponse, usersResponse] = await Promise.all([
           axios.get(`${API}/statistiques`),
           user.role === 'admin' ? axios.get(`${API}/rapports/statistiques-avancees`) : Promise.resolve({ data: null }),
-          axios.get(`${API}/users`),
-          axios.get(`${API}/assignations/${new Date().toISOString().split('T')[0]}`)
+          axios.get(`${API}/users`)
         ]);
         
         setStats(statsResponse.data);
