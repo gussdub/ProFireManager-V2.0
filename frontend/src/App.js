@@ -1933,16 +1933,10 @@ const Planning = () => {
             <Button 
               variant="destructive" 
               disabled={user.role === 'employe'}
-              onClick={() => {
-                toast({
-                  title: "Assignation manuelle",
-                  description: "Cliquez sur une cellule vide pour assigner manuellement",
-                  variant: "default"
-                });
-              }}
+              onClick={() => setShowAdvancedAssignModal(true)}
               data-testid="manual-assign-btn"
             >
-              👤 Assignation manuelle
+              👤 Assignation manuelle avancée
             </Button>
           </div>
         </div>
