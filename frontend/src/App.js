@@ -2111,35 +2111,6 @@ const Planning = () => {
               ✨ Attribution auto
             </Button>
             <Button 
-              variant="outline" 
-              disabled={user.role === 'employe'}
-              onClick={async () => {
-                if (user.role === 'employe') return;
-
-                try {
-                  const targetDate = viewMode === 'mois' ? `${currentMonth}-01` : currentWeek;
-                  const response = await axios.post(`${API}/planning/attribution-auto-demo?semaine_debut=${targetDate}`);
-                  
-                  toast({
-                    title: "Attribution DÉMO agressive réussie",
-                    description: `${response.data.assignations_creees} nouvelles assignations créées - Planning rempli au maximum !`,
-                    variant: "success"
-                  });
-
-                  fetchPlanningData();
-                } catch (error) {
-                  toast({
-                    title: "Erreur d'attribution démo",
-                    description: error.response?.data?.detail || "Impossible d'effectuer l'attribution démo",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="auto-assign-demo-btn"
-            >
-              🎪 Attribution démo (remplit tout)
-            </Button>
-            <Button 
               variant="destructive" 
               disabled={user.role === 'employe'}
               onClick={() => setShowAdvancedAssignModal(true)}
