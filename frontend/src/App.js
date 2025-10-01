@@ -546,21 +546,21 @@ const Dashboard = () => {
                 try {
                   const response = await axios.post(`${API}/init-disponibilites-demo-complete`);
                   toast({
-                    title: "Disponibilités DÉMO optimisées",
-                    description: `${response.data.disponibilites_creees} disponibilités créées - Planning va se remplir complètement !`,
+                    title: "Disponibilités DÉMO créées",
+                    description: `${response.data.disponibilites_creees} disponibilités pour ${response.data.all_users_included} employés - Attribution auto va remplir le planning !`,
                     variant: "success"
                   });
                 } catch (error) {
                   toast({
                     title: "Erreur",
-                    description: "Impossible de créer les disponibilités optimisées",
+                    description: "Impossible de créer les disponibilités",
                     variant: "destructive"
                   });
                 }
               }}
               data-testid="init-demo-complete-availability-btn"
             >
-              📅 Créer disponibilités (massives)
+              📅 Créer disponibilités (tous temps partiel)
             </Button>
             <Button 
               variant="destructive" 
