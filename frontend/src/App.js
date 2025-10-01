@@ -1786,13 +1786,39 @@ const Planning = () => {
   };
 
   const handleRemoveAllPersonnelFromGarde = async () => {
-    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer TOUT le personnel de cette garde ?\n\nCela supprimera toutes les assignations pour la ${selectedGardeDetails.typeGarde.nom} du ${selectedGardeDetails.date.toLocaleDateString('fr-FR')}.`)) {
+    console.log('selectedGardeDetails:', selectedGardeDetails);
+    console.log('assignations:', selectedGardeDetails.assignations);
+    
+    if (!selectedGardeDetails.assignations || selectedGardeDetails.assignations.length === 0) {
+      toast({
+        title: "Aucun personnel",
+        description: "Il n'y a aucun personnel assigné à cette garde",
+        variant: "default"
+      });
+      return;
+    }
+
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer TOUT le personnel de cette garde ?\n\nCela supprimera ${selectedGardeDetails.assignations.length} assignation(s) pour la ${selectedGardeDetails.typeGarde.nom} du ${selectedGardeDetails.date.toLocaleDateString('fr-FR')}.`)) {
       return;
     }
 
     try {
+      // Vérifier que chaque assignation a un ID
+      const assignationsWithIds = selectedGardeDetails.assignations.filter(a => a.id);
+      
+      if (assignationsWithIds.length === 0) {
+        toast({
+          title: "Erreur technique",
+          description: "Les assignations n'ont pas d'ID - impossible de les supprimer",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      console.log('Deleting assignations with IDs:', assignationsWithIds.map(a => a.id));
+
       // Supprimer toutes les assignations de cette garde
-      const deletePromises = selectedGardeDetails.assignations.map(assignation => 
+      const deletePromises = assignationsWithIds.map(assignation => 
         axios.delete(`${API}/planning/assignation/${assignation.id}`)
       );
 
@@ -1800,7 +1826,7 @@ const Planning = () => {
       
       toast({
         title: "Personnel supprimé",
-        description: `Tout le personnel (${selectedGardeDetails.assignations.length} personne(s)) a été retiré de cette garde`,
+        description: `Tout le personnel (${assignationsWithIds.length} personne(s)) a été retiré de cette garde`,
         variant: "success"
       });
 
@@ -1809,9 +1835,10 @@ const Planning = () => {
       fetchPlanningData();
       
     } catch (error) {
+      console.error('Error removing all personnel:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer le personnel de cette garde",
+        description: error.response?.data?.detail || "Impossible de supprimer le personnel de cette garde",
         variant: "destructive"
       });
     }
