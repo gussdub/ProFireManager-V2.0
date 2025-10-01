@@ -137,16 +137,26 @@ body {
   text-align: center;
 }
 
+/* Demo buttons mobile fix */
 .demo-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 0.5rem;
 }
 
 .demo-buttons button {
-  font-size: 0.75rem;
-  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
   height: auto;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+@media (min-width: 480px) {
+  .demo-buttons {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 /* App Layout */
