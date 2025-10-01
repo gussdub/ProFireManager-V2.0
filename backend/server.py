@@ -1777,6 +1777,24 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
             remplacements_effectues=0
         )
 
+# Réinitialiser tout le planning (vider toutes assignations)
+@api_router.post("/planning/reinitialiser")
+async def reinitialiser_planning(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Supprimer toutes les assignations
+        result = await db.assignations.delete_many({})
+        
+        return {
+            "message": f"Planning réinitialisé avec succès",
+            "assignations_supprimees": result.deleted_count
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur réinitialisation: {str(e)}")
+
 # Réparer tous les mots de passe démo
 @api_router.post("/repair-demo-passwords")
 async def repair_demo_passwords():
