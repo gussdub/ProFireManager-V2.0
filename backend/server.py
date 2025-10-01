@@ -2337,82 +2337,56 @@ async def init_disponibilites_semaine_courante(current_user: User = Depends(get_
         disponibilites_created = 0
         
         # ALGORITHME OPTIMISÉ POUR DÉMO - MAXIMUM DE DISPONIBILITÉS
-        for user in temps_partiel_users:
+        # DÉTECTION AUTOMATIQUE de TOUS les employés temps partiel (peu importe le nombre)
+        tous_temps_partiel = await db.users.find({
+            "type_emploi": "temps_partiel",
+            "statut": "Actif"
+        }).to_list(1000)
+        
+        print(f"AUTO-DÉTECTION: {len(tous_temps_partiel)} employés temps partiel trouvés")
+        
+        disponibilites_created = 0
+        
+        # ALGORITHME OPTIMISÉ POUR TOUS VOS EMPLOYÉS TEMPS PARTIEL
+        for user_index, user in enumerate(tous_temps_partiel):
             for day_offset in range(7):  # Chaque jour de la semaine courante
                 date_dispo = start_week + timedelta(days=day_offset)
                 date_str = date_dispo.strftime("%Y-%m-%d")
                 day_name = date_dispo.strftime("%A").lower()
                 
-                # FORCER CRÉATION pour types de garde prioritaires démo
-                for type_garde in types_garde:
-                    jours_app = type_garde.get("jours_application", [])
-                    
-                    # GARDE AM SEMAINE - TOUS LES EMPLOYÉS TEMPS PARTIEL DISPONIBLES
-                    if "AM" in type_garde["nom"] and "Semaine" in type_garde["nom"]:
-                        if day_name in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
-                            # TOUS les 12 employés temps partiel disponibles pour Garde AM
-                            dispo_obj = Disponibilite(
-                                user_id=user["id"],
-                                date=date_str,
-                                type_garde_id=type_garde["id"],
-                                heure_debut="06:00",
-                                heure_fin="18:00",
-                                statut="disponible"
-                            )
-                            await db.disponibilites.insert_one(dispo_obj.dict())
-                            disponibilites_created += 1
-                    
-                    # GARDE PM SEMAINE - TOUS LES EMPLOYÉS TEMPS PARTIEL DISPONIBLES  
-                    elif "PM" in type_garde["nom"] and "Semaine" in type_garde["nom"]:
-                        if day_name in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
-                            # TOUS les 12 employés temps partiel disponibles pour Garde PM
-                            dispo_obj = Disponibilite(
-                                user_id=user["id"],
-                                date=date_str,
-                                type_garde_id=type_garde["id"],
-                                heure_debut="18:00",
-                                heure_fin="06:00",
-                                statut="disponible"
-                            )
-                            await db.disponibilites.insert_one(dispo_obj.dict())
-                            disponibilites_created += 1
-                    
-                    # GARDE WEEKEND - TOUS LES EMPLOYÉS TEMPS PARTIEL DISPONIBLES
-                    elif "Weekend" in type_garde["nom"]:
-                        if day_name in ['saturday', 'sunday']:
-                            # TOUS les 12 employés temps partiel disponibles pour Weekend
-                            dispo_obj = Disponibilite(
-                                user_id=user["id"],
-                                date=date_str,
-                                type_garde_id=type_garde["id"],
-                                heure_debut=type_garde["heure_debut"],
-                                heure_fin=type_garde["heure_fin"],
-                                statut="disponible"
-                            )
-                            await db.disponibilites.insert_one(dispo_obj.dict())
-                            disponibilites_created += 1
-                    
-                    # GARDE EXTERNE CITERNE - QUELQUES EMPLOYÉS DISPONIBLES
-                    elif "Externe" in type_garde["nom"] or "Citerne" in type_garde["nom"]:
-                        # 50% des employés disponibles pour garde externe
-                        user_index = int(user["numero_employe"][-1]) if user["numero_employe"][-1].isdigit() else 0
-                        if user_index % 2 == 0:
-                            dispo_obj = Disponibilite(
-                                user_id=user["id"],
-                                date=date_str,
-                                type_garde_id=type_garde["id"],
-                                heure_debut=type_garde["heure_debut"],
-                                heure_fin=type_garde["heure_fin"],
-                                statut="disponible"
-                            )
-                            await db.disponibilites.insert_one(dispo_obj.dict())
-                            disponibilites_created += 1
+                # Pattern de disponibilité varié selon l'employé
+                if user_index % 3 == 0:  # 1/3 des employés : Lun-Mer-Ven
+                    jours_pattern = ['monday', 'wednesday', 'friday']
+                elif user_index % 3 == 1:  # 1/3 des employés : Mar-Jeu-Sam
+                    jours_pattern = ['tuesday', 'thursday', 'saturday']
+                else:  # 1/3 des employés : Mer-Ven-Dim
+                    jours_pattern = ['wednesday', 'friday', 'sunday']
+                
+                if day_name in jours_pattern:
+                    # Créer disponibilités pour TOUS les types de garde applicables
+                    for type_garde in types_garde:
+                        jours_app = type_garde.get("jours_application", [])
+                        if jours_app and day_name not in jours_app:
+                            continue
+                        
+                        # CRÉER DISPONIBILITÉ pour vos employés (pompiers ET lieutenants)
+                        dispo_obj = Disponibilite(
+                            user_id=user["id"],
+                            date=date_str,
+                            type_garde_id=type_garde["id"],
+                            heure_debut=type_garde["heure_debut"],
+                            heure_fin=type_garde["heure_fin"],
+                            statut="disponible"
+                        )
+                        await db.disponibilites.insert_one(dispo_obj.dict())
+                        disponibilites_created += 1
         
         return {
-            "message": f"Disponibilités semaine courante créées",
-            "semaine": f"{start_week.strftime('%Y-%m-%d')} - {end_week.strftime('%Y-%m-%d')}",
+            "message": f"Disponibilités créées pour TOUS vos employés temps partiel",
+            "employes_temps_partiel": len(tous_temps_partiel),
             "disponibilites_creees": disponibilites_created,
-            "employes_temps_partiel": len(temps_partiel_users)
+            "all_users_included": len(tous_temps_partiel),
+            "strategy": f"AUTO-DÉTECTION: {len(tous_temps_partiel)} employés temps partiel avec patterns optimisés"
         }
         
     except Exception as e:
