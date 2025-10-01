@@ -2158,6 +2158,87 @@ async def init_demo_data_realiste():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
 
+# Affecter disponibilités à TOUS les employés temps partiel existants (auto-détection)
+@api_router.post("/auto-affecter-disponibilites-temps-partiel")
+async def auto_affecter_disponibilites_temps_partiel(current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # DÉTECTION AUTOMATIQUE de tous les employés temps partiel
+        tous_temps_partiel = await db.users.find({
+            "type_emploi": "temps_partiel",
+            "statut": "Actif"
+        }).to_list(1000)
+        
+        print(f"Trouvé {len(tous_temps_partiel)} employés temps partiel")
+        
+        # Supprimer les anciennes disponibilités de la semaine courante
+        today = datetime.now(timezone.utc).date()
+        start_week = today - timedelta(days=today.weekday())
+        end_week = start_week + timedelta(days=6)
+        
+        await db.disponibilites.delete_many({
+            "date": {
+                "$gte": start_week.strftime("%Y-%m-%d"),
+                "$lte": end_week.strftime("%Y-%m-%d")
+            }
+        })
+        
+        # Récupérer types de garde
+        types_garde = await db.types_garde.find().to_list(100)
+        
+        disponibilites_created = 0
+        
+        # AFFECTER DISPONIBILITÉS À TOUS LES TEMPS PARTIEL DÉTECTÉS
+        for index, user in enumerate(tous_temps_partiel):
+            print(f"Affectation pour {user['prenom']} {user['nom']} ({user['grade']})")
+            
+            # Pattern de disponibilité selon l'index pour variété
+            if index % 4 == 0:  # Pattern 1: Lun-Mer-Ven
+                jours_disponibles = [0, 2, 4]
+            elif index % 4 == 1:  # Pattern 2: Mar-Jeu-Sam  
+                jours_disponibles = [1, 3, 5]
+            elif index % 4 == 2:  # Pattern 3: Mer-Ven-Dim
+                jours_disponibles = [2, 4, 6]
+            else:  # Pattern 4: Lun-Jeu-Dim
+                jours_disponibles = [0, 3, 6]
+            
+            for day_offset in jours_disponibles:
+                date_dispo = start_week + timedelta(days=day_offset)
+                date_str = date_dispo.strftime("%Y-%m-%d")
+                day_name = date_dispo.strftime("%A").lower()
+                
+                # Créer disponibilités pour TOUS les types de garde applicables
+                for type_garde in types_garde:
+                    jours_app = type_garde.get("jours_application", [])
+                    if jours_app and day_name not in jours_app:
+                        continue
+                    
+                    # Créer disponibilité (stratégie intensive pour démo)
+                    dispo_obj = Disponibilite(
+                        user_id=user["id"],
+                        date=date_str,
+                        type_garde_id=type_garde["id"],
+                        heure_debut=type_garde["heure_debut"],
+                        heure_fin=type_garde["heure_fin"],
+                        statut="disponible"
+                    )
+                    await db.disponibilites.insert_one(dispo_obj.dict())
+                    disponibilites_created += 1
+        
+        return {
+            "message": f"Disponibilités affectées automatiquement",
+            "employes_temps_partiel_detectes": len(tous_temps_partiel),
+            "disponibilites_creees": disponibilites_created,
+            "semaine": f"{start_week.strftime('%Y-%m-%d')} - {end_week.strftime('%Y-%m-%d')}",
+            "patterns": "4 patterns différents pour variété démo",
+            "employés_détectés": [f"{u['prenom']} {u['nom']} ({u['grade']})" for u in tous_temps_partiel]
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur auto-affectation: {str(e)}")
+
 # Créer disponibilités MAXIMALES pour démo parfaite
 @api_router.post("/init-disponibilites-demo-complete")
 async def init_disponibilites_demo_complete(current_user: User = Depends(get_current_user)):
