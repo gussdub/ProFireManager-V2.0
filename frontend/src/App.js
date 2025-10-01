@@ -1785,6 +1785,38 @@ const Planning = () => {
     }
   };
 
+  const handleRemoveAllPersonnelFromGarde = async () => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer TOUT le personnel de cette garde ?\n\nCela supprimera toutes les assignations pour la ${selectedGardeDetails.typeGarde.nom} du ${selectedGardeDetails.date.toLocaleDateString('fr-FR')}.`)) {
+      return;
+    }
+
+    try {
+      // Supprimer toutes les assignations de cette garde
+      const deletePromises = selectedGardeDetails.assignations.map(assignation => 
+        axios.delete(`${API}/planning/assignation/${assignation.id}`)
+      );
+
+      await Promise.all(deletePromises);
+      
+      toast({
+        title: "Personnel supprimé",
+        description: `Tout le personnel (${selectedGardeDetails.assignations.length} personne(s)) a été retiré de cette garde`,
+        variant: "success"
+      });
+
+      // Fermer le modal et recharger les données
+      setShowGardeDetailsModal(false);
+      fetchPlanningData();
+      
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le personnel de cette garde",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleRemovePersonFromGarde = async (personId, gardeName) => {
     if (!window.confirm(`Êtes-vous sûr de vouloir retirer cette personne de la garde ${gardeName} ?`)) {
       return;
