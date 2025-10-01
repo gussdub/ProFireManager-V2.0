@@ -608,6 +608,28 @@ const Dashboard = () => {
             >
               📅 Créer disponibilités semaine courante
             </Button>
+            <Button 
+              variant="destructive" 
+              onClick={async () => {
+                try {
+                  const response = await axios.post(`${API}/planning/reinitialiser`);
+                  toast({
+                    title: "Planning réinitialisé",
+                    description: `${response.data.assignations_supprimees} assignation(s) supprimée(s) - Planning maintenant vide pour démo`,
+                    variant: "success"
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Erreur",
+                    description: "Impossible de réinitialiser le planning",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              data-testid="reset-planning-btn"
+            >
+              🗑️ Vider tout le planning
+            </Button>
           </div>
         </div>
       )}
