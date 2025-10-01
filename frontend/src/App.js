@@ -609,6 +609,28 @@ const Dashboard = () => {
               📅 Créer disponibilités semaine courante
             </Button>
             <Button 
+              variant="default" 
+              onClick={async () => {
+                try {
+                  const response = await axios.post(`${API}/init-disponibilites-demo-complete`);
+                  toast({
+                    title: "Disponibilités DÉMO optimisées",
+                    description: `${response.data.disponibilites_creees} disponibilités créées - Planning va se remplir complètement !`,
+                    variant: "success"
+                  });
+                } catch (error) {
+                  toast({
+                    title: "Erreur",
+                    description: "Impossible de créer les disponibilités optimisées",
+                    variant: "destructive"
+                  });
+                }
+              }}
+              data-testid="init-demo-complete-availability-btn"
+            >
+              🎯 OPTIMISER pour démo (disponibilités massives)
+            </Button>
+            <Button 
               variant="destructive" 
               onClick={async () => {
                 try {
