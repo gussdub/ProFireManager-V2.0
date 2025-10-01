@@ -1491,6 +1491,116 @@ async def assignation_manuelle_avancee(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur assignation avancée: {str(e)}")
 
+# Mode démo spécial - Attribution automatique agressive pour impression client
+@api_router.post("/planning/attribution-auto-demo")
+async def attribution_automatique_demo(semaine_debut: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    try:
+        # Get all available users and types de garde
+        users = await db.users.find({"statut": "Actif"}).to_list(1000)
+        types_garde = await db.types_garde.find().to_list(1000)
+        
+        # Get existing assignations for the week
+        semaine_fin = (datetime.strptime(semaine_debut, "%Y-%m-%d") + timedelta(days=6)).strftime("%Y-%m-%d")
+        existing_assignations = await db.assignations.find({
+            "date": {
+                "$gte": semaine_debut,
+                "$lte": semaine_fin
+            }
+        }).to_list(1000)
+        
+        nouvelles_assignations = []
+        
+        # MODE DÉMO AGRESSIF - REMPLIR AU MAXIMUM
+        for type_garde in types_garde:
+            for day_offset in range(7):
+                current_date = datetime.strptime(semaine_debut, "%Y-%m-%d") + timedelta(days=day_offset)
+                date_str = current_date.strftime("%Y-%m-%d")
+                day_name = current_date.strftime("%A").lower()
+                
+                # Skip if type garde doesn't apply to this day
+                if type_garde.get("jours_application") and day_name not in type_garde["jours_application"]:
+                    continue
+                
+                # Compter combien de personnel déjà assigné pour cette garde
+                existing_for_garde = [a for a in existing_assignations 
+                                    if a["date"] == date_str and a["type_garde_id"] == type_garde["id"]]
+                
+                personnel_deja_assigne = len(existing_for_garde)
+                personnel_requis = type_garde.get("personnel_requis", 1)
+                
+                # Assigner jusqu'au maximum requis
+                for i in range(personnel_requis - personnel_deja_assigne):
+                    # Trouver utilisateurs disponibles
+                    available_users = []
+                    
+                    for user in users:
+                        # Skip si déjà assigné cette garde ce jour
+                        if any(a["user_id"] == user["id"] and a["date"] == date_str and a["type_garde_id"] == type_garde["id"] 
+                               for a in existing_assignations):
+                            continue
+                        
+                        # Skip si déjà assigné autre garde ce jour (éviter conflits)
+                        if any(a["user_id"] == user["id"] and a["date"] == date_str 
+                               for a in existing_assignations):
+                            continue
+                        
+                        # Vérifier disponibilités
+                        user_dispos = await db.disponibilites.find({
+                            "user_id": user["id"],
+                            "date": date_str,
+                            "type_garde_id": type_garde["id"],
+                            "statut": "disponible"
+                        }).to_list(10)
+                        
+                        if user_dispos:
+                            available_users.append(user)
+                    
+                    if not available_users:
+                        break  # Pas d'utilisateurs disponibles pour ce poste
+                    
+                    # MODE DÉMO : ASSOUPLIR CONTRAINTE OFFICIER
+                    if type_garde.get("officier_obligatoire", False):
+                        # Chercher officiers d'abord
+                        officers = [u for u in available_users if u["grade"] in ["Capitaine", "Lieutenant", "Directeur"]]
+                        # Sinon pompiers avec fonction supérieur
+                        if not officers:
+                            officers = [u for u in available_users if u.get("fonction_superieur", False)]
+                        # En dernier recours : tous pompiers (MODE DÉMO)
+                        if not officers:
+                            officers = available_users
+                        
+                        if officers:
+                            selected_user = officers[0]
+                        else:
+                            continue
+                    else:
+                        selected_user = available_users[0]
+                    
+                    # Créer assignation
+                    assignation_obj = Assignation(
+                        user_id=selected_user["id"],
+                        type_garde_id=type_garde["id"],
+                        date=date_str,
+                        assignation_type="auto_demo"
+                    )
+                    
+                    await db.assignations.insert_one(assignation_obj.dict())
+                    nouvelles_assignations.append(assignation_obj.dict())
+                    existing_assignations.append(assignation_obj.dict())
+        
+        return {
+            "message": f"Attribution DÉMO agressive effectuée avec succès",
+            "assignations_creees": len(nouvelles_assignations),
+            "algorithme": "Mode démo : Contraintes assouplies pour impression maximum",
+            "semaine": f"{semaine_debut} - {semaine_fin}"
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur attribution démo: {str(e)}")
+
 # Attribution automatique intelligente avec rotation équitable et ancienneté
 @api_router.post("/planning/attribution-auto")
 async def attribution_automatique(semaine_debut: str, current_user: User = Depends(get_current_user)):
