@@ -5047,11 +5047,6 @@ const MonProfil = () => {
               >
                 🔒 Changer le mot de passe
               </Button>
-              {user.role === 'admin' && (
-                <Button variant="outline" data-testid="security-settings-btn">
-                  ⚙️ Paramètres de sécurité avancés
-                </Button>
-              )}
             </div>
           </div>
         </div>
