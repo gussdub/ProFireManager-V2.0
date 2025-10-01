@@ -2330,13 +2330,8 @@ async def init_disponibilites_semaine_courante(current_user: User = Depends(get_
             }
         })
         
-        # Récupérer tous les employés temps partiel
-        temps_partiel_users = await db.users.find({"type_emploi": "temps_partiel"}).to_list(100)
+        # Récupérer tous les types de garde
         types_garde = await db.types_garde.find().to_list(100)
-        
-        disponibilites_created = 0
-        
-        # ALGORITHME OPTIMISÉ POUR DÉMO - MAXIMUM DE DISPONIBILITÉS
         # DÉTECTION AUTOMATIQUE de TOUS les employés temps partiel (peu importe le nombre)
         tous_temps_partiel = await db.users.find({
             "type_emploi": "temps_partiel",
