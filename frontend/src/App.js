@@ -2380,16 +2380,10 @@ const Planning = () => {
                     </Button>
                     <Button 
                       variant="destructive" 
-                      onClick={() => {
-                        toast({
-                          title: "Annuler la garde",
-                          description: "Fonctionnalité en développement",
-                          variant: "default"
-                        });
-                      }}
-                      data-testid="cancel-garde-btn"
+                      onClick={handleRemoveAllPersonnelFromGarde}
+                      data-testid="remove-all-personnel-btn"
                     >
-                      🚫 Annuler garde
+                      🗑️ Supprimer tout le personnel
                     </Button>
                   </>
                 )}
