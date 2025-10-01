@@ -534,80 +534,12 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Section données démo toujours visible pour admin */}
+      {/* Section données démo épurée pour admin */}
       {user.role === 'admin' && (
         <div className="demo-data-section-always">
           <h2>🎪 Données de démonstration</h2>
-          <p>Créez des données réalistes pour vos démonstrations client</p>
+          <p>Préparez vos démonstrations client en 2 étapes</p>
           <div className="demo-actions">
-            <Button 
-              variant="default" 
-              onClick={async () => {
-                try {
-                  await axios.post(`${API}/init-demo-client-data`);
-                  toast({
-                    title: "Données démo créées",
-                    description: "15 pompiers + historique + formations créés pour démonstration",
-                    variant: "success"
-                  });
-                  setTimeout(() => window.location.reload(), 2000);
-                } catch (error) {
-                  toast({
-                    title: "Erreur",
-                    description: "Impossible de créer les données démo",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="init-demo-data-btn"
-            >
-              🚒 Créer données démo client (15 pompiers)
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={async () => {
-                try {
-                  await axios.post(`${API}/init-demo-data`);
-                  toast({
-                    title: "Données de base créées",
-                    description: "4 comptes de base + types de garde créés",
-                    variant: "success"
-                  });
-                  setTimeout(() => window.location.reload(), 2000);
-                } catch (error) {
-                  toast({
-                    title: "Erreur",
-                    description: "Impossible de créer les données de base",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="init-basic-data-btn"
-            >
-              ⚙️ Créer données de base (4 comptes)
-            </Button>
-            <Button 
-              variant="outline" 
-              onClick={async () => {
-                try {
-                  await axios.post(`${API}/init-disponibilites-semaine-courante`);
-                  toast({
-                    title: "Disponibilités créées",
-                    description: "Disponibilités pour la semaine courante créées - l'assignation auto va maintenant fonctionner !",
-                    variant: "success"
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Erreur",
-                    description: "Impossible de créer les disponibilités",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="init-current-week-availability-btn"
-            >
-              📅 Créer disponibilités semaine courante
-            </Button>
             <Button 
               variant="default" 
               onClick={async () => {
@@ -628,7 +560,7 @@ const Dashboard = () => {
               }}
               data-testid="init-demo-complete-availability-btn"
             >
-              🎯 OPTIMISER pour démo (disponibilités massives)
+              📅 Créer disponibilités (massives)
             </Button>
             <Button 
               variant="destructive" 
@@ -637,7 +569,7 @@ const Dashboard = () => {
                   const response = await axios.post(`${API}/planning/reinitialiser`);
                   toast({
                     title: "Planning réinitialisé",
-                    description: `${response.data.assignations_supprimees} assignation(s) supprimée(s) - Planning maintenant vide pour démo`,
+                    description: `${response.data.assignations_supprimees} assignation(s) supprimée(s) - Planning vide pour démo`,
                     variant: "success"
                   });
                 } catch (error) {
@@ -650,7 +582,7 @@ const Dashboard = () => {
               }}
               data-testid="reset-planning-btn"
             >
-              🗑️ Vider tout le planning
+              🗑️ Vider le planning
             </Button>
           </div>
         </div>
