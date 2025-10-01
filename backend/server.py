@@ -1777,6 +1777,33 @@ async def get_statistiques(current_user: User = Depends(get_current_user)):
             remplacements_effectues=0
         )
 
+# Réparer tous les mots de passe démo
+@api_router.post("/repair-demo-passwords")
+async def repair_demo_passwords():
+    try:
+        password_fixes = [
+            ("admin@firemanager.ca", "admin123"),
+            ("superviseur@firemanager.ca", "superviseur123"),
+            ("employe@firemanager.ca", "employe123"),
+            ("partiel@firemanager.ca", "partiel123")
+        ]
+        
+        fixed_count = 0
+        for email, password in password_fixes:
+            user = await db.users.find_one({"email": email})
+            if user:
+                new_hash = get_password_hash(password)
+                await db.users.update_one(
+                    {"email": email},
+                    {"$set": {"mot_de_passe_hash": new_hash}}
+                )
+                fixed_count += 1
+                print(f"Fixed password for {email}")
+        
+        return {"message": f"{fixed_count} mots de passe démo réparés"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erreur: {str(e)}")
+
 # Fix all demo passwords endpoint
 @api_router.post("/fix-all-passwords")
 async def fix_all_passwords():
