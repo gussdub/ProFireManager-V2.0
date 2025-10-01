@@ -2074,29 +2074,43 @@ async def init_disponibilites_semaine_courante(current_user: User = Depends(get_
         disponibilites_created = 0
         
         for user in temps_partiel_users:
-            # Créer disponibilités MASSIVES pour chaque jour de la semaine courante
+            # Créer disponibilités MASSIVES pour TOUS les jours et TOUS les types de garde applicables
             for day_offset in range(7):  # Lundi à Dimanche
                 date_dispo = start_week + timedelta(days=day_offset)
                 date_str = date_dispo.strftime("%Y-%m-%d")
                 day_name = date_dispo.strftime("%A").lower()
                 
-                # Créer disponibilités pour TOUS les types de garde applicables
+                # Pour chaque type de garde, créer des disponibilités
                 for type_garde in types_garde:
                     # Vérifier si ce type de garde s'applique à ce jour
-                    if type_garde.get("jours_application") and day_name not in type_garde.get("jours_application", []):
-                        continue
+                    jours_app = type_garde.get("jours_application", [])
+                    if jours_app and day_name not in jours_app:
+                        continue  # Skip si pas applicable
                     
-                    # TOUJOURS disponible (100% pour démo impressionnante)
-                    dispo_obj = Disponibilite(
-                        user_id=user["id"],
-                        date=date_str,
-                        type_garde_id=type_garde["id"],
-                        heure_debut=type_garde["heure_debut"],
-                        heure_fin=type_garde["heure_fin"],
-                        statut="disponible"
-                    )
-                    await db.disponibilites.insert_one(dispo_obj.dict())
-                    disponibilites_created += 1
+                    # CRÉER SYSTÉMATIQUEMENT des disponibilités pour démo
+                    # Surtout pour les types demandés : AM, PM, Weekend
+                    should_create = False
+                    
+                    if "AM" in type_garde["nom"] and day_name in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
+                        should_create = True  # TOUS temps partiel disponibles pour Garde AM semaine
+                    elif "PM" in type_garde["nom"] and day_name in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
+                        should_create = True  # TOUS temps partiel disponibles pour Garde PM semaine
+                    elif "Weekend" in type_garde["nom"] and day_name in ['saturday', 'sunday']:
+                        should_create = True  # TOUS temps partiel disponibles pour Garde Weekend
+                    elif "Externe" in type_garde["nom"]:
+                        should_create = True  # Garde externe citerne - tous disponibles
+                    
+                    if should_create:
+                        dispo_obj = Disponibilite(
+                            user_id=user["id"],
+                            date=date_str,
+                            type_garde_id=type_garde["id"],
+                            heure_debut=type_garde["heure_debut"],
+                            heure_fin=type_garde["heure_fin"],
+                            statut="disponible"
+                        )
+                        await db.disponibilites.insert_one(dispo_obj.dict())
+                        disponibilites_created += 1
         
         return {
             "message": f"Disponibilités semaine courante créées",
