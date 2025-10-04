@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 
 class ProFireManagerAPITester:
-    def __init__(self, base_url="https://emergency-shifts-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://fireshift-manager.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.tokens = {}
