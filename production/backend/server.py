@@ -278,6 +278,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-@app.on_event("shutdown")
-async def shutdown_db_client():
+# Lifespan events (nouveau FastAPI)
+@app.on_event("startup")
+async def startup_event():
+    logger.info("ProFireManager API v2.0 démarrée")
+
+@app.on_event("shutdown") 
+async def shutdown_event():
+    logger.info("Fermeture ProFireManager API")
     client.close()
