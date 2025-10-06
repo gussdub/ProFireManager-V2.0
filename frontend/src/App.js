@@ -186,24 +186,6 @@ const Login = () => {
                 {loading ? 'Connexion...' : 'Se connecter'}
               </Button>
             </form>
-            
-            <div className="demo-accounts">
-              <h3>Comptes de démonstration :</h3>
-              <div className="demo-buttons">
-                <Button variant="outline" onClick={() => loadDemoAccount('admin')} data-testid="demo-admin-btn">
-                  Admin (Jean Dupont)
-                </Button>
-                <Button variant="outline" onClick={() => loadDemoAccount('superviseur')} data-testid="demo-supervisor-btn">
-                  Superviseur (Sophie Dubois)
-                </Button>
-                <Button variant="outline" onClick={() => loadDemoAccount('employe')} data-testid="demo-employee-btn">
-                  Employé (Pierre Bernard)
-                </Button>
-                <Button variant="outline" onClick={() => loadDemoAccount('partiel')} data-testid="demo-parttime-btn">
-                  Temps partiel (Claire Garcia)
-                </Button>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
