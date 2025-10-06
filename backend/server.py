@@ -178,10 +178,35 @@ def send_welcome_email(user_email: str, user_name: str, user_role: str, temp_pas
         </html>
         """
         
-        # Mode démo - simuler l'envoi d'email
-        print(f"[DEMO MODE] Email de bienvenue envoyé à {user_email}: {subject}")
-        print(f"[DEMO MODE] Contenu: Compte {role_name} créé pour {user_name}")
-        return True
+        # Envoyer l'email via SendGrid
+        sendgrid_api_key = os.environ.get('SENDGRID_API_KEY')
+        sender_email = os.environ.get('SENDER_EMAIL', 'noreply@profiremanager.ca')
+        
+        if not sendgrid_api_key:
+            print(f"[WARNING] SENDGRID_API_KEY non configurée - Email non envoyé à {user_email}")
+            return False
+        
+        try:
+            message = Mail(
+                from_email=sender_email,
+                to_emails=user_email,
+                subject=subject,
+                html_content=html_content
+            )
+            
+            sg = SendGridAPIClient(sendgrid_api_key)
+            response = sg.send(message)
+            
+            if response.status_code in [200, 201, 202]:
+                print(f"✅ Email de bienvenue envoyé avec succès à {user_email}")
+                return True
+            else:
+                print(f"⚠️ Erreur SendGrid (code {response.status_code}) pour {user_email}")
+                return False
+                
+        except Exception as e:
+            print(f"❌ Erreur lors de l'envoi de l'email à {user_email}: {str(e)}")
+            return False
         
     except Exception as e:
         print(f"Erreur envoi email: {str(e)}")
