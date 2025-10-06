@@ -121,19 +121,6 @@ const Login = () => {
     setLoading(false);
   };
 
-  const loadDemoAccount = (role) => {
-    const accounts = {
-      admin: { email: 'admin@firemanager.ca', password: 'admin123' },
-      superviseur: { email: 'superviseur@firemanager.ca', password: 'superviseur123' },
-      employe: { email: 'employe@firemanager.ca', password: 'employe123' },
-      partiel: { email: 'partiel@firemanager.ca', password: 'partiel123' }
-    };
-    
-    const account = accounts[role];
-    setEmail(account.email);
-    setMotDePasse(account.password);
-  };
-
   return (
     <div className="login-container">
       <div className="login-box">
