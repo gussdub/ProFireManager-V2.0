@@ -1019,6 +1019,23 @@ async def approuver_demande_conge(demande_id: str, action: str, commentaire: str
         }
     )
     
+    # Créer notification pour le demandeur
+    demandeur = await db.users.find_one({"id": demande["demandeur_id"]})
+    if demandeur:
+        titre = f"Congé {statut}" if statut == "approuve" else f"Congé refusé"
+        message = f"Votre demande de congé du {demande['date_debut']} au {demande['date_fin']} a été {statut}e"
+        if commentaire:
+            message += f". Commentaire: {commentaire}"
+        
+        await creer_notification(
+            destinataire_id=demande["demandeur_id"],
+            type=f"conge_{statut}",
+            titre=titre,
+            message=message,
+            lien="/conges",
+            data={"demande_id": demande_id}
+        )
+    
     return {"message": f"Demande {statut}e avec succès"}
 
 # Algorithme intelligent de recherche de remplaçants
