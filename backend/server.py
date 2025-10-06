@@ -769,6 +769,19 @@ async def get_assignations(semaine_debut: str, current_user: User = Depends(get_
 async def create_demande_remplacement(demande: DemandeRemplacementCreate, current_user: User = Depends(get_current_user)):
     demande_obj = DemandeRemplacement(**demande.dict(), demandeur_id=current_user.id)
     await db.demandes_remplacement.insert_one(demande_obj.dict())
+    
+    # Créer notification pour les superviseurs/admins
+    superviseurs_admins = await db.users.find({"role": {"$in": ["superviseur", "admin"]}}).to_list(100)
+    for user in superviseurs_admins:
+        await creer_notification(
+            destinataire_id=user["id"],
+            type="remplacement_demande",
+            titre="Nouvelle demande de remplacement",
+            message=f"{current_user.prenom} {current_user.nom} demande un remplacement le {demande.date}",
+            lien="/remplacements",
+            data={"demande_id": demande_obj.id}
+        )
+    
     # Clean the object before returning to avoid ObjectId serialization issues
     cleaned_demande = clean_mongo_doc(demande_obj.dict())
     return DemandeRemplacement(**cleaned_demande)
