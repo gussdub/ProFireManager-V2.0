@@ -2907,6 +2907,125 @@ async def init_demo_data():
     
     return {"message": "Données de démonstration créées avec succès"}
 
+# ==================== NOTIFICATIONS ====================
+
+@api_router.get("/notifications", response_model=List[Notification])
+async def get_notifications(current_user: User = Depends(get_current_user)):
+    """Récupère toutes les notifications de l'utilisateur connecté"""
+    notifications = await db.notifications.find(
+        {"destinataire_id": current_user.id}
+    ).sort("date_creation", -1).limit(50).to_list(50)
+    
+    cleaned_notifications = [clean_mongo_doc(notif) for notif in notifications]
+    return [Notification(**notif) for notif in cleaned_notifications]
+
+@api_router.get("/notifications/non-lues/count")
+async def get_unread_count(current_user: User = Depends(get_current_user)):
+    """Compte le nombre de notifications non lues"""
+    count = await db.notifications.count_documents({
+        "destinataire_id": current_user.id,
+        "statut": "non_lu"
+    })
+    return {"count": count}
+
+@api_router.put("/notifications/{notification_id}/marquer-lu")
+async def marquer_notification_lue(notification_id: str, current_user: User = Depends(get_current_user)):
+    """Marque une notification comme lue"""
+    notification = await db.notifications.find_one({
+        "id": notification_id,
+        "destinataire_id": current_user.id
+    })
+    
+    if not notification:
+        raise HTTPException(status_code=404, detail="Notification non trouvée")
+    
+    await db.notifications.update_one(
+        {"id": notification_id},
+        {"$set": {
+            "statut": "lu",
+            "date_lecture": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Notification marquée comme lue"}
+
+@api_router.put("/notifications/marquer-toutes-lues")
+async def marquer_toutes_lues(current_user: User = Depends(get_current_user)):
+    """Marque toutes les notifications comme lues"""
+    result = await db.notifications.update_many(
+        {
+            "destinataire_id": current_user.id,
+            "statut": "non_lu"
+        },
+        {"$set": {
+            "statut": "lu",
+            "date_lecture": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": f"{result.modified_count} notification(s) marquée(s) comme lue(s)"}
+
+# Helper function pour créer des notifications
+async def creer_notification(
+    destinataire_id: str,
+    type: str,
+    titre: str,
+    message: str,
+    lien: Optional[str] = None,
+    data: Optional[Dict[str, Any]] = None
+):
+    """Crée une notification dans la base de données"""
+    notification = Notification(
+        destinataire_id=destinataire_id,
+        type=type,
+        titre=titre,
+        message=message,
+        lien=lien,
+        data=data or {}
+    )
+    await db.notifications.insert_one(notification.dict())
+    return notification
+
+# ==================== PARAMÈTRES REMPLACEMENTS ====================
+
+@api_router.get("/parametres/remplacements")
+async def get_parametres_remplacements(current_user: User = Depends(get_current_user)):
+    """Récupère les paramètres de remplacements"""
+    if current_user.role not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    parametres = await db.parametres_remplacements.find_one()
+    
+    if not parametres:
+        # Créer paramètres par défaut
+        default_params = ParametresRemplacements()
+        await db.parametres_remplacements.insert_one(default_params.dict())
+        return default_params
+    
+    cleaned_params = clean_mongo_doc(parametres)
+    return ParametresRemplacements(**cleaned_params)
+
+@api_router.put("/parametres/remplacements")
+async def update_parametres_remplacements(
+    parametres: ParametresRemplacements,
+    current_user: User = Depends(get_current_user)
+):
+    """Met à jour les paramètres de remplacements"""
+    if current_user.role not in ["admin"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    existing = await db.parametres_remplacements.find_one()
+    
+    if existing:
+        await db.parametres_remplacements.update_one(
+            {"id": existing["id"]},
+            {"$set": parametres.dict()}
+        )
+    else:
+        await db.parametres_remplacements.insert_one(parametres.dict())
+    
+    return {"message": "Paramètres mis à jour avec succès"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
