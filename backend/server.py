@@ -747,6 +747,25 @@ async def create_assignation(assignation: AssignationCreate, current_user: User 
     # Store assignation in database
     assignation_obj = Assignation(**assignation.dict())
     await db.assignations.insert_one(assignation_obj.dict())
+    
+    # Créer notification pour l'employé assigné
+    user_assigne = await db.users.find_one({"id": assignation.user_id})
+    type_garde = await db.types_garde.find_one({"id": assignation.type_garde_id})
+    
+    if user_assigne and type_garde:
+        await creer_notification(
+            destinataire_id=assignation.user_id,
+            type="planning_assigne",
+            titre="Nouveau quart assigné",
+            message=f"Vous avez été assigné(e) au quart '{type_garde['nom']}' le {assignation.date}",
+            lien="/planning",
+            data={
+                "assignation_id": assignation_obj.id,
+                "date": assignation.date,
+                "type_garde": type_garde["nom"]
+            }
+        )
+    
     return {"message": "Assignation créée avec succès"}
 
 @api_router.get("/planning/assignations/{semaine_debut}")
