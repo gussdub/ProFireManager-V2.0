@@ -503,62 +503,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Section données démo épurée pour admin */}
-      {user.role === 'admin' && (
-        <div className="demo-data-section-always">
-          <h2>🎪 Données de démonstration</h2>
-          <p>Préparez vos démonstrations client en 2 étapes</p>
-          <div className="demo-actions">
-            <Button 
-              variant="default" 
-              onClick={async () => {
-                try {
-                  const response = await axios.post(`${API}/init-disponibilites-demo-complete`);
-                  toast({
-                    title: "Disponibilités DÉMO créées",
-                    description: `${response.data.disponibilites_creees} disponibilités pour ${response.data.all_users_included} employés - Attribution auto va remplir le planning !`,
-                    variant: "success"
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Erreur",
-                    description: "Impossible de créer les disponibilités",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="init-demo-complete-availability-btn"
-            >
-              📅 Créer disponibilités (tous temps partiel)
-            </Button>
-            <Button 
-              variant="destructive" 
-              onClick={async () => {
-                try {
-                  const response = await axios.post(`${API}/planning/reinitialiser`);
-                  toast({
-                    title: "Planning réinitialisé",
-                    description: `${response.data.assignations_supprimees} assignation(s) supprimée(s) - Planning vide pour démo`,
-                    variant: "success"
-                  });
-                } catch (error) {
-                  toast({
-                    title: "Erreur",
-                    description: "Impossible de réinitialiser le planning",
-                    variant: "destructive"
-                  });
-                }
-              }}
-              data-testid="reset-planning-btn"
-            >
-              🗑️ Vider le planning
-            </Button>
-          </div>
-        </div>
-      )}
-
-
-
+      {/* Fin du Dashboard */}
       {user.role === 'employe' && (
         <div className="employee-dashboard-section">
           <h2>👤 Mon activité</h2>
