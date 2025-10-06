@@ -904,6 +904,18 @@ class DemandeCongeCreate(BaseModel):
     priorite: str = "normale"
     documents: List[str] = []
 
+class Notification(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    destinataire_id: str
+    type: str  # remplacement_disponible, conge_approuve, conge_refuse, conge_demande, planning_assigne
+    titre: str
+    message: str
+    lien: Optional[str] = None  # Lien vers la page concernée
+    statut: str = "non_lu"  # non_lu, lu
+    data: Optional[Dict[str, Any]] = {}  # Données supplémentaires (demande_id, etc.)
+    date_creation: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    date_lecture: Optional[str] = None
+
 class NotificationRemplacement(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     demande_remplacement_id: str
@@ -913,6 +925,16 @@ class NotificationRemplacement(BaseModel):
     statut: str = "envoye"  # envoye, lu, accepte, refuse
     date_envoi: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     date_reponse: Optional[datetime] = None
+    ordre_priorite: Optional[int] = None  # Pour le mode séquentiel
+
+class ParametresRemplacements(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    mode_notification: str = "simultane"  # simultane, sequentiel, groupe_sequentiel
+    taille_groupe: int = 3  # Pour mode groupe_sequentiel
+    delai_attente_heures: int = 24  # Délai avant de passer au suivant
+    max_contacts: int = 5
+    priorite_grade: bool = True
+    priorite_competences: bool = True
 
 # Demandes de congé routes
 @api_router.post("/demandes-conge", response_model=DemandeCongé)
