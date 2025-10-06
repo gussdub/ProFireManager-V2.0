@@ -969,13 +969,14 @@ async def create_demande_conge(demande: DemandeCongeCreate, current_user: User =
         # Notifier les superviseurs et admins
         superviseurs_admins = await db.users.find({"role": {"$in": ["superviseur", "admin"]}}).to_list(100)
         for superviseur in superviseurs_admins:
-            notification = NotificationRemplacement(
-                demande_remplacement_id=demande_obj.id,
+            await creer_notification(
                 destinataire_id=superviseur["id"],
-                message=f"Demande de congé {demande.type_conge} de {current_user.nom} {current_user.prenom}",
-                type_notification="approbation_requise"
+                type="conge_demande",
+                titre="Nouvelle demande de congé",
+                message=f"{current_user.prenom} {current_user.nom} demande un congé ({demande.type_conge}) du {demande.date_debut} au {demande.date_fin}",
+                lien="/conges",
+                data={"demande_id": demande_obj.id}
             )
-            await db.notifications.insert_one(notification.dict())
     
     return demande_obj
 
