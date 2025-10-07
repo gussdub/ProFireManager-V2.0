@@ -1087,6 +1087,7 @@ const Parametres = ({ user }) => {
         )}
       </div>
 
+      {/* Modals Section */}
       {/* Modal d'édition type de garde avec jours */}
       {showEditTypeModal && editingItem && (
         <div className="modal-overlay" onClick={() => setShowEditTypeModal(false)}>
