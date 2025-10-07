@@ -1407,6 +1407,21 @@ const Personnel = () => {
                   )}
                 </div>
 
+                {/* EPI - Équipements de Protection Individuels */}
+                <div className="detail-section">
+                  <h5>🛡️ Équipements de Protection Individuels (EPI)</h5>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => {
+                      handleViewEPI(selectedUser);
+                    }}
+                    data-testid="view-epi-btn"
+                  >
+                    📋 Gérer les EPI
+                  </Button>
+                </div>
+
                 {/* Actions rapides */}
                 <div className="profile-actions">
                   <Button 
