@@ -1009,10 +1009,8 @@ const Parametres = ({ user }) => {
                   </div>
                 </div>
               </div>
-                  </div>
-                </div>
 
-                <div className="settings-column">
+              <div className="settings-column">
                   <h4 className="compact-title">Règles de validation automatique</h4>
                   <div className="validation-rules-compact">
                     <label className="validation-rule-compact">
