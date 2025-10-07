@@ -1301,26 +1301,6 @@ const Parametres = ({ user }) => {
                     )}
                   </div>
                 </div>
-
-                <div className="settings-column">
-                  <h4 className="compact-title">⚡ Actions rapides</h4>
-                  <div className="epi-quick-actions">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setShowEpiReportModal(true)}
-                      data-testid="view-epi-alerts"
-                    >
-                      ⚠️ EPI à vérifier
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => console.log('Export inventaire')}
-                      data-testid="export-epi-inventory"
-                    >
-                      📋 Inventaire complet
-                    </Button>
-                  </div>
-                </div>
               </div>
 
               {/* Types d'EPI et normes NFPA - Version épurée */}
