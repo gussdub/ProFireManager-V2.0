@@ -1201,7 +1201,7 @@ const Parametres = ({ user }) => {
       )}
 
       {/* Modal d'édition compétence */}
-      {showEditFormationModal && editingItem && (
+      {false && showEditFormationModal && editingItem && (
         <div className="modal-overlay" onClick={() => setShowEditFormationModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-competence-modal">
             <div className="modal-header">
