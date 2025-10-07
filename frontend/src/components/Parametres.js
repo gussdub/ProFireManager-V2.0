@@ -1594,7 +1594,7 @@ const Parametres = ({ user }) => {
       )}
 
       {/* Modal de modification d'accès utilisateur */}
-      {false && showEditAccessModal && editingUser && (
+      {showEditAccessModal && editingUser && (
         <div className="modal-overlay" onClick={() => setShowEditAccessModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} data-testid="edit-access-modal">
             <div className="modal-header">
