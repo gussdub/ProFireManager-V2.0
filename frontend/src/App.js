@@ -563,7 +563,7 @@ const ModuleEPI = ({ user }) => {
           </div>
         </div>
 
-        {/* Actions rapides */}
+        {/* Cartes d'alertes */}
         <div className="epi-quick-actions-grid">
           <div className="epi-stat-card">
             <div className="epi-stat-header">
@@ -582,26 +582,65 @@ const ModuleEPI = ({ user }) => {
               </div>
             </div>
           </div>
+
+          <div className="epi-stat-card">
+            <div className="epi-stat-header epi-stat-header-priorite">
+              <h3>🚨 Haute Priorité</h3>
+            </div>
+            <div className="epi-stat-body">
+              <div className="alert-stats">
+                <div className="alert-stat-item">
+                  <span className="alert-stat-number urgent">{alerts.filter(a => a.priorite === 'haute').length}</span>
+                  <span className="alert-stat-label">Actions urgentes</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Liste des alertes */}
-        {alerts.length > 0 && (
-          <div className="epi-alerts-section">
-            <h3>📋 Alertes EPI</h3>
-            <div className="epi-alerts-list">
-              {alerts.map((alert, index) => (
-                <div key={index} className="epi-alert-card" data-priority={alert.priorite}>
-                  <div className="epi-alert-icon">
-                    {alert.type === 'expiration' ? '⏰' : '🔍'}
-                  </div>
-                  <div className="epi-alert-content">
-                    <strong>{alert.employe_nom}</strong>
-                    <p>{getEPINom(alert.type_epi)} - {alert.type === 'expiration' ? 'Expiration' : 'Inspection'}</p>
-                    <span className="epi-alert-days">Dans {alert.jours_restants} jour(s)</span>
-                  </div>
-                </div>
-              ))}
+        {/* Tableau détaillé des alertes */}
+        {alerts.length > 0 ? (
+          <div className="epi-table-section">
+            <h3>📋 Détails des Alertes EPI</h3>
+            <div className="epi-table-wrapper">
+              <table className="epi-table">
+                <thead>
+                  <tr>
+                    <th>Priorité</th>
+                    <th>Employé</th>
+                    <th>Type EPI</th>
+                    <th>Type d'alerte</th>
+                    <th>Échéance</th>
+                    <th>Jours restants</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alerts.map((alert, index) => (
+                    <tr key={index} className={`priority-row-${alert.priorite}`}>
+                      <td>
+                        <span className={`priority-badge ${alert.priorite}`}>
+                          {alert.priorite === 'haute' ? '🚨 Haute' : '⚠️ Moyenne'}
+                        </span>
+                      </td>
+                      <td><strong>{alert.employe_nom}</strong></td>
+                      <td>{getEPINom(alert.type_epi)}</td>
+                      <td>{alert.type === 'expiration' ? '⏰ Expiration' : '🔍 Inspection'}</td>
+                      <td>{alert.type === 'expiration' ? alert.date_expiration : alert.date_inspection}</td>
+                      <td>
+                        <span className={`days-badge ${alert.jours_restants <= 7 ? 'urgent' : 'warning'}`}>
+                          {alert.jours_restants} jour(s)
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
+        ) : (
+          <div className="no-alerts-epi">
+            <p>✅ Aucune alerte EPI pour le moment</p>
+            <p>Tous les équipements sont à jour</p>
           </div>
         )}
 
