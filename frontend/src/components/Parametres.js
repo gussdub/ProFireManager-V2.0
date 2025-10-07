@@ -1699,6 +1699,7 @@ const Parametres = ({ user }) => {
         </div>
       )}
     </div>
+    </>
   );
 };
 
