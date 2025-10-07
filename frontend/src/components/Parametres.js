@@ -1284,7 +1284,7 @@ const Parametres = ({ user }) => {
       )}
 
       {/* Modal de création d'utilisateur */}
-      {false && showCreateUserModal && (
+      {showCreateUserModal && (
         <div className="modal-overlay" onClick={() => setShowCreateUserModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-user-modal">
             <div className="modal-header">
