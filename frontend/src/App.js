@@ -519,7 +519,7 @@ const ModuleEPI = ({ user }) => {
       'veste_bunker': 'Veste Bunker',
       'pantalon_bunker': 'Pantalon Bunker',
       'gants': 'Gants',
-      'masque_apria': 'Masque APRIA',
+      'masque_apria': 'Facial APRIA',
       'cagoule': 'Cagoule Anti-Particules'
     };
     return noms[typeEpi] || typeEpi;
@@ -5762,7 +5762,7 @@ const MonProfil = () => {
       'veste_bunker': 'Veste Bunker',
       'pantalon_bunker': 'Pantalon Bunker',
       'gants': 'Gants',
-      'masque_apria': 'Masque APRIA',
+      'masque_apria': 'Facial APRIA',
       'cagoule': 'Cagoule Anti-Particules'
     };
     return noms[typeEpi] || typeEpi;
@@ -6213,7 +6213,7 @@ const Rapports = () => {
       'veste_bunker': 'Veste Bunker',
       'pantalon_bunker': 'Pantalon Bunker',
       'gants': 'Gants',
-      'masque_apria': 'Masque APRIA',
+      'masque_apria': 'Facial APRIA',
       'cagoule': 'Cagoule Anti-Particules'
     };
     return noms[typeEpi] || typeEpi;
