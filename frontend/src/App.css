@@ -4453,6 +4453,81 @@ body {
 
 .epi-readonly-info strong {
   font-size: 0.85rem;
+
+/* Sections compactes en grille pour modal Voir */
+.detail-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.detail-section-compact {
+  background: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.detail-section-compact h5 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.competences-compact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.competence-chip {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.epi-compact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.epi-compact-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.75rem;
+}
+
+.epi-compact-text {
+  color: #0f172a;
+  font-weight: 500;
+}
+
+.no-data-compact {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-style: italic;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .detail-sections-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
   color: #0f172a;
   white-space: nowrap;
   overflow: hidden;
