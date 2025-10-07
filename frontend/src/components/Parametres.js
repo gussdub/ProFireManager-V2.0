@@ -126,6 +126,57 @@ const Parametres = ({ user }) => {
     { value: 'sunday', label: 'Dimanche' }
   ];
 
+  const episTypesDefaut = [
+    { 
+      id: 'casque',
+      nom: 'Casque', 
+      icone: '🪖',
+      duree_vie_annees: 10,
+      inspection_mois: 12,
+      tailles: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+    },
+    { 
+      id: 'bottes',
+      nom: 'Bottes', 
+      icone: '👢',
+      duree_vie_annees: 3,
+      inspection_mois: 6,
+      tailles: ['39', '40', '41', '42', '43', '44', '45', '46', '47', '48']
+    },
+    { 
+      id: 'veste_bunker',
+      nom: 'Veste Bunker', 
+      icone: '🧥',
+      duree_vie_annees: 10,
+      inspection_mois: 12,
+      tailles: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+    },
+    { 
+      id: 'pantalon_bunker',
+      nom: 'Pantalon Bunker', 
+      icone: '👖',
+      duree_vie_annees: 10,
+      inspection_mois: 12,
+      tailles: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL']
+    },
+    { 
+      id: 'gants',
+      nom: 'Gants', 
+      icone: '🧤',
+      duree_vie_annees: 2,
+      inspection_mois: 6,
+      tailles: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+    },
+    { 
+      id: 'masque_scba',
+      nom: 'Masque SCBA', 
+      icone: '😷',
+      duree_vie_annees: 15,
+      inspection_mois: 12,
+      tailles: ['S', 'M', 'L']
+    }
+  ];
+
   useEffect(() => {
     if (user?.role === 'admin') {
       fetchData();
