@@ -1575,16 +1575,23 @@ const Personnel = () => {
                 {/* EPI - Équipements de Protection Individuels */}
                 <div className="detail-section">
                   <h5>🛡️ Équipements de Protection Individuels (EPI)</h5>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => {
-                      handleViewEPI(selectedUser);
-                    }}
-                    data-testid="view-epi-btn"
-                  >
-                    📋 Gérer les EPI
-                  </Button>
+                  {userEPIs.length > 0 ? (
+                    <div className="epi-readonly-list">
+                      {userEPIs.map(epi => (
+                        <div key={epi.id} className="epi-readonly-item">
+                          <span className="epi-readonly-icon">{getEPIIcone(epi.type_epi)}</span>
+                          <div className="epi-readonly-info">
+                            <strong>{getEPINom(epi.type_epi)}</strong>
+                            <span className="epi-readonly-details">
+                              Taille: {epi.taille} • État: {epi.etat}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="no-data-text">Aucun EPI enregistré</p>
+                  )}
                 </div>
 
                 {/* Actions rapides */}
