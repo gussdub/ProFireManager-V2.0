@@ -300,45 +300,53 @@ class ProFireManagerTester:
             return False
     
     def test_settings_api(self):
-        """Test Settings API endpoints (if they exist)"""
+        """Test Settings API endpoints"""
         if not self.auth_token:
             self.log_test("Settings API", False, "No authentication token")
             return False
         
         try:
-            # Try to access settings endpoints - these might not be implemented yet
-            # Based on the code, I don't see specific settings endpoints, so this is exploratory
-            
-            # Test if there are any settings-related endpoints
-            endpoints_to_test = [
-                "/parametres",
-                "/settings",
-                "/config",
-                "/system-settings"
-            ]
-            
-            found_settings = False
-            for endpoint in endpoints_to_test:
-                try:
-                    response = self.session.get(f"{self.base_url}{endpoint}")
-                    if response.status_code == 200:
-                        found_settings = True
-                        self.log_test("Settings API", True, f"Found settings endpoint: {endpoint}")
-                        break
-                    elif response.status_code == 404:
-                        continue  # Expected for non-existent endpoints
-                    else:
-                        # Some other error - might indicate the endpoint exists but has issues
-                        self.log_test("Settings API", False, f"Settings endpoint {endpoint} returned {response.status_code}")
-                        return False
-                except:
-                    continue
-            
-            if not found_settings:
-                self.log_test("Settings API", False, "No settings endpoints found - may need to be implemented")
+            # Test GET - Retrieve replacement parameters
+            response = self.session.get(f"{self.base_url}/parametres/remplacements")
+            if response.status_code != 200:
+                self.log_test("Settings API", False, f"Failed to fetch replacement parameters: {response.status_code}")
                 return False
             
-            return True
+            current_params = response.json()
+            
+            # Test PUT - Update replacement parameters
+            updated_params = {
+                "mode_notification": "sequentiel",
+                "taille_groupe": 5,
+                "delai_attente_heures": 48,
+                "max_contacts": 8,
+                "priorite_grade": True,
+                "priorite_competences": False
+            }
+            
+            response = self.session.put(f"{self.base_url}/parametres/remplacements", json=updated_params)
+            if response.status_code != 200:
+                self.log_test("Settings API", False, f"Failed to update replacement parameters: {response.status_code}")
+                return False
+            
+            # Verify the update
+            response = self.session.get(f"{self.base_url}/parametres/remplacements")
+            if response.status_code != 200:
+                self.log_test("Settings API", False, f"Failed to verify updated parameters: {response.status_code}")
+                return False
+            
+            updated_result = response.json()
+            
+            # Check if the update was successful
+            if updated_result.get("mode_notification") == "sequentiel" and updated_result.get("delai_attente_heures") == 48:
+                self.log_test("Settings API", True, "Replacement parameters retrieved and updated successfully")
+                
+                # Restore original parameters
+                self.session.put(f"{self.base_url}/parametres/remplacements", json=current_params)
+                return True
+            else:
+                self.log_test("Settings API", False, "Parameter update verification failed")
+                return False
             
         except Exception as e:
             self.log_test("Settings API", False, f"Settings API error: {str(e)}")
