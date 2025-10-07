@@ -169,7 +169,7 @@ const Parametres = ({ user }) => {
     },
     { 
       id: 'masque_apria',
-      nom: 'Masque APRIA', 
+      nom: 'Facial APRIA', 
       icone: '😷',
       duree_vie_annees: 15,
       inspection_mois: 12,
