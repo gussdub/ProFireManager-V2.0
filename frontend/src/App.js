@@ -264,6 +264,75 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
 
   return (
     <>
+      {/* Notification bell icon */}
+      <div className="notification-bell-container">
+        <button 
+          className="notification-bell"
+          onClick={() => setShowNotifications(!showNotifications)}
+          data-testid="notification-bell"
+        >
+          <i className="fas fa-bell"></i>
+          {unreadCount > 0 && (
+            <span className="notification-badge">{unreadCount}</span>
+          )}
+        </button>
+
+        {/* Dropdown des notifications */}
+        {showNotifications && (
+          <div className="notifications-dropdown">
+            <div className="notifications-header">
+              <h3>Notifications</h3>
+              {unreadCount > 0 && (
+                <button onClick={marquerToutesLues} className="mark-all-read">
+                  Tout marquer comme lu
+                </button>
+              )}
+            </div>
+
+            <div className="notifications-list">
+              {notifications.length === 0 ? (
+                <div className="no-notifications">
+                  <i className="fas fa-inbox"></i>
+                  <p>Aucune notification</p>
+                </div>
+              ) : (
+                notifications.map(notif => (
+                  <div 
+                    key={notif.id}
+                    className={`notification-item ${notif.statut === 'non_lu' ? 'unread' : ''}`}
+                    onClick={() => {
+                      marquerCommeLue(notif.id);
+                      if (notif.lien) {
+                        setCurrentPage(notif.lien.replace('/', ''));
+                        setShowNotifications(false);
+                      }
+                    }}
+                  >
+                    <div className="notification-icon">
+                      {notif.type === 'remplacement_demande' && '🔄'}
+                      {notif.type === 'conge_approuve' && '✅'}
+                      {notif.type === 'conge_refuse' && '❌'}
+                      {notif.type === 'conge_demande' && '📝'}
+                      {notif.type === 'planning_assigne' && '📅'}
+                    </div>
+                    <div className="notification-content">
+                      <h4>{notif.titre}</h4>
+                      <p>{notif.message}</p>
+                      <span className="notification-time">
+                        {new Date(notif.date_creation).toLocaleString('fr-FR')}
+                      </span>
+                    </div>
+                    {notif.statut === 'non_lu' && (
+                      <div className="notification-dot"></div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* Mobile hamburger button */}
       <button 
         className="mobile-menu-toggle"
