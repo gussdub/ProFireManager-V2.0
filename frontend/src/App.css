@@ -4477,10 +4477,42 @@ body {
   margin-bottom: 2rem;
 }
 
+.epi-stat-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.epi-stat-card:hover {
+  border-color: #dc2626;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.15);
+  transform: translateY(-4px);
+}
+
+.epi-stat-header {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+  border-bottom: 2px solid #b91c1c;
+}
+
+.epi-stat-header h3 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.epi-stat-body {
+  padding: 1.5rem;
+}
+
 .alert-stats {
   display: flex;
   gap: 2rem;
-  padding: 1rem 0;
+  justify-content: space-around;
 }
 
 .alert-stat-item {
