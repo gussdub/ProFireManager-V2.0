@@ -4519,10 +4519,10 @@ body {
   color: #94a3b8;
   font-size: 0.8rem;
 
-/* Modal ULTRA COMPACT pour Vue */
-.modal-body-mini {
-  padding: 0.75rem !important;
-  max-height: 65vh;
+/* Modal Optimisé pour Vue - Beau Design + Compact */
+.modal-body-optimized {
+  padding: 1rem !important;
+  max-height: 70vh;
   overflow-y: auto;
 }
 
