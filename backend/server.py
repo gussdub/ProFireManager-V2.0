@@ -47,7 +47,6 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 24 * 60  # 24 hours
 
 # Simplified password hashing
-import hashlib
 
 # Helper functions
 def validate_complex_password(password: str) -> bool:
@@ -632,7 +631,7 @@ async def revoke_user_completely(user_id: str, current_user: User = Depends(get_
     await db.demandes_remplacement.delete_many({"demandeur_id": user_id})
     await db.demandes_remplacement.delete_many({"remplacant_id": user_id})
     
-    return {"message": f"Utilisateur et toutes ses données ont été supprimés définitivement"}
+    return {"message": "Utilisateur et toutes ses données ont été supprimés définitivement"}
 
 # Types de garde routes
 @api_router.post("/types-garde", response_model=TypeGarde)
@@ -1081,7 +1080,7 @@ async def approuver_demande_conge(demande_id: str, action: str, commentaire: str
     # Créer notification pour le demandeur
     demandeur = await db.users.find_one({"id": demande["demandeur_id"]})
     if demandeur:
-        titre = f"Congé {statut}" if statut == "approuve" else f"Congé refusé"
+        titre = f"Congé {statut}" if statut == "approuve" else "Congé refusé"
         message = f"Votre demande de congé du {demande['date_debut']} au {demande['date_fin']} a été {statut}e"
         if commentaire:
             message += f". Commentaire: {commentaire}"
@@ -1168,7 +1167,7 @@ async def recherche_remplacants_automatique(demande_id: str, current_user: User 
             await db.notifications.insert_one(notification.dict())
         
         return {
-            "message": f"Recherche automatique effectuée",
+            "message": "Recherche automatique effectuée",
             "remplacants_contactes": len(remplacants_finaux),
             "algorithme": "Disponibilités → Grade → Compétences → Score compatibilité"
         }
@@ -1620,7 +1619,7 @@ async def assignation_manuelle_avancee(
                     current_month = current_month.replace(month=current_month.month + 1)
         
         return {
-            "message": f"Assignation avancée créée avec succès",
+            "message": "Assignation avancée créée avec succès",
             "assignations_creees": len(assignations_creees),
             "recurrence": recurrence_type,
             "periode": f"{date_debut.strftime('%Y-%m-%d')} à {date_fin.strftime('%Y-%m-%d')}"
@@ -1730,7 +1729,7 @@ async def attribution_automatique_demo(semaine_debut: str, current_user: User = 
                     existing_assignations.append(assignation_obj.dict())
         
         return {
-            "message": f"Attribution DÉMO agressive effectuée avec succès",
+            "message": "Attribution DÉMO agressive effectuée avec succès",
             "assignations_creees": len(nouvelles_assignations),
             "algorithme": "Mode démo : Contraintes assouplies pour impression maximum",
             "semaine": f"{semaine_debut} - {semaine_fin}"
@@ -1868,7 +1867,7 @@ async def attribution_automatique(semaine_debut: str, current_user: User = Depen
                 user_monthly_hours[selected_user["id"]] += type_garde.get("duree_heures", 8)
         
         return {
-            "message": f"Attribution automatique intelligente effectuée avec succès",
+            "message": "Attribution automatique intelligente effectuée avec succès",
             "assignations_creees": len(nouvelles_assignations),
             "algorithme": "5 niveaux: Manuel → Disponibilités → Grades → Rotation équitable → Ancienneté",
             "semaine": f"{semaine_debut} - {semaine_fin}"
@@ -2036,7 +2035,7 @@ async def reinitialiser_planning(current_user: User = Depends(get_current_user))
         result = await db.assignations.delete_many({})
         
         return {
-            "message": f"Planning réinitialisé avec succès",
+            "message": "Planning réinitialisé avec succès",
             "assignations_supprimees": result.deleted_count
         }
         
@@ -2366,7 +2365,7 @@ async def auto_affecter_disponibilites_temps_partiel(current_user: User = Depend
                     disponibilites_created += 1
         
         return {
-            "message": f"Disponibilités affectées automatiquement",
+            "message": "Disponibilités affectées automatiquement",
             "employes_temps_partiel_detectes": len(tous_temps_partiel),
             "disponibilites_creees": disponibilites_created,
             "semaine": f"{start_week.strftime('%Y-%m-%d')} - {end_week.strftime('%Y-%m-%d')}",
@@ -2439,7 +2438,7 @@ async def init_disponibilites_demo_complete(current_user: User = Depends(get_cur
                     disponibilites_created += 1
         
         return {
-            "message": f"Disponibilités DÉMO COMPLÈTES créées",
+            "message": "Disponibilités DÉMO COMPLÈTES créées",
             "semaine": f"{start_week.strftime('%Y-%m-%d')} - {end_week.strftime('%Y-%m-%d')}",
             "disponibilites_creees": disponibilites_created,
             "all_users_included": len(all_users),
@@ -2515,7 +2514,7 @@ async def init_disponibilites_semaine_courante(current_user: User = Depends(get_
                         disponibilites_created += 1
         
         return {
-            "message": f"Disponibilités créées pour TOUS vos employés temps partiel",
+            "message": "Disponibilités créées pour TOUS vos employés temps partiel",
             "employes_temps_partiel": len(tous_temps_partiel),
             "disponibilites_creees": disponibilites_created,
             "all_users_included": len(tous_temps_partiel),
@@ -2776,7 +2775,7 @@ async def init_demo_client_data():
             await db.sessions_formation.insert_one(session_obj.dict())
         
         return {
-            "message": f"Données démo CLIENT créées avec succès",
+            "message": "Données démo CLIENT créées avec succès",
             "details": {
                 "utilisateurs": len(demo_users),
                 "formations": len(demo_formations),
