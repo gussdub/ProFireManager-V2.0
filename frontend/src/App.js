@@ -4831,7 +4831,12 @@ const Formations = () => {
                     </Button>
                   )}
                   {user.role !== 'employe' && (
-                    <Button variant="ghost" size="sm" data-testid={`edit-session-${session.id}`}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleEditSession(session)}
+                      data-testid={`edit-session-${session.id}`}
+                    >
                       ✏️ Modifier
                     </Button>
                   )}
