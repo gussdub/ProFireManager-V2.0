@@ -389,6 +389,72 @@ class ProFireManagerTester:
             self.log_test("Notification System", False, f"Notification system error: {str(e)}")
             return False
     
+    def test_planning_endpoints(self):
+        """Test Planning-related endpoints"""
+        if not self.auth_token:
+            self.log_test("Planning Endpoints", False, "No authentication token")
+            return False
+        
+        try:
+            # Test planning for current week
+            from datetime import datetime, timedelta
+            today = datetime.now()
+            monday = today - timedelta(days=today.weekday())
+            week_start = monday.strftime("%Y-%m-%d")
+            
+            # Test GET planning
+            response = self.session.get(f"{self.base_url}/planning/{week_start}")
+            if response.status_code != 200:
+                self.log_test("Planning Endpoints", False, f"Failed to fetch planning: {response.status_code}")
+                return False
+            
+            planning_data = response.json()
+            
+            # Test GET assignations
+            response = self.session.get(f"{self.base_url}/planning/assignations/{week_start}")
+            if response.status_code != 200:
+                self.log_test("Planning Endpoints", False, f"Failed to fetch assignations: {response.status_code}")
+                return False
+            
+            assignations = response.json()
+            
+            self.log_test("Planning Endpoints", True, f"Planning endpoints working - Found {len(assignations)} assignations for week {week_start}")
+            return True
+            
+        except Exception as e:
+            self.log_test("Planning Endpoints", False, f"Planning endpoints error: {str(e)}")
+            return False
+    
+    def test_replacement_system(self):
+        """Test Replacement system functionality"""
+        if not self.auth_token:
+            self.log_test("Replacement System", False, "No authentication token")
+            return False
+        
+        try:
+            # Test GET replacement requests
+            response = self.session.get(f"{self.base_url}/remplacements")
+            if response.status_code != 200:
+                self.log_test("Replacement System", False, f"Failed to fetch replacement requests: {response.status_code}")
+                return False
+            
+            replacements = response.json()
+            
+            # Test GET leave requests (demandes-conge)
+            response = self.session.get(f"{self.base_url}/demandes-conge")
+            if response.status_code != 200:
+                self.log_test("Replacement System", False, f"Failed to fetch leave requests: {response.status_code}")
+                return False
+            
+            leave_requests = response.json()
+            
+            self.log_test("Replacement System", True, f"Replacement system working - Found {len(replacements)} replacement requests and {len(leave_requests)} leave requests")
+            return True
+            
+        except Exception as e:
+            self.log_test("Replacement System", False, f"Replacement system error: {str(e)}")
+            return False
+    
     def create_admin_user_if_needed(self):
         """Create admin user if it doesn't exist"""
         try:
