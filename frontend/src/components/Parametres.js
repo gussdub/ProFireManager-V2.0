@@ -1023,33 +1023,7 @@ const Parametres = ({ user }) => {
                 </div>
               </div>
 
-              <div className="validation-summary-compact">
-                <h4>Résumé de la validation</h4>
-                <div className="summary-content">
-                  <p>Processus appliqué lors d'une demande de remplacement :</p>
-                  <div className="validation-steps">
-                    <span className={`step ${systemSettings.privilegier_disponibles ? 'active' : 'inactive'}`}>
-                      {systemSettings.privilegier_disponibles ? '✅' : '❌'} Disponibilité
-                    </span>
-                    <span className={`step ${systemSettings.grade_egal ? 'active' : 'inactive'}`}>
-                      {systemSettings.grade_egal ? '✅' : '❌'} Grade
-                    </span>
-                    <span className={`step ${systemSettings.competences_egales ? 'active' : 'inactive'}`}>
-                      {systemSettings.competences_egales ? '✅' : '❌'} Compétences
-                    </span>
-                  </div>
-                  <p className="summary-result">
-                    <strong>Mode :</strong> {
-                      systemSettings.mode_notification === 'simultane' ? 'Simultané' :
-                      systemSettings.mode_notification === 'sequentiel' ? 'Séquentiel' : 
-                      `Groupes de ${systemSettings.taille_groupe || 3}`
-                    } | <strong>Contacts :</strong> max {systemSettings.max_personnes_contact} personnes
-                    {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && 
-                      ` | Délai : ${systemSettings.delai_attente_minutes || 1440} min`
-                    }
-                  </p>
-                </div>
-              </div>
+              {/* Résumé supprimé comme demandé */}
             </div>
           </div>
         )}
