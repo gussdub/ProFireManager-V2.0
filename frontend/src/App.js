@@ -2166,7 +2166,7 @@ const Personnel = () => {
                     <option value="veste_bunker">🧥 Veste Bunker</option>
                     <option value="pantalon_bunker">👖 Pantalon Bunker</option>
                     <option value="gants">🧤 Gants</option>
-                    <option value="masque_apria">😷 Masque APRIA</option>
+                    <option value="masque_apria">😷 Facial APRIA</option>
                     <option value="cagoule">🎭 Cagoule Anti-Particules</option>
                   </select>
                 </div>
