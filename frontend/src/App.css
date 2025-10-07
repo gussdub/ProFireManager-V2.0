@@ -4118,28 +4118,58 @@ body {
 
 /* EPI Info Section */
 .epi-info-section {
-  margin: 2rem 0;
+  margin: 3rem 0 2rem;
+  animation: fadeInUp 0.6s ease-out;
 }
 
 .info-card {
-  background: linear-gradient(135deg, #eff6ff, #dbeafe);
-  border: 1px solid #3b82f6;
-  border-radius: 12px;
-  padding: 1.5rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  border: 2px solid #60a5fa;
+  border-radius: 16px;
+  padding: 2rem;
   text-align: center;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% {
+    transform: translate(-50%, -50%);
+  }
+  50% {
+    transform: translate(-30%, -30%);
+  }
 }
 
 .info-card h4 {
   color: #1e40af;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.02em;
 }
 
 .info-card p {
   color: #1e40af;
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 1;
+  font-size: 0.95rem;
 }
 
 .info-card p:last-child {
@@ -4147,7 +4177,8 @@ body {
 }
 
 .info-card strong {
-  font-weight: 600;
+  font-weight: 700;
+  color: #1e3a8a;
 }
 
 /* EPI Quick Actions */
