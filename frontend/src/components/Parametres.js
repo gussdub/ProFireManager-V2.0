@@ -91,7 +91,11 @@ const Parametres = ({ user }) => {
     // Nouvelles règles de validation pour remplacements
     privilegier_disponibles: true,
     grade_egal: true,
-    competences_egales: true
+    competences_egales: true,
+    // Paramètres de notification de remplacement
+    mode_notification: 'simultane',
+    taille_groupe: 3,
+    delai_attente_minutes: 1440
   });
 
   const { toast } = useToast();
