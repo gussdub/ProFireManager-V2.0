@@ -95,7 +95,14 @@ const Parametres = ({ user }) => {
     // Paramètres de notification de remplacement
     mode_notification: 'simultane',
     taille_groupe: 3,
-    delai_attente_minutes: 1440
+    delai_attente_minutes: 1440,
+    // Paramètres de disponibilités
+    blocage_dispos_active: true,
+    jour_blocage_dispos: 15,
+    exceptions_admin_superviseur: true,
+    admin_peut_modifier_temps_partiel: true,
+    notifications_dispos_actives: true,
+    jours_avance_notification: 3
   });
 
   const { toast } = useToast();
