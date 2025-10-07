@@ -873,6 +873,159 @@ const Personnel = () => {
     }
   };
 
+  // Fonctions de gestion des EPI
+  const handleViewEPI = async (user) => {
+    try {
+      const response = await axios.get(`${API}/epi/employe/${user.id}`);
+      setUserEPIs(response.data);
+      setSelectedUser(user);
+      setShowEPIModal(true);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les EPI",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleAddEPI = () => {
+    setShowAddEPIModal(true);
+  };
+
+  const handleCreateEPI = async () => {
+    if (!newEPI.type_epi || !newEPI.taille || !newEPI.date_attribution || !newEPI.date_expiration) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.post(`${API}/epi`, {
+        ...newEPI,
+        employe_id: selectedUser.id
+      });
+      
+      toast({
+        title: "EPI ajouté",
+        description: "L'équipement a été ajouté avec succès",
+        variant: "success"
+      });
+      
+      setShowAddEPIModal(false);
+      resetNewEPI();
+      
+      // Recharger les EPI
+      const response = await axios.get(`${API}/epi/employe/${selectedUser.id}`);
+      setUserEPIs(response.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: error.response?.data?.detail || "Impossible d'ajouter l'EPI",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateEPITaille = async (epiId, newTaille) => {
+    try {
+      await axios.put(`${API}/epi/${epiId}`, {
+        taille: newTaille
+      });
+      
+      toast({
+        title: "Taille mise à jour",
+        description: "La taille de l'EPI a été modifiée",
+        variant: "success"
+      });
+      
+      // Recharger les EPI
+      const response = await axios.get(`${API}/epi/employe/${selectedUser.id}`);
+      setUserEPIs(response.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la taille",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDeleteEPI = async (epiId) => {
+    if (!window.confirm("Êtes-vous sûr de vouloir supprimer cet EPI ?")) {
+      return;
+    }
+
+    try {
+      await axios.delete(`${API}/epi/${epiId}`);
+      
+      toast({
+        title: "EPI supprimé",
+        description: "L'équipement a été supprimé",
+        variant: "success"
+      });
+      
+      // Recharger les EPI
+      const response = await axios.get(`${API}/epi/employe/${selectedUser.id}`);
+      setUserEPIs(response.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer l'EPI",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetNewEPI = () => {
+    setNewEPI({
+      type_epi: '',
+      taille: '',
+      date_attribution: new Date().toISOString().split('T')[0],
+      etat: 'Neuf',
+      date_expiration: '',
+      date_prochaine_inspection: '',
+      notes: ''
+    });
+  };
+
+  const getEPINom = (typeEpi) => {
+    const noms = {
+      'casque': 'Casque',
+      'bottes': 'Bottes',
+      'veste_bunker': 'Veste Bunker',
+      'pantalon_bunker': 'Pantalon Bunker',
+      'gants': 'Gants',
+      'masque_scba': 'Masque SCBA'
+    };
+    return noms[typeEpi] || typeEpi;
+  };
+
+  const getEPIIcone = (typeEpi) => {
+    const icones = {
+      'casque': '🪖',
+      'bottes': '👢',
+      'veste_bunker': '🧥',
+      'pantalon_bunker': '👖',
+      'gants': '🧤',
+      'masque_scba': '😷'
+    };
+    return icones[typeEpi] || '🛡️';
+  };
+
+  const getEtatColor = (etat) => {
+    const colors = {
+      'Neuf': '#10B981',
+      'Bon': '#3B82F6',
+      'À remplacer': '#F59E0B',
+      'Défectueux': '#EF4444'
+    };
+    return colors[etat] || '#6B7280';
+  };
+
   const getFormationName = (formationId) => {
     const formation = formations.find(f => f.id === formationId);
     return formation ? formation.nom : formationId;
