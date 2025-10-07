@@ -1335,6 +1335,247 @@ body {
   gap: 1rem;
 }
 
+
+
+/* ==================== NOTIFICATIONS ==================== */
+
+.notification-bell-container {
+  position: fixed;
+  top: 1rem;
+  right: 5rem;
+  z-index: 999;
+}
+
+.notification-bell {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #dc2626;
+  transition: all 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.notification-bell:hover {
+  background: #fef2f2;
+  border-color: #dc2626;
+  transform: scale(1.05);
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 2px solid white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 400px;
+  max-height: 500px;
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notifications-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #fef2f2;
+}
+
+.notifications-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.mark-all-read {
+  background: transparent;
+  border: none;
+  color: #dc2626;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.mark-all-read:hover {
+  text-decoration: underline;
+}
+
+.notifications-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.no-notifications {
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #9ca3af;
+}
+
+.no-notifications i {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.no-notifications p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.notification-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+}
+
+.notification-item:hover {
+  background: #f9fafb;
+}
+
+.notification-item.unread {
+  background: #fef2f2;
+}
+
+.notification-item.unread:hover {
+  background: #fee2e2;
+}
+
+.notification-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border-radius: 50%;
+}
+
+.notification-item.unread .notification-icon {
+  background: #fecaca;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content h4 {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.notification-content p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.85rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.notification-dot {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .notification-bell-container {
+    right: 3.5rem;
+    top: 0.75rem;
+  }
+
+  .notification-bell {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+
+  .notification-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 0.65rem;
+  }
+
+  .notifications-dropdown {
+    width: 90vw;
+    max-width: 350px;
+    right: -50px;
+  }
+
+  .notification-item {
+    padding: 0.85rem 1rem;
+  }
+
+  .notification-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1.2rem;
+  }
+}
+
 .setting-group label {
   display: flex;
   flex-direction: column;
