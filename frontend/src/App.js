@@ -1932,78 +1932,114 @@ const Personnel = () => {
               <h3>👤 Profil de {selectedUser.prenom} {selectedUser.nom}</h3>
               <Button variant="ghost" onClick={() => setShowViewModal(false)}>✕</Button>
             </div>
-            <div className="modal-body modal-body-mini">
-              <div className="user-profile-view-mini">
-                {/* Header mini */}
-                <div className="mini-header">
-                  <span className="mini-avatar">👤</span>
-                  <div>
-                    <strong>{selectedUser.prenom} {selectedUser.nom}</strong>
-                    <div className="mini-badges">
-                      <span className="mini-badge">{selectedUser.grade}</span>
-                      <span className="mini-badge">{selectedUser.type_emploi === 'temps_plein' ? 'TP' : 'TPartiel'}</span>
-                      <span className="mini-badge">#{selectedUser.numero_employe}</span>
+            <div className="modal-body modal-body-optimized">
+              <div className="user-profile-view">
+                {/* Header stylé */}
+                <div className="profile-summary-compact">
+                  <div className="profile-avatar-medium">
+                    <span className="avatar-icon-medium">👤</span>
+                  </div>
+                  <div className="profile-info-summary">
+                    <h4>{selectedUser.prenom} {selectedUser.nom}</h4>
+                    <div className="profile-badges">
+                      <span className="grade-badge" style={{ backgroundColor: getGradeColor(selectedUser.grade) }}>
+                        {selectedUser.grade}
+                      </span>
+                      <span className="employment-badge">
+                        {selectedUser.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
+                      </span>
+                      <span className={`status-badge ${selectedUser.statut.toLowerCase()}`}>
+                        {selectedUser.statut}
+                      </span>
                     </div>
+                    <p className="employee-id">#{selectedUser.numero_employe}</p>
                   </div>
                 </div>
 
-                {/* Grid 2 colonnes */}
-                <div className="mini-grid">
-                  <div className="mini-col">
-                    <div className="mini-block">
-                      <strong className="mini-title">📞 Contact</strong>
-                      <div className="mini-text">{selectedUser.email}</div>
-                      <div className="mini-text">{selectedUser.telephone || '-'}</div>
-                      <div className="mini-text">Urgence: {selectedUser.contact_urgence || '-'}</div>
+                {/* Grille 2 colonnes pour TOUTES les sections */}
+                <div className="profile-details-grid-optimized">
+                  {/* Colonne gauche */}
+                  <div className="detail-column">
+                    <div className="detail-section detail-section-optimized">
+                      <h5>📞 Contact</h5>
+                      <div className="detail-list">
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Email</span>
+                          <span className="detail-value">{selectedUser.email}</span>
+                        </div>
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Téléphone</span>
+                          <span className="detail-value">{selectedUser.telephone || 'Non renseigné'}</span>
+                        </div>
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Contact d'urgence</span>
+                          <span className="detail-value emergency">{selectedUser.contact_urgence || 'Non renseigné'}</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="mini-block">
-                      <strong className="mini-title">📜 Compétences</strong>
+
+                    <div className="detail-section detail-section-optimized">
+                      <h5>📜 Compétences</h5>
                       {selectedUser.formations?.length > 0 ? (
-                        <div className="mini-chips">
-                          {selectedUser.formations.slice(0, 4).map((formationId, index) => (
-                            <span key={index} className="micro-chip">{getFormationName(formationId)}</span>
+                        <div className="competences-view-optimized">
+                          {selectedUser.formations.map((formationId, index) => (
+                            <div key={index} className="competence-badge-optimized">
+                              <span className="competence-name">{getFormationName(formationId)}</span>
+                              <span className="competence-status">✅</span>
+                            </div>
                           ))}
-                          {selectedUser.formations.length > 4 && (
-                            <span className="micro-chip">+{selectedUser.formations.length - 4}</span>
-                          )}
                         </div>
                       ) : (
-                        <div className="mini-text">Aucune</div>
+                        <p className="no-data-text">Aucune compétence enregistrée</p>
                       )}
                     </div>
                   </div>
 
-                  <div className="mini-col">
-                    <div className="mini-block">
-                      <strong className="mini-title">🎖️ Professionnel</strong>
-                      <div className="mini-text">Embauche: {selectedUser.date_embauche}</div>
-                      <div className="mini-text">
-                        Ancienneté: {(() => {
-                          const embauche = new Date(selectedUser.date_embauche.split('/').reverse().join('-'));
-                          const annees = Math.floor((new Date() - embauche) / (365.25 * 24 * 60 * 60 * 1000));
-                          return `${annees} an(s)`;
-                        })()}
-                      </div>
-                      <div className="mini-text">
-                        {selectedUser.role === 'admin' ? '👑 Admin' : 
-                         selectedUser.role === 'superviseur' ? '🎖️ Superviseur' : '👤 Employé'}
+                  {/* Colonne droite */}
+                  <div className="detail-column">
+                    <div className="detail-section detail-section-optimized">
+                      <h5>🎖️ Professionnel</h5>
+                      <div className="detail-list">
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Date d'embauche</span>
+                          <span className="detail-value">{selectedUser.date_embauche}</span>
+                        </div>
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Ancienneté</span>
+                          <span className="detail-value">
+                            {(() => {
+                              const embauche = new Date(selectedUser.date_embauche.split('/').reverse().join('-'));
+                              const annees = Math.floor((new Date() - embauche) / (365.25 * 24 * 60 * 60 * 1000));
+                              return `${annees} an(s)`;
+                            })()}
+                          </span>
+                        </div>
+                        <div className="detail-item-optimized">
+                          <span className="detail-label">Rôle système</span>
+                          <span className="detail-value">
+                            {selectedUser.role === 'admin' ? '👑 Administrateur' : 
+                             selectedUser.role === 'superviseur' ? '🎖️ Superviseur' : '👤 Employé'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                    <div className="mini-block">
-                      <strong className="mini-title">🛡️ EPI</strong>
+
+                    <div className="detail-section detail-section-optimized">
+                      <h5>🛡️ Équipements (EPI)</h5>
                       {userEPIs.length > 0 ? (
-                        <div className="mini-epi-list">
-                          {userEPIs.slice(0, 4).map(epi => (
-                            <div key={epi.id} className="mini-text">
-                              {getEPIIcone(epi.type_epi)} {getEPINom(epi.type_epi)} ({epi.taille})
+                        <div className="epi-view-optimized">
+                          {userEPIs.map(epi => (
+                            <div key={epi.id} className="epi-item-optimized">
+                              <span className="epi-icon-opt">{getEPIIcone(epi.type_epi)}</span>
+                              <div className="epi-info-opt">
+                                <strong>{getEPINom(epi.type_epi)}</strong>
+                                <span className="epi-details-opt">Taille: {epi.taille} • {epi.etat}</span>
+                              </div>
                             </div>
                           ))}
-                          {userEPIs.length > 4 && (
-                            <div className="mini-text">+{userEPIs.length - 4} autres</div>
-                          )}
                         </div>
                       ) : (
-                        <div className="mini-text">Aucun</div>
+                        <p className="no-data-text">Aucun EPI enregistré</p>
                       )}
                     </div>
                   </div>
