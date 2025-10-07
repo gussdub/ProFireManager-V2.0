@@ -463,6 +463,10 @@ class ProFireManagerTester:
         self.test_settings_api()
         self.test_notification_system()
         
+        # Test 7: Additional Core Functionality
+        self.test_planning_endpoints()
+        self.test_replacement_system()
+        
         # Summary
         print("\n" + "=" * 50)
         print("📊 TEST SUMMARY")
