@@ -4244,6 +4244,167 @@ body {
   
   .spec-icon {
     width: 32px;
+
+/* ==================== EPI MANAGEMENT STYLES ==================== */
+
+.epi-management {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.epi-header-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.epi-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.epi-item-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.epi-item-card:hover {
+  border-color: #dc2626;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.1);
+  transform: translateY(-4px);
+}
+
+.epi-item-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.epi-item-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.epi-item-title {
+  flex-grow: 1;
+}
+
+.epi-item-title h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.epi-etat-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.epi-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.epi-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.epi-label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.epi-value {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+.epi-item-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.no-epi {
+  text-align: center;
+  padding: 3rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.no-epi p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* EPI Form Styles */
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Medium Modal for Add EPI */
+.medium-modal {
+  max-width: 600px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+/* Responsive EPI Management */
+@media (max-width: 768px) {
+  .epi-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .epi-item-actions {
+    flex-direction: column;
+  }
+  
+  .epi-item-actions button {
+    width: 100%;
+  }
+}
+
     height: 32px;
     font-size: 1rem;
   }
