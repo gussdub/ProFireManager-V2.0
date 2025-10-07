@@ -25,6 +25,8 @@ const Parametres = ({ user }) => {
   const [showEditFormationModal, setShowEditFormationModal] = useState(false);
   const [showCreateUserModal, setShowCreateUserModal] = useState(false);
   const [showEditAccessModal, setShowEditAccessModal] = useState(false);
+  const [showEpiModal, setShowEpiModal] = useState(false);
+  const [showEpiReportModal, setShowEpiReportModal] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [editingUser, setEditingUser] = useState(null);
   const [userAccess, setUserAccess] = useState({
