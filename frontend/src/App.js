@@ -519,7 +519,7 @@ const ModuleEPI = ({ user }) => {
       'veste_bunker': 'Veste Bunker',
       'pantalon_bunker': 'Pantalon Bunker',
       'gants': 'Gants',
-      'masque_scba': 'Masque SCBA',
+      'masque_apria': 'Masque APRIA',
       'cagoule': 'Cagoule Anti-Particules'
     };
     return noms[typeEpi] || typeEpi;
@@ -532,7 +532,7 @@ const ModuleEPI = ({ user }) => {
       'veste_bunker': '🧥',
       'pantalon_bunker': '👖',
       'gants': '🧤',
-      'masque_scba': '😷',
+      'masque_apria': '😷',
       'cagoule': '🎭'
     };
     return icones[typeEpi] || '🛡️';
