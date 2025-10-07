@@ -6166,6 +6166,12 @@ const Rapports = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (activeSection === 'epi' && user?.role === 'admin') {
+      fetchEPIData();
+    }
+  }, [activeSection, user]);
+
   const fetchStatistiques = async () => {
     setLoading(true);
     try {
