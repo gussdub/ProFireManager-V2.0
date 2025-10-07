@@ -6189,6 +6189,36 @@ const Rapports = () => {
     }
   };
 
+  const fetchEPIData = async () => {
+    setLoadingEPI(true);
+    try {
+      const response = await axios.get(`${API}/epi/alertes/all`);
+      setEpiAlerts(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des données EPI:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données EPI",
+        variant: "destructive"
+      });
+    } finally {
+      setLoadingEPI(false);
+    }
+  };
+
+  const getEPINom = (typeEpi) => {
+    const noms = {
+      'casque': 'Casque',
+      'bottes': 'Bottes',
+      'veste_bunker': 'Veste Bunker',
+      'pantalon_bunker': 'Pantalon Bunker',
+      'gants': 'Gants',
+      'masque_apria': 'Masque APRIA',
+      'cagoule': 'Cagoule Anti-Particules'
+    };
+    return noms[typeEpi] || typeEpi;
+  };
+
   const handleExportPDF = async (typeRapport = "general", userId = null) => {
     try {
       const params = new URLSearchParams({ type_rapport: typeRapport });
