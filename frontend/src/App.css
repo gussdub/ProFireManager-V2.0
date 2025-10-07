@@ -4706,10 +4706,11 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.65rem 0.75rem;
   background: #f8fafc;
   border-radius: 6px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.65rem;
+  gap: 1.5rem;
 }
 
 .detail-item-optimized:last-child {
@@ -4720,6 +4721,7 @@ body {
   font-size: 0.8rem;
   color: #64748b;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .detail-item-optimized .detail-value {
@@ -4727,6 +4729,7 @@ body {
   color: #0f172a;
   font-weight: 600;
   text-align: right;
+  flex: 1;
 }
 
 /* Compétences optimisées */
