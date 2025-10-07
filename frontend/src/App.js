@@ -2430,20 +2430,86 @@ const Personnel = () => {
 
                 {/* Section 4: EPI (Équipements de Protection Individuels) */}
                 <div className="form-section">
-                  <h4 className="section-title">🛡️ Équipements de Protection Individuels (EPI)</h4>
-                  <p className="section-description">Gérez les EPI via le module EPI dédié pour une gestion complète (inspections, remplacements, etc.)</p>
-                  <div className="epi-form-section">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setShowEditModal(false);
-                        handleViewEPI(selectedUser);
-                      }}
-                      data-testid="manage-epi-from-edit-btn"
-                    >
-                      🛡️ Gérer les EPI de cet employé
-                    </Button>
+                  <div 
+                    className="section-accordion-header"
+                    onClick={() => setShowEPIAccordion(!showEPIAccordion)}
+                  >
+                    <h4 className="section-title">🛡️ Équipements de Protection Individuels (EPI)</h4>
+                    <span className="accordion-icon">{showEPIAccordion ? '▼' : '▶'}</span>
                   </div>
+
+                  {showEPIAccordion && (
+                    <div className="epi-accordion-content">
+                      {/* Bouton ajout */}
+                      <div className="epi-inline-actions">
+                        <Button 
+                          size="sm"
+                          onClick={handleAddEPI}
+                          data-testid="add-epi-inline-btn"
+                        >
+                          + Ajouter un EPI
+                        </Button>
+                      </div>
+
+                      {/* Liste des EPI */}
+                      {userEPIs.length > 0 ? (
+                        <div className="epi-inline-list">
+                          {userEPIs.map(epi => (
+                            <div key={epi.id} className="epi-inline-item">
+                              <div className="epi-inline-header">
+                                <span className="epi-inline-icon">{getEPIIcone(epi.type_epi)}</span>
+                                <strong>{getEPINom(epi.type_epi)}</strong>
+                              </div>
+                              <div className="epi-inline-fields">
+                                <div className="form-field-inline">
+                                  <Label>Taille</Label>
+                                  <Input
+                                    value={epi.taille}
+                                    onChange={(e) => {
+                                      const updatedEPIs = userEPIs.map(item => 
+                                        item.id === epi.id ? {...item, taille: e.target.value} : item
+                                      );
+                                      setUserEPIs(updatedEPIs);
+                                    }}
+                                    className="epi-inline-input"
+                                  />
+                                </div>
+                                <div className="form-field-inline">
+                                  <Label>État</Label>
+                                  <select
+                                    value={epi.etat}
+                                    onChange={(e) => {
+                                      const updatedEPIs = userEPIs.map(item => 
+                                        item.id === epi.id ? {...item, etat: e.target.value} : item
+                                      );
+                                      setUserEPIs(updatedEPIs);
+                                    }}
+                                    className="form-select-inline"
+                                  >
+                                    <option value="Neuf">Neuf</option>
+                                    <option value="Bon">Bon</option>
+                                    <option value="À remplacer">À remplacer</option>
+                                    <option value="Défectueux">Défectueux</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div className="epi-inline-actions-row">
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDeleteEPI(epi.id)}
+                                >
+                                  🗑️ Supprimer
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="no-epi-inline">Aucun EPI enregistré</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
