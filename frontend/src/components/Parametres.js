@@ -1041,6 +1041,157 @@ const Parametres = ({ user }) => {
             </div>
           </div>
         )}
+
+        {activeTab === 'disponibilites' && (
+          <div className="disponibilites-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Paramètres des Disponibilités</h2>
+                <p>Configuration du système de blocage des disponibilités par date limite</p>
+              </div>
+            </div>
+            
+            <div className="availability-settings">
+              <div className="settings-row">
+                <div className="settings-column">
+                  <h4 className="compact-title">🚫 Système de blocage</h4>
+                  <p>Bloquer la modification des disponibilités du mois suivant à une date déterminée</p>
+                  
+                  <div className="setting-inputs-compact">
+                    <label className="setting-toggle">
+                      <div className="toggle-info">
+                        <span>Activer le système de blocage</span>
+                        <small>Active la restriction des modifications de disponibilités</small>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={systemSettings.blocage_dispos_active}
+                        onChange={(e) => handleSettingChange('blocage_dispos_active', e.target.checked)}
+                        data-testid="toggle-blocage-dispos"
+                      />
+                    </label>
+
+                    {systemSettings.blocage_dispos_active && (
+                      <div className="input-group-compact">
+                        <Label>Jour de blocage du mois</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="28"
+                          value={systemSettings.jour_blocage_dispos || 15}
+                          onChange={(e) => handleSettingChange('jour_blocage_dispos', parseInt(e.target.value))}
+                          data-testid="jour-blocage-input"
+                        />
+                        <small>Le {systemSettings.jour_blocage_dispos || 15} du mois, bloquer les modifications du mois suivant à minuit</small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="settings-column">
+                  <h4 className="compact-title">⚙️ Exceptions et permissions</h4>
+                  <div className="validation-rules-compact">
+                    <label className="validation-rule-compact">
+                      <input
+                        type="checkbox"
+                        checked={systemSettings.exceptions_admin_superviseur}
+                        onChange={(e) => handleSettingChange('exceptions_admin_superviseur', e.target.checked)}
+                        data-testid="toggle-exceptions-admin"
+                      />
+                      <div className="rule-content-compact">
+                        <span className="rule-title">Exceptions pour admin/superviseur</span>
+                        <span className="rule-description">Les administrateurs et superviseurs peuvent modifier même après la date limite</span>
+                      </div>
+                    </label>
+                    
+                    <label className="validation-rule-compact">
+                      <input
+                        type="checkbox"
+                        checked={systemSettings.admin_peut_modifier_temps_partiel}
+                        onChange={(e) => handleSettingChange('admin_peut_modifier_temps_partiel', e.target.checked)}
+                        data-testid="toggle-admin-modif-temps-partiel"
+                      />
+                      <div className="rule-content-compact">
+                        <span className="rule-title">Admin peut modifier les temps partiel</span>
+                        <span className="rule-description">Les admin/superviseurs peuvent modifier les disponibilités des employés temps partiel</span>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <div className="settings-row">
+                <div className="settings-column">
+                  <h4 className="compact-title">🔔 Notifications</h4>
+                  <div className="setting-inputs-compact">
+                    <label className="setting-toggle">
+                      <div className="toggle-info">
+                        <span>Activer les notifications</span>
+                        <small>Prévenir les employés avant la date limite</small>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={systemSettings.notifications_dispos_actives}
+                        onChange={(e) => handleSettingChange('notifications_dispos_actives', e.target.checked)}
+                        data-testid="toggle-notifications-dispos"
+                      />
+                    </label>
+
+                    {systemSettings.notifications_dispos_actives && (
+                      <div className="input-group-compact">
+                        <Label>Nombre de jours d'avance</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="14"
+                          value={systemSettings.jours_avance_notification || 3}
+                          onChange={(e) => handleSettingChange('jours_avance_notification', parseInt(e.target.value))}
+                          data-testid="jours-avance-input"
+                        />
+                        <small>Notifier {systemSettings.jours_avance_notification || 3} jour(s) avant la date limite</small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="settings-column">
+                  <h4 className="compact-title">📊 État actuel</h4>
+                  <div className="status-info">
+                    <div className="status-item">
+                      <span className="status-label">Prochaine date limite :</span>
+                      <span className="status-value">
+                        {systemSettings.blocage_dispos_active ? 
+                          `${systemSettings.jour_blocage_dispos || 15} ${new Date().getMonth() === 11 ? 'janvier' : 
+                            ['février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][new Date().getMonth()]
+                          } à minuit` : 
+                          'Système désactivé'
+                        }
+                      </span>
+                    </div>
+                    <div className="status-item">
+                      <span className="status-label">Mois concerné :</span>
+                      <span className="status-value">
+                        {systemSettings.blocage_dispos_active ? 
+                          ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][(new Date().getMonth() + 1) % 12] :
+                          'Aucun'
+                        }
+                      </span>
+                    </div>
+                    <div className="status-item">
+                      <span className="status-label">Saisie libre pour :</span>
+                      <span className="status-value">
+                        {systemSettings.blocage_dispos_active ? 
+                          'Mois +2 et suivants' : 
+                          'Tous les mois'
+                        }
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal d'édition type de garde avec jours */}
