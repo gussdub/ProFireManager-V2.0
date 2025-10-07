@@ -1242,13 +1242,6 @@ const Parametres = ({ user }) => {
                 <h2>Gestion des Équipements de Protection Individuels (EPI)</h2>
                 <p>Configuration et suivi des EPI selon les normes NFPA canadiennes</p>
               </div>
-              <Button 
-                variant="default" 
-                onClick={() => setShowEpiReportModal(true)}
-                data-testid="epi-report-btn"
-              >
-                📊 Rapport EPI
-              </Button>
             </div>
             
             <div className="epi-content">
