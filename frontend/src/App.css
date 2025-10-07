@@ -4649,21 +4649,34 @@ body {
 
 /* Tableau EPI dans Module EPI */
 .epi-table-section {
-  margin: 2rem 0;
+  margin: 2.5rem 0;
 }
 
 .epi-table-section h3 {
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
   color: #0f172a;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.epi-table-section h3::after {
+  content: '';
+  flex-grow: 1;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(220, 38, 38, 0.3) 0%, transparent 100%);
+  border-radius: 2px;
 }
 
 .epi-table-wrapper {
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   overflow: hidden;
+  border: 1px solid #e2e8f0;
 }
 
 .epi-table {
@@ -4672,47 +4685,60 @@ body {
 }
 
 .epi-table thead {
-  background: linear-gradient(135deg, #1e293b, #334155);
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  position: relative;
+}
+
+.epi-table thead::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #dc2626, #ef4444, #f87171);
 }
 
 .epi-table thead th {
-  padding: 1.25rem 1rem;
+  padding: 1.5rem 1.25rem;
   text-align: left;
   color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
+  font-weight: 700;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 3px solid #dc2626;
+  letter-spacing: 0.08em;
+  position: relative;
 }
 
 .epi-table tbody tr {
-  border-bottom: 1px solid #e2e8f0;
-  transition: all 0.2s ease;
+  border-bottom: 1px solid #f1f5f9;
+  transition: all 0.3s ease;
 }
 
 .epi-table tbody tr:hover {
-  background: #f8fafc;
-  transform: scale(1.01);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(to right, #fef2f2, #ffffff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: scale(1.005);
 }
 
 .epi-table tbody tr.priority-row-haute {
-  border-left: 4px solid #dc2626;
+  border-left: 5px solid #dc2626;
+  background: linear-gradient(to right, rgba(220, 38, 38, 0.03), transparent);
 }
 
 .epi-table tbody tr.priority-row-moyenne {
-  border-left: 4px solid #f59e0b;
+  border-left: 5px solid #f59e0b;
+  background: linear-gradient(to right, rgba(245, 158, 11, 0.03), transparent);
 }
 
 .epi-table tbody td {
-  padding: 1rem;
+  padding: 1.25rem;
   font-size: 0.95rem;
   color: #0f172a;
 }
 
 .epi-table tbody td strong {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .days-badge {
