@@ -5011,6 +5011,156 @@ const Formations = () => {
           </div>
         </div>
       )}
+
+      {/* Modal Modifier Session */}
+      {showEditModal && selectedSession && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-content extra-large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-session-modal">
+            <div className="modal-header">
+              <h3>✏️ Modifier la session de formation</h3>
+              <Button variant="ghost" onClick={() => setShowEditModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="session-form-grid">
+                <div className="form-section">
+                  <h4 className="section-title">📋 Informations générales</h4>
+                  <div className="form-field">
+                    <Label>Titre de la formation *</Label>
+                    <Input
+                      value={editSession.titre}
+                      onChange={(e) => setEditSession({...editSession, titre: e.target.value})}
+                      placeholder="Ex: Formation sauvetage aquatique - Niveau 1"
+                      data-testid="edit-session-titre-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Compétence associée *</Label>
+                    <select
+                      value={editSession.competence_id}
+                      onChange={(e) => setEditSession({...editSession, competence_id: e.target.value})}
+                      className="form-select"
+                      data-testid="edit-session-competence-select"
+                    >
+                      <option value="">Sélectionner une compétence</option>
+                      {competences.map(comp => (
+                        <option key={comp.id} value={comp.id}>
+                          {comp.nom} - {comp.duree_heures}h
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Date de début *</Label>
+                      <Input
+                        type="date"
+                        value={editSession.date_debut}
+                        onChange={(e) => setEditSession({...editSession, date_debut: e.target.value})}
+                        data-testid="edit-session-date-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Heure de début *</Label>
+                      <Input
+                        type="time"
+                        value={editSession.heure_debut}
+                        onChange={(e) => setEditSession({...editSession, heure_debut: e.target.value})}
+                        data-testid="edit-session-heure-input"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-row">
+                    <div className="form-field">
+                      <Label>Durée (heures) *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="40"
+                        value={editSession.duree_heures}
+                        onChange={(e) => setEditSession({...editSession, duree_heures: parseInt(e.target.value)})}
+                        data-testid="edit-session-duree-input"
+                      />
+                    </div>
+                    <div className="form-field">
+                      <Label>Nombre de places *</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="50"
+                        value={editSession.places_max}
+                        onChange={(e) => setEditSession({...editSession, places_max: parseInt(e.target.value)})}
+                        data-testid="edit-session-places-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h4 className="section-title">📍 Logistique</h4>
+                  <div className="form-field">
+                    <Label>Lieu de formation *</Label>
+                    <Input
+                      value={editSession.lieu}
+                      onChange={(e) => setEditSession({...editSession, lieu: e.target.value})}
+                      placeholder="Ex: Caserne centrale, Salle de formation A"
+                      data-testid="edit-session-lieu-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Formateur *</Label>
+                    <Input
+                      value={editSession.formateur}
+                      onChange={(e) => setEditSession({...editSession, formateur: e.target.value})}
+                      placeholder="Ex: Capitaine Martin Dubois"
+                      data-testid="edit-session-formateur-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-section">
+                  <h4 className="section-title">📝 Contenu pédagogique</h4>
+                  <div className="form-field">
+                    <Label>Description de la formation *</Label>
+                    <textarea
+                      value={editSession.descriptif}
+                      onChange={(e) => setEditSession({...editSession, descriptif: e.target.value})}
+                      placeholder="Décrivez les objectifs et le contenu de cette formation..."
+                      rows="3"
+                      className="form-textarea"
+                      data-testid="edit-session-descriptif-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Plan de cours (optionnel)</Label>
+                    <textarea
+                      value={editSession.plan_cours}
+                      onChange={(e) => setEditSession({...editSession, plan_cours: e.target.value})}
+                      placeholder="Détaillez le programme, les modules, les exercices pratiques..."
+                      rows="4"
+                      className="form-textarea"
+                      data-testid="edit-session-plan-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEditModal(false)}>
+                  Annuler
+                </Button>
+                <Button variant="default" miners={handleUpdateSession} data-testid="update-session-submit-btn">
+                  💾 Sauvegarder les modifications
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
