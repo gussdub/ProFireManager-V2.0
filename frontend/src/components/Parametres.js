@@ -1510,7 +1510,7 @@ const Parametres = ({ user }) => {
       )}
 
       {/* Modal de création de compétence */}
-      {showCreateFormationModal && (
+      {false && showCreateFormationModal && (
         <div className="modal-overlay" onClick={() => setShowCreateFormationModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-competence-modal">
             <div className="modal-header">
