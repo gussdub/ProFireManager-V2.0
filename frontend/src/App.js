@@ -765,8 +765,16 @@ const Personnel = () => {
     });
   };
 
-  const handleViewUser = (user) => {
+  const handleViewUser = async (user) => {
     setSelectedUser(user);
+    // Charger les EPI de l'utilisateur
+    try {
+      const response = await axios.get(`${API}/epi/employe/${user.id}`);
+      setUserEPIs(response.data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des EPI:', error);
+      setUserEPIs([]);
+    }
     setShowViewModal(true);
   };
 
