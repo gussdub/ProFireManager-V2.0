@@ -4896,6 +4896,129 @@ body {
 
 .no-epi-inline {
   text-align: center;
+
+/* Rapport EPI Styles */
+.rapport-epi {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.rapport-table-section {
+  margin-top: 2rem;
+}
+
+.rapport-table-section h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+.rapport-table-wrapper {
+  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.rapport-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rapport-table thead {
+  background: linear-gradient(135deg, #dc2626, #ef4444);
+}
+
+.rapport-table thead th {
+  padding: 1rem;
+  text-align: left;
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.rapport-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+  transition: background 0.2s ease;
+}
+
+.rapport-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.rapport-table tbody td {
+  padding: 1rem;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+.priority-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.priority-badge.haute {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.priority-badge.moyenne {
+  background: #fef3c7;
+  color: #f59e0b;
+}
+
+.days-remaining {
+  font-weight: 600;
+  color: #3b82f6;
+}
+
+.days-remaining.urgent {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.no-alerts-message {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 2px solid #86efac;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.no-alerts-message p {
+  margin: 0.5rem 0;
+  font-size: 1.125rem;
+}
+
+.no-alerts-message p:first-child {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.no-alerts-message p:last-child {
+  color: #15803d;
+}
+
+.kpi-card.epi-expiration {
+  border-left: 4px solid #f59e0b;
+}
+
+.kpi-card.epi-inspection {
+  border-left: 4px solid #3b82f6;
+}
+
+.kpi-card.epi-haute-priorite {
+  border-left: 4px solid #dc2626;
+}
+
   padding: 2rem;
   color: #64748b;
   font-style: italic;
