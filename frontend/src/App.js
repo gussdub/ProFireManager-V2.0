@@ -625,14 +625,12 @@ const ModuleEPI = ({ user }) => {
       {myEPIs.length > 0 ? (
         <div className="my-epi-grid">
           {myEPIs.map(epi => (
-            <Card key={epi.id} className="my-epi-card">
-              <CardHeader>
-                <div className="my-epi-card-header">
-                  <span className="my-epi-icon">{getEPIIcone(epi.type_epi)}</span>
-                  <CardTitle>{getEPINom(epi.type_epi)}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
+            <div key={epi.id} className="my-epi-card">
+              <div className="my-epi-card-header">
+                <span className="my-epi-icon">{getEPIIcone(epi.type_epi)}</span>
+                <h3>{getEPINom(epi.type_epi)}</h3>
+              </div>
+              <div className="my-epi-card-body">
                 <div className="my-epi-details">
                   <div className="my-epi-detail-row">
                     <span>Taille:</span>
@@ -656,8 +654,8 @@ const ModuleEPI = ({ user }) => {
                     🔍 Inspecter
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
