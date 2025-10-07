@@ -6156,6 +6156,8 @@ const Rapports = () => {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('vue-ensemble');
   const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [epiAlerts, setEpiAlerts] = useState([]);
+  const [loadingEPI, setLoadingEPI] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
