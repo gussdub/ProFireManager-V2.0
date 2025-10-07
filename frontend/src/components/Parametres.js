@@ -168,8 +168,8 @@ const Parametres = ({ user }) => {
       tailles: ['XS', 'S', 'M', 'L', 'XL', 'XXL']
     },
     { 
-      id: 'masque_scba',
-      nom: 'Masque SCBA', 
+      id: 'masque_apria',
+      nom: 'Masque APRIA', 
       icone: '😷',
       duree_vie_annees: 15,
       inspection_mois: 12,
