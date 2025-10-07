@@ -107,7 +107,11 @@ const Parametres = ({ user }) => {
     exceptions_admin_superviseur: true,
     admin_peut_modifier_temps_partiel: true,
     notifications_dispos_actives: true,
-    jours_avance_notification: 3
+    jours_avance_notification: 3,
+    // Paramètres EPI
+    epi_notifications_actives: true,
+    epi_jours_avance_expiration: 30,
+    epi_jours_avance_inspection: 14
   });
 
   const { toast } = useToast();
