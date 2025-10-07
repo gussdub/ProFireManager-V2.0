@@ -537,6 +537,13 @@ const Parametres = ({ user }) => {
         >
           🔄 Paramètres Remplacements
         </button>
+        <button
+          className={`tab-button ${activeTab === 'disponibilites' ? 'active' : ''}`}
+          onClick={() => setActiveTab('disponibilites')}
+          data-testid="tab-disponibilites"
+        >
+          📅 Paramètres Disponibilités
+        </button>
       </div>
 
       {/* Contenu conditionnel selon l'onglet actif */}
