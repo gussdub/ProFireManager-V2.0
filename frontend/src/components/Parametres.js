@@ -1337,39 +1337,12 @@ const Parametres = ({ user }) => {
                 </div>
               </div>
 
-              {/* Gestion par employé */}
-              <div className="epi-employees-section">
-                <h4>👥 EPI par employé</h4>
-                <div className="employees-epi-list">
-                  {users.map(user => (
-                    <div key={user.id} className="employee-epi-card" data-testid={`employee-epi-${user.id}`}>
-                      <div className="employee-info">
-                        <div className="employee-avatar">
-                          <span>👤</span>
-                        </div>
-                        <div className="employee-details">
-                          <h5>{user.prenom} {user.nom}</h5>
-                          <span className="employee-role">{user.grade} - {user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}</span>
-                        </div>
-                      </div>
-                      <div className="epi-status-summary">
-                        <span className="epi-count">6/6 EPI</span>
-                        <span className="epi-alerts">⚠️ 2 à vérifier</span>
-                      </div>
-                      <div className="epi-actions">
-                        <Button 
-                          variant="ghost" 
-                          onClick={() => {
-                            setSelectedUserEpi(user);
-                            setShowEpiModal(true);
-                          }}
-                          data-testid={`manage-epi-${user.id}`}
-                        >
-                          ⚙️ Gérer EPI
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+              {/* Note : La gestion individuelle des EPI se trouve dans le module Personnel */}
+              <div className="epi-info-section">
+                <div className="info-card">
+                  <h4>💡 Information</h4>
+                  <p>La gestion des EPI individuels (tailles, dates, statuts) se trouve dans le <strong>module Personnel</strong>, dans la fiche de chaque employé.</p>
+                  <p>Utilisez cette section pour configurer les paramètres généraux et consulter les rapports globaux.</p>
                 </div>
               </div>
             </div>
