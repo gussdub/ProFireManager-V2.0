@@ -6605,6 +6605,115 @@ const Rapports = () => {
             </div>
           </div>
         )}
+
+        {/* Section EPI */}
+        {activeSection === 'epi' && (
+          <div className="rapport-epi">
+            <h2>🛡️ Rapport EPI</h2>
+            
+            {loadingEPI ? (
+              <div className="loading">Chargement des données EPI...</div>
+            ) : (
+              <>
+                {/* KPI Cards EPI */}
+                <div className="kpi-grid">
+                  <div className="kpi-card epi-expiration">
+                    <div className="kpi-icon">⏰</div>
+                    <div className="kpi-content">
+                      <span className="kpi-value">{epiAlerts.filter(a => a.type === 'expiration').length}</span>
+                      <span className="kpi-label">Expirations proches</span>
+                      <span className="kpi-detail">Dans les 30 jours</span>
+                    </div>
+                  </div>
+
+                  <div className="kpi-card epi-inspection">
+                    <div className="kpi-icon">🔍</div>
+                    <div className="kpi-content">
+                      <span className="kpi-value">{epiAlerts.filter(a => a.type === 'inspection').length}</span>
+                      <span className="kpi-label">Inspections à venir</span>
+                      <span className="kpi-detail">Dans les 14 jours</span>
+                    </div>
+                  </div>
+
+                  <div className="kpi-card epi-haute-priorite">
+                    <div className="kpi-icon">🚨</div>
+                    <div className="kpi-content">
+                      <span className="kpi-value">{epiAlerts.filter(a => a.priorite === 'haute').length}</span>
+                      <span className="kpi-label">Haute priorité</span>
+                      <span className="kpi-detail">Action urgente requise</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Table des alertes EPI */}
+                {epiAlerts.length > 0 ? (
+                  <div className="rapport-table-section">
+                    <h3>Alertes EPI détaillées</h3>
+                    <div className="rapport-table-wrapper">
+                      <table className="rapport-table">
+                        <thead>
+                          <tr>
+                            <th>Priorité</th>
+                            <th>Employé</th>
+                            <th>Type EPI</th>
+                            <th>Type d'alerte</th>
+                            <th>Échéance</th>
+                            <th>Jours restants</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {epiAlerts.map((alert, index) => (
+                            <tr key={index} className={`priority-${alert.priorite}`}>
+                              <td>
+                                <span className={`priority-badge ${alert.priorite}`}>
+                                  {alert.priorite === 'haute' ? '🚨 Haute' : '⚠️ Moyenne'}
+                                </span>
+                              </td>
+                              <td>{alert.employe_nom}</td>
+                              <td>{getEPINom(alert.type_epi)}</td>
+                              <td>{alert.type === 'expiration' ? '⏰ Expiration' : '🔍 Inspection'}</td>
+                              <td>
+                                {alert.type === 'expiration' ? alert.date_expiration : alert.date_inspection}
+                              </td>
+                              <td>
+                                <span className={`days-remaining ${alert.jours_restants <= 7 ? 'urgent' : ''}`}>
+                                  {alert.jours_restants} jour(s)
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="no-alerts-message">
+                    <p>✅ Aucune alerte EPI pour le moment</p>
+                    <p>Tous les équipements sont à jour</p>
+                  </div>
+                )}
+
+                {/* Exports */}
+                <div className="analytics-exports">
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleExportPDF('epi')}
+                    data-testid="export-epi-pdf"
+                  >
+                    📄 Export EPI PDF
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    onClick={() => handleExportExcel('epi')}
+                    data-testid="export-epi-excel"
+                  >
+                    📊 Export EPI Excel
+                  </Button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
