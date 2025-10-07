@@ -2520,8 +2520,7 @@ const Personnel = () => {
                                 setUserEPIs(updatedEPIs);
                               }
                             }}
-                            placeholder={existingEPI ? '' : 'Non attribué'}
-                            disabled={!existingEPI}
+                            placeholder="Saisir la taille"
                             className="epi-taille-input-modal"
                           />
                         </div>
