@@ -1023,9 +1023,11 @@ const Personnel = () => {
   const [showDisponibilitesModal, setShowDisponibilitesModal] = useState(false);
   const [showEPIModal, setShowEPIModal] = useState(false);
   const [showAddEPIModal, setShowAddEPIModal] = useState(false);
+  const [showEPIAccordion, setShowEPIAccordion] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDisponibilites, setUserDisponibilites] = useState([]);
   const [userEPIs, setUserEPIs] = useState([]);
+  const [editingEPIId, setEditingEPIId] = useState(null);
   const [newEPI, setNewEPI] = useState({
     type_epi: '',
     taille: '',
