@@ -3115,6 +3115,220 @@ async def update_parametres_remplacements(
     
     return {"message": "Paramètres mis à jour avec succès"}
 
+# ==================== EPI ROUTES ====================
+
+@api_router.post("/epi", response_model=EPIEmploye)
+async def create_epi(epi: EPIEmployeCreate, current_user: User = Depends(get_current_user)):
+    """Crée un nouvel EPI pour un employé (Admin/Superviseur)"""
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Vérifier si l'employé existe
+    employe = await db.users.find_one({"id": epi.employe_id})
+    if not employe:
+        raise HTTPException(status_code=404, detail="Employé non trouvé")
+    
+    # Vérifier qu'il n'existe pas déjà un EPI de ce type pour cet employé
+    existing_epi = await db.epi_employes.find_one({
+        "employe_id": epi.employe_id,
+        "type_epi": epi.type_epi
+    })
+    
+    if existing_epi:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Un EPI de type {epi.type_epi} existe déjà pour cet employé"
+        )
+    
+    epi_obj = EPIEmploye(**epi.dict())
+    await db.epi_employes.insert_one(epi_obj.dict())
+    
+    return epi_obj
+
+@api_router.get("/epi/employe/{employe_id}", response_model=List[EPIEmploye])
+async def get_epi_employe(employe_id: str, current_user: User = Depends(get_current_user)):
+    """Récupère tous les EPI d'un employé"""
+    # Admin et superviseur peuvent voir tous les EPI
+    # Employé peut voir seulement ses propres EPI
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != employe_id:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    epis = await db.epi_employes.find({"employe_id": employe_id}).to_list(100)
+    cleaned_epis = [clean_mongo_doc(epi) for epi in epis]
+    return [EPIEmploye(**epi) for epi in cleaned_epis]
+
+@api_router.get("/epi/{epi_id}", response_model=EPIEmploye)
+async def get_epi_by_id(epi_id: str, current_user: User = Depends(get_current_user)):
+    """Récupère un EPI spécifique par son ID"""
+    epi = await db.epi_employes.find_one({"id": epi_id})
+    
+    if not epi:
+        raise HTTPException(status_code=404, detail="EPI non trouvé")
+    
+    # Vérifier les permissions
+    if current_user.role not in ["admin", "superviseur"] and current_user.id != epi["employe_id"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    cleaned_epi = clean_mongo_doc(epi)
+    return EPIEmploye(**cleaned_epi)
+
+@api_router.put("/epi/{epi_id}", response_model=EPIEmploye)
+async def update_epi(
+    epi_id: str,
+    epi_update: EPIEmployeUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Met à jour un EPI
+    - Admin/Superviseur: peuvent modifier tous les champs
+    - Employé: peut modifier uniquement la taille
+    """
+    epi = await db.epi_employes.find_one({"id": epi_id})
+    
+    if not epi:
+        raise HTTPException(status_code=404, detail="EPI non trouvé")
+    
+    # Vérifier les permissions
+    is_owner = current_user.id == epi["employe_id"]
+    is_admin_or_supervisor = current_user.role in ["admin", "superviseur"]
+    
+    if not (is_owner or is_admin_or_supervisor):
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Si c'est un employé, il ne peut modifier que la taille
+    if not is_admin_or_supervisor:
+        if epi_update.etat or epi_update.date_expiration or epi_update.date_prochaine_inspection or epi_update.notes:
+            raise HTTPException(
+                status_code=403,
+                detail="Les employés peuvent modifier uniquement la taille"
+            )
+    
+    # Préparer les champs à mettre à jour
+    update_data = {k: v for k, v in epi_update.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    await db.epi_employes.update_one(
+        {"id": epi_id},
+        {"$set": update_data}
+    )
+    
+    updated_epi = await db.epi_employes.find_one({"id": epi_id})
+    cleaned_epi = clean_mongo_doc(updated_epi)
+    return EPIEmploye(**cleaned_epi)
+
+@api_router.delete("/epi/{epi_id}")
+async def delete_epi(epi_id: str, current_user: User = Depends(get_current_user)):
+    """Supprime un EPI (Admin/Superviseur seulement)"""
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    result = await db.epi_employes.delete_one({"id": epi_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="EPI non trouvé")
+    
+    return {"message": "EPI supprimé avec succès"}
+
+@api_router.post("/epi/{epi_id}/inspection")
+async def add_inspection(
+    epi_id: str,
+    inspection: InspectionEPI,
+    current_user: User = Depends(get_current_user)
+):
+    """Ajoute une inspection à un EPI"""
+    epi = await db.epi_employes.find_one({"id": epi_id})
+    
+    if not epi:
+        raise HTTPException(status_code=404, detail="EPI non trouvé")
+    
+    # L'inspection peut être faite par l'employé lui-même ou par un admin/superviseur
+    if current_user.id != epi["employe_id"] and current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Ajouter l'inspection à l'historique
+    inspection_data = inspection.dict()
+    inspection_data["inspecteur_id"] = current_user.id
+    
+    await db.epi_employes.update_one(
+        {"id": epi_id},
+        {
+            "$push": {"historique_inspections": inspection_data},
+            "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}
+        }
+    )
+    
+    # Si l'inspection indique un remplacement nécessaire, créer une notification
+    if inspection.resultat == "Remplacement nécessaire":
+        employe = await db.users.find_one({"id": epi["employe_id"]})
+        
+        # Notifier les admins et superviseurs
+        superviseurs_admins = await db.users.find({"role": {"$in": ["superviseur", "admin"]}}).to_list(100)
+        for superviseur in superviseurs_admins:
+            await creer_notification(
+                destinataire_id=superviseur["id"],
+                type="epi_remplacement",
+                titre="Remplacement EPI nécessaire",
+                message=f"{employe['prenom']} {employe['nom']} signale que son {epi['type_epi']} nécessite un remplacement",
+                lien="/personnel",
+                data={"epi_id": epi_id, "employe_id": epi["employe_id"]}
+            )
+    
+    return {"message": "Inspection ajoutée avec succès"}
+
+@api_router.get("/epi/alertes/all", response_model=List[Dict[str, Any]])
+async def get_epi_alerts(current_user: User = Depends(get_current_user)):
+    """Récupère toutes les alertes EPI (expirations et inspections à venir)"""
+    if current_user.role not in ["admin", "superviseur"]:
+        raise HTTPException(status_code=403, detail="Accès refusé")
+    
+    # Récupérer tous les EPI
+    all_epis = await db.epi_employes.find().to_list(1000)
+    
+    alerts = []
+    today = datetime.now(timezone.utc)
+    
+    for epi in all_epis:
+        # Récupérer l'info employé
+        employe = await db.users.find_one({"id": epi["employe_id"]})
+        if not employe:
+            continue
+        
+        # Vérifier expiration
+        if epi.get("date_expiration"):
+            date_exp = datetime.fromisoformat(epi["date_expiration"].replace('Z', '+00:00'))
+            days_until_expiration = (date_exp - today).days
+            
+            if days_until_expiration <= 30:
+                alerts.append({
+                    "type": "expiration",
+                    "epi_id": epi["id"],
+                    "employe_id": epi["employe_id"],
+                    "employe_nom": f"{employe['prenom']} {employe['nom']}",
+                    "type_epi": epi["type_epi"],
+                    "jours_restants": days_until_expiration,
+                    "date_expiration": epi["date_expiration"],
+                    "priorite": "haute" if days_until_expiration <= 7 else "moyenne"
+                })
+        
+        # Vérifier inspection
+        if epi.get("date_prochaine_inspection"):
+            date_insp = datetime.fromisoformat(epi["date_prochaine_inspection"].replace('Z', '+00:00'))
+            days_until_inspection = (date_insp - today).days
+            
+            if days_until_inspection <= 14:
+                alerts.append({
+                    "type": "inspection",
+                    "epi_id": epi["id"],
+                    "employe_id": epi["employe_id"],
+                    "employe_nom": f"{employe['prenom']} {employe['nom']}",
+                    "type_epi": epi["type_epi"],
+                    "jours_restants": days_until_inspection,
+                    "date_inspection": epi["date_prochaine_inspection"],
+                    "priorite": "haute" if days_until_inspection <= 3 else "moyenne"
+                })
+    
+    return alerts
+
 # Include the router in the main app
 app.include_router(api_router)
 
