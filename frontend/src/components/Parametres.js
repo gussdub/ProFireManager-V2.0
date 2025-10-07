@@ -1315,20 +1315,39 @@ const Parametres = ({ user }) => {
                 </div>
               </div>
 
-              {/* Types d'EPI et normes NFPA */}
+              {/* Types d'EPI et normes NFPA - Version épurée */}
               <div className="epi-types-section">
                 <h4>🛡️ Types d'EPI et normes NFPA</h4>
-                <div className="epi-types-grid">
+                <div className="epi-types-modern-grid">
                   {episTypesDefaut.map(epi => (
-                    <div key={epi.id} className="epi-type-card" data-testid={`epi-type-${epi.id}`}>
-                      <div className="epi-type-header">
-                        <span className="epi-icon">{epi.icone}</span>
-                        <div className="epi-info">
-                          <h5>{epi.nom}</h5>
-                          <div className="epi-details">
-                            <span className="epi-detail">⏱️ Durée de vie: {epi.duree_vie_annees} ans</span>
-                            <span className="epi-detail">🔍 Inspection: {epi.inspection_mois} mois</span>
-                            <span className="epi-detail">📏 Tailles: {epi.tailles.length} options</span>
+                    <div key={epi.id} className="epi-modern-card" data-testid={`epi-type-${epi.id}`}>
+                      <div className="epi-card-header">
+                        <div className="epi-icon-large">{epi.icone}</div>
+                        <h5 className="epi-name">{epi.nom}</h5>
+                      </div>
+                      
+                      <div className="epi-specs">
+                        <div className="spec-item">
+                          <div className="spec-icon">⏱️</div>
+                          <div className="spec-content">
+                            <span className="spec-value">{epi.duree_vie_annees} ans</span>
+                            <span className="spec-label">Durée de vie</span>
+                          </div>
+                        </div>
+                        
+                        <div className="spec-item">
+                          <div className="spec-icon">🔍</div>
+                          <div className="spec-content">
+                            <span className="spec-value">{epi.inspection_mois} mois</span>
+                            <span className="spec-label">Inspection</span>
+                          </div>
+                        </div>
+                        
+                        <div className="spec-item">
+                          <div className="spec-icon">📏</div>
+                          <div className="spec-content">
+                            <span className="spec-value">{epi.tailles.length}</span>
+                            <span className="spec-label">Tailles disponibles</span>
                           </div>
                         </div>
                       </div>
