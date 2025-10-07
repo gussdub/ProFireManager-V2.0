@@ -1655,6 +1655,219 @@ const Personnel = () => {
         </div>
       )}
 
+      {/* EPI Modal - Gestion des équipements */}
+      {showEPIModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowEPIModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="epi-modal">
+            <div className="modal-header">
+              <h3>🛡️ EPI - {selectedUser.prenom} {selectedUser.nom}</h3>
+              <Button variant="ghost" onClick={() => setShowEPIModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="epi-management">
+                {/* Bouton d'ajout (Admin/Superviseur uniquement) */}
+                <div className="epi-header-actions">
+                  <Button 
+                    onClick={handleAddEPI}
+                    data-testid="add-epi-btn"
+                  >
+                    + Ajouter un EPI
+                  </Button>
+                </div>
+
+                {/* Liste des EPI */}
+                {userEPIs.length > 0 ? (
+                  <div className="epi-list">
+                    {userEPIs.map(epi => (
+                      <div key={epi.id} className="epi-item-card" data-testid={`epi-item-${epi.id}`}>
+                        <div className="epi-item-header">
+                          <div className="epi-item-icon">{getEPIIcone(epi.type_epi)}</div>
+                          <div className="epi-item-title">
+                            <h4>{getEPINom(epi.type_epi)}</h4>
+                            <span 
+                              className="epi-etat-badge" 
+                              style={{ backgroundColor: getEtatColor(epi.etat) }}
+                            >
+                              {epi.etat}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="epi-item-details">
+                          <div className="epi-detail-row">
+                            <span className="epi-label">Taille:</span>
+                            <span className="epi-value">{epi.taille}</span>
+                          </div>
+                          <div className="epi-detail-row">
+                            <span className="epi-label">Attribution:</span>
+                            <span className="epi-value">{epi.date_attribution}</span>
+                          </div>
+                          <div className="epi-detail-row">
+                            <span className="epi-label">Expiration:</span>
+                            <span className="epi-value">{epi.date_expiration}</span>
+                          </div>
+                          {epi.date_prochaine_inspection && (
+                            <div className="epi-detail-row">
+                              <span className="epi-label">Prochaine inspection:</span>
+                              <span className="epi-value">{epi.date_prochaine_inspection}</span>
+                            </div>
+                          )}
+                          {epi.notes && (
+                            <div className="epi-detail-row">
+                              <span className="epi-label">Notes:</span>
+                              <span className="epi-value">{epi.notes}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="epi-item-actions">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              const newTaille = prompt("Nouvelle taille:", epi.taille);
+                              if (newTaille) handleUpdateEPITaille(epi.id, newTaille);
+                            }}
+                            data-testid={`update-taille-${epi.id}`}
+                          >
+                            ✏️ Modifier taille
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => handleDeleteEPI(epi.id)}
+                            data-testid={`delete-epi-${epi.id}`}
+                          >
+                            🗑️ Supprimer
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="no-epi">
+                    <p>Aucun EPI enregistré pour cet employé</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add EPI Modal */}
+      {showAddEPIModal && selectedUser && (
+        <div className="modal-overlay" onClick={() => setShowAddEPIModal(false)}>
+          <div className="modal-content medium-modal" onClick={(e) => e.stopPropagation()} data-testid="add-epi-modal">
+            <div className="modal-header">
+              <h3>+ Ajouter un EPI</h3>
+              <Button variant="ghost" onClick={() => setShowAddEPIModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-field">
+                  <Label>Type d'EPI *</Label>
+                  <select
+                    value={newEPI.type_epi}
+                    onChange={(e) => setNewEPI({...newEPI, type_epi: e.target.value})}
+                    className="form-select"
+                    data-testid="new-epi-type-select"
+                  >
+                    <option value="">Sélectionnez un type</option>
+                    <option value="casque">🪖 Casque</option>
+                    <option value="bottes">👢 Bottes</option>
+                    <option value="veste_bunker">🧥 Veste Bunker</option>
+                    <option value="pantalon_bunker">👖 Pantalon Bunker</option>
+                    <option value="gants">🧤 Gants</option>
+                    <option value="masque_scba">😷 Masque SCBA</option>
+                  </select>
+                </div>
+
+                <div className="form-field">
+                  <Label>Taille *</Label>
+                  <Input
+                    value={newEPI.taille}
+                    onChange={(e) => setNewEPI({...newEPI, taille: e.target.value})}
+                    placeholder="Ex: M, L, 42, etc."
+                    data-testid="new-epi-taille-input"
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Date d'attribution *</Label>
+                    <Input
+                      type="date"
+                      value={newEPI.date_attribution}
+                      onChange={(e) => setNewEPI({...newEPI, date_attribution: e.target.value})}
+                      data-testid="new-epi-attribution-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>État</Label>
+                    <select
+                      value={newEPI.etat}
+                      onChange={(e) => setNewEPI({...newEPI, etat: e.target.value})}
+                      className="form-select"
+                      data-testid="new-epi-etat-select"
+                    >
+                      <option value="Neuf">Neuf</option>
+                      <option value="Bon">Bon</option>
+                      <option value="À remplacer">À remplacer</option>
+                      <option value="Défectueux">Défectueux</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-field">
+                    <Label>Date d'expiration *</Label>
+                    <Input
+                      type="date"
+                      value={newEPI.date_expiration}
+                      onChange={(e) => setNewEPI({...newEPI, date_expiration: e.target.value})}
+                      data-testid="new-epi-expiration-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <Label>Prochaine inspection</Label>
+                    <Input
+                      type="date"
+                      value={newEPI.date_prochaine_inspection}
+                      onChange={(e) => setNewEPI({...newEPI, date_prochaine_inspection: e.target.value})}
+                      data-testid="new-epi-inspection-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <Label>Notes</Label>
+                  <textarea
+                    value={newEPI.notes}
+                    onChange={(e) => setNewEPI({...newEPI, notes: e.target.value})}
+                    className="form-textarea"
+                    rows="3"
+                    placeholder="Remarques ou observations..."
+                    data-testid="new-epi-notes-input"
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowAddEPIModal(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleCreateEPI} data-testid="create-epi-btn">
+                  Ajouter l'EPI
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Edit User Modal - Complet et fonctionnel */}
       {showEditModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
