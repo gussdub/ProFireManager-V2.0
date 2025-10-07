@@ -3,63 +3,63 @@
     "test": "Server Health Check",
     "success": true,
     "message": "Server is running: ProFireManager API v2.0",
-    "timestamp": "2025-10-07T14:52:00.589727",
+    "timestamp": "2025-10-07T14:52:29.719440",
     "details": {}
   },
   {
     "test": "Admin Authentication",
     "success": true,
     "message": "Login successful for admin@firefighter.com (Role: admin)",
-    "timestamp": "2025-10-07T14:52:00.600983",
+    "timestamp": "2025-10-07T14:52:29.727906",
     "details": {}
   },
   {
     "test": "JWT Token Validation",
     "success": true,
     "message": "Token valid - User: admin@firefighter.com",
-    "timestamp": "2025-10-07T14:52:00.609171",
+    "timestamp": "2025-10-07T14:52:29.735712",
     "details": {}
   },
   {
     "test": "Database Connectivity",
     "success": true,
     "message": "Database accessible - Found 24 users",
-    "timestamp": "2025-10-07T14:52:00.619277",
+    "timestamp": "2025-10-07T14:52:29.744834",
     "details": {}
   },
   {
     "test": "Types-Garde CRUD",
     "success": true,
     "message": "All CRUD operations successful",
-    "timestamp": "2025-10-07T14:52:00.659243",
+    "timestamp": "2025-10-07T14:52:29.774830",
     "details": {}
   },
   {
     "test": "Formations API",
     "success": true,
     "message": "All formation operations successful - Found 8 existing formations",
-    "timestamp": "2025-10-07T14:52:00.694935",
+    "timestamp": "2025-10-07T14:52:29.799338",
     "details": {}
   },
   {
     "test": "Users Management",
     "success": true,
     "message": "All user operations successful - Found 24 existing users",
-    "timestamp": "2025-10-07T14:52:00.958969",
+    "timestamp": "2025-10-07T14:52:30.050669",
     "details": {}
   },
   {
     "test": "Settings API",
-    "success": false,
-    "message": "No settings endpoints found - may need to be implemented",
-    "timestamp": "2025-10-07T14:52:00.982669",
+    "success": true,
+    "message": "Replacement parameters retrieved and updated successfully",
+    "timestamp": "2025-10-07T14:52:30.084108",
     "details": {}
   },
   {
     "test": "Notification System",
     "success": true,
     "message": "Found notification endpoints: /notifications, /remplacements",
-    "timestamp": "2025-10-07T14:52:01.002215",
+    "timestamp": "2025-10-07T14:52:30.105978",
     "details": {}
   }
 ]
