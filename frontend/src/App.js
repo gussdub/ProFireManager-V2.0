@@ -2061,6 +2061,24 @@ const Personnel = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Section 4: EPI (Équipements de Protection Individuels) */}
+                <div className="form-section">
+                  <h4 className="section-title">🛡️ Équipements de Protection Individuels (EPI)</h4>
+                  <p className="section-description">Gérez les EPI via le module EPI dédié pour une gestion complète (inspections, remplacements, etc.)</p>
+                  <div className="epi-form-section">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setShowEditModal(false);
+                        handleViewEPI(selectedUser);
+                      }}
+                      data-testid="manage-epi-from-edit-btn"
+                    >
+                      🛡️ Gérer les EPI de cet employé
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-actions">
