@@ -488,8 +488,7 @@ const Parametres = ({ user }) => {
   if (loading) return <div className="loading" data-testid="parametres-loading">Chargement...</div>;
 
   return (
-    <>
-      <div className="parametres">
+    <div className="parametres">
       <div className="parametres-header">
         <div>
           <h1 data-testid="parametres-title">Paramètres du système</h1>
