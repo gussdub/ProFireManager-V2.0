@@ -4588,6 +4588,55 @@ const Formations = () => {
     }
   };
 
+  const handleEditSession = (session) => {
+    setSelectedSession(session);
+    setEditSession({
+      titre: session.titre,
+      competence_id: session.competence_id,
+      duree_heures: session.duree_heures,
+      date_debut: session.date_debut,
+      heure_debut: session.heure_debut,
+      lieu: session.lieu,
+      formateur: session.formateur,
+      descriptif: session.descriptif || '',
+      plan_cours: session.plan_cours || '',
+      places_max: session.places_max
+    });
+    setShowEditModal(true);
+  };
+
+  const handleUpdateSession = async () => {
+    if (!editSession.titre || !editSession.competence_id || !editSession.date_debut || !editSession.lieu || !editSession.formateur) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs obligatoires",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      await axios.put(`${API}/sessions-formation/${selectedSession.id}`, editSession);
+      toast({
+        title: "Formation mise à jour",
+        description: "La session de formation a été modifiée avec succès",
+        variant: "success"
+      });
+      setShowEditModal(false);
+      setSelectedSession(null);
+      
+      // Reload sessions
+      const response = await axios.get(`${API}/sessions-formation`);
+      setSessions(response.data);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de modifier la session de formation",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleInscription = async (sessionId, isInscrit) => {
     try {
       if (isInscrit) {
