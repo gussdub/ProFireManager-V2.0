@@ -4396,6 +4396,14 @@ body {
     grid-template-columns: 1fr;
   }
   
+  .epi-item-actions {
+    flex-direction: column;
+  }
+  
+  .epi-item-actions button {
+    width: 100%;
+  }
+}
 
 /* EPI Readonly List in View Modal */
 .epi-readonly-list {
