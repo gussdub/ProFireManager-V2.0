@@ -1850,9 +1850,25 @@ const Personnel = () => {
 
                 {/* Section 4: EPI (Équipements de Protection Individuels) - Optionnel */}
                 <div className="form-section">
-                  <h4 className="section-title">🛡️ Équipements de Protection Individuels (EPI)</h4>
-                  <p className="section-description">Les EPI peuvent être ajoutés maintenant ou plus tard</p>
-                  <p className="info-note">💡 Les EPI pourront aussi être gérés après la création via Personnel &gt; Fiche employé</p>
+                  <h4 className="section-title">🛡️ Tailles des EPI (Optionnel)</h4>
+                  <p className="section-description">Les tailles peuvent être saisies maintenant ou ajoutées plus tard via le Module EPI</p>
+                  
+                  <div className="epi-tailles-grid-modal">
+                    {getAllEPITypes().map(epiType => (
+                      <div key={epiType.id} className="epi-taille-row">
+                        <span className="epi-taille-icon-modal">{epiType.icone}</span>
+                        <Label className="epi-taille-label-modal">{epiType.nom}</Label>
+                        <Input
+                          placeholder="Non attribué"
+                          disabled
+                          className="epi-taille-input-modal"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <p className="epi-note-modal">
+                    💡 Les EPI seront attribués et gérés via le <strong>Module EPI</strong> après la création du pompier
+                  </p>
                 </div>
               </div>
 
