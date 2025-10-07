@@ -4222,9 +4222,6 @@ body {
   transform: translateX(4px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
-  padding: 0.875rem 1rem;
-  font-weight: 500;
-}
 
 /* Responsive EPI */
 @media (max-width: 768px) {
@@ -4245,10 +4242,6 @@ body {
     height: 32px;
     font-size: 1rem;
   }
-}
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.5rem;
 }
 
 .rapports-header p {
