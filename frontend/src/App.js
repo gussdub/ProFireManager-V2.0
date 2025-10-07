@@ -1932,112 +1932,80 @@ const Personnel = () => {
               <h3>👤 Profil de {selectedUser.prenom} {selectedUser.nom}</h3>
               <Button variant="ghost" onClick={() => setShowViewModal(false)}>✕</Button>
             </div>
-            <div className="modal-body">
-              <div className="user-profile-view">
-                {/* En-tête du profil */}
-                <div className="profile-summary">
-                  <div className="profile-avatar-large">
-                    <span className="avatar-icon-large">👤</span>
-                  </div>
-                  <div className="profile-info-summary">
-                    <h4>{selectedUser.prenom} {selectedUser.nom}</h4>
-                    <div className="profile-badges">
-                      <span className="grade-badge" style={{ backgroundColor: getGradeColor(selectedUser.grade) }}>
-                        {selectedUser.grade}
-                      </span>
-                      <span className="employment-badge">
-                        {selectedUser.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}
-                      </span>
-                      <span className={`status-badge ${selectedUser.statut.toLowerCase()}`}>
-                        {selectedUser.statut}
-                      </span>
-                    </div>
-                    <p className="employee-id">#{selectedUser.numero_employe}</p>
-                  </div>
-                </div>
-
-                {/* Informations détaillées */}
-                <div className="profile-details-grid">
-                  <div className="detail-section">
-                    <h5>📞 Contact</h5>
-                    <div className="detail-list">
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Email</span>
-                        <span className="detail-value">{selectedUser.email}</span>
-                      </div>
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Téléphone</span>
-                        <span className="detail-value">{selectedUser.telephone || 'Non renseigné'}</span>
-                      </div>
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Contact d'urgence</span>
-                        <span className="detail-value emergency">{selectedUser.contact_urgence || 'Non renseigné'}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="detail-section">
-                    <h5>🎖️ Professionnel</h5>
-                    <div className="detail-list">
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Date d'embauche</span>
-                        <span className="detail-value">{selectedUser.date_embauche}</span>
-                      </div>
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Ancienneté</span>
-                        <span className="detail-value">
-                          {(() => {
-                            const embauche = new Date(selectedUser.date_embauche.split('/').reverse().join('-'));
-                            const aujourdhui = new Date();
-                            const annees = Math.floor((aujourdhui - embauche) / (365.25 * 24 * 60 * 60 * 1000));
-                            return `${annees} an(s)`;
-                          })()}
-                        </span>
-                      </div>
-                      <div className="detail-item-modern">
-                        <span className="detail-label">Rôle système</span>
-                        <span className="detail-value">
-                          {selectedUser.role === 'admin' ? '👑 Administrateur' : 
-                           selectedUser.role === 'superviseur' ? '🎖️ Superviseur' : '👤 Employé'}
-                        </span>
-                      </div>
+            <div className="modal-body modal-body-mini">
+              <div className="user-profile-view-mini">
+                {/* Header mini */}
+                <div className="mini-header">
+                  <span className="mini-avatar">👤</span>
+                  <div>
+                    <strong>{selectedUser.prenom} {selectedUser.nom}</strong>
+                    <div className="mini-badges">
+                      <span className="mini-badge">{selectedUser.grade}</span>
+                      <span className="mini-badge">{selectedUser.type_emploi === 'temps_plein' ? 'TP' : 'TPartiel'}</span>
+                      <span className="mini-badge">#{selectedUser.numero_employe}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Sections compactes en 2 colonnes */}
-                <div className="detail-sections-grid">
-                  {/* Compétences */}
-                  <div className="detail-section-compact">
-                    <h5>📜 Compétences</h5>
-                    {selectedUser.formations?.length > 0 ? (
-                      <div className="competences-compact">
-                        {selectedUser.formations.map((formationId, index) => (
-                          <span key={index} className="competence-chip">
-                            {getFormationName(formationId)}
-                          </span>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="no-data-compact">Aucune</p>
-                    )}
+                {/* Grid 2 colonnes */}
+                <div className="mini-grid">
+                  <div className="mini-col">
+                    <div className="mini-block">
+                      <strong className="mini-title">📞 Contact</strong>
+                      <div className="mini-text">{selectedUser.email}</div>
+                      <div className="mini-text">{selectedUser.telephone || '-'}</div>
+                      <div className="mini-text">Urgence: {selectedUser.contact_urgence || '-'}</div>
+                    </div>
+                    <div className="mini-block">
+                      <strong className="mini-title">📜 Compétences</strong>
+                      {selectedUser.formations?.length > 0 ? (
+                        <div className="mini-chips">
+                          {selectedUser.formations.slice(0, 4).map((formationId, index) => (
+                            <span key={index} className="micro-chip">{getFormationName(formationId)}</span>
+                          ))}
+                          {selectedUser.formations.length > 4 && (
+                            <span className="micro-chip">+{selectedUser.formations.length - 4}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mini-text">Aucune</div>
+                      )}
+                    </div>
                   </div>
 
-                  {/* EPI - Équipements de Protection Individuels */}
-                  <div className="detail-section-compact">
-                    <h5>🛡️ EPI</h5>
-                    {userEPIs.length > 0 ? (
-                      <div className="epi-compact-list">
-                        {userEPIs.map(epi => (
-                          <div key={epi.id} className="epi-compact-item">
-                            <span>{getEPIIcone(epi.type_epi)}</span>
-                            <span className="epi-compact-text">{getEPINom(epi.type_epi)} ({epi.taille})</span>
-                          </div>
-                        ))}
+                  <div className="mini-col">
+                    <div className="mini-block">
+                      <strong className="mini-title">🎖️ Professionnel</strong>
+                      <div className="mini-text">Embauche: {selectedUser.date_embauche}</div>
+                      <div className="mini-text">
+                        Ancienneté: {(() => {
+                          const embauche = new Date(selectedUser.date_embauche.split('/').reverse().join('-'));
+                          const annees = Math.floor((new Date() - embauche) / (365.25 * 24 * 60 * 60 * 1000));
+                          return `${annees} an(s)`;
+                        })()}
                       </div>
-                    ) : (
-                      <p className="no-data-compact">Aucun</p>
-                    )}
+                      <div className="mini-text">
+                        {selectedUser.role === 'admin' ? '👑 Admin' : 
+                         selectedUser.role === 'superviseur' ? '🎖️ Superviseur' : '👤 Employé'}
+                      </div>
+                    </div>
+                    <div className="mini-block">
+                      <strong className="mini-title">🛡️ EPI</strong>
+                      {userEPIs.length > 0 ? (
+                        <div className="mini-epi-list">
+                          {userEPIs.slice(0, 4).map(epi => (
+                            <div key={epi.id} className="mini-text">
+                              {getEPIIcone(epi.type_epi)} {getEPINom(epi.type_epi)} ({epi.taille})
+                            </div>
+                          ))}
+                          {userEPIs.length > 4 && (
+                            <div className="mini-text">+{userEPIs.length - 4} autres</div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="mini-text">Aucun</div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
