@@ -184,6 +184,59 @@ const Login = () => {
 const Sidebar = ({ currentPage, setCurrentPage }) => {
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Charger les notifications
+  const loadNotifications = async () => {
+    try {
+      const response = await axios.get(`${API}/notifications`);
+      setNotifications(response.data);
+      
+      const countResponse = await axios.get(`${API}/notifications/non-lues/count`);
+      setUnreadCount(countResponse.data.count);
+    } catch (error) {
+      console.error('Erreur chargement notifications:', error);
+    }
+  };
+
+  // Charger au montage et toutes les 30 secondes
+  useEffect(() => {
+    if (user) {
+      loadNotifications();
+      const interval = setInterval(loadNotifications, 30000); // 30 secondes
+      return () => clearInterval(interval);
+    }
+  }, [user]);
+
+  // Jouer un son quand il y a de nouvelles notifications
+  useEffect(() => {
+    if (unreadCount > 0) {
+      // Son de notification (vous pouvez personnaliser)
+      const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZjTkIHGy57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3QtBSh+y/HajzsIHGu57OihUhELTKXh8bllHgU2jdXty3Qt');
+      audio.volume = 0.3;
+      audio.play().catch(e => console.log('Audio play failed:', e));
+    }
+  }, [unreadCount]);
+
+  const marquerCommeLue = async (notifId) => {
+    try {
+      await axios.put(`${API}/notifications/${notifId}/marquer-lu`);
+      loadNotifications();
+    } catch (error) {
+      console.error('Erreur marquage notification:', error);
+    }
+  };
+
+  const marquerToutesLues = async () => {
+    try {
+      await axios.put(`${API}/notifications/marquer-toutes-lues`);
+      loadNotifications();
+    } catch (error) {
+      console.error('Erreur marquage toutes notifications:', error);
+    }
+  };
 
   const menuItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'superviseur', 'employe'] },
