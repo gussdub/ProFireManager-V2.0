@@ -5920,6 +5920,51 @@ const MonProfil = () => {
             </div>
           </div>
 
+          {/* Mes Tailles EPI */}
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>🛡️ Mes Tailles EPI</h2>
+              <Button
+                onClick={() => setIsEditingEPI(!isEditingEPI)}
+                variant={isEditingEPI ? "secondary" : "default"}
+                data-testid="edit-epi-tailles-btn"
+              >
+                {isEditingEPI ? 'Annuler' : 'Modifier'}
+              </Button>
+            </div>
+
+            {myEPIs.length > 0 ? (
+              <div className="epi-tailles-grid">
+                {myEPIs.map(epi => (
+                  <div key={epi.id} className="epi-taille-item">
+                    <span className="epi-taille-icon">{getEPIIcone(epi.type_epi)}</span>
+                    <div className="epi-taille-info">
+                      <Label>{getEPINom(epi.type_epi)}</Label>
+                      <Input
+                        value={epiTailles[epi.type_epi] || epi.taille}
+                        onChange={(e) => setEpiTailles({...epiTailles, [epi.type_epi]: e.target.value})}
+                        disabled={!isEditingEPI}
+                        placeholder="Taille"
+                        className="epi-taille-input"
+                        data-testid={`epi-taille-${epi.type_epi}`}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="no-epi-text">Aucun EPI n'est actuellement attribué. Contactez votre superviseur.</p>
+            )}
+
+            {isEditingEPI && myEPIs.length > 0 && (
+              <div className="form-actions">
+                <Button onClick={handleSaveEPITailles} data-testid="save-epi-tailles-btn">
+                  Sauvegarder les tailles
+                </Button>
+              </div>
+            )}
+          </div>
+
           {/* Sécurité du compte */}
           <div className="profile-section">
             <h2>Sécurité du compte</h2>
