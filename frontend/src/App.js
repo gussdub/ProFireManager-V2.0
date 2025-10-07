@@ -414,6 +414,370 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
   );
 };
 
+// Module EPI Component - Vue différente selon le rôle
+const ModuleEPI = ({ user }) => {
+  const [loading, setLoading] = useState(true);
+  const [myEPIs, setMyEPIs] = useState([]);
+  const [allEPIs, setAllEPIs] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+  const [showInspectionModal, setShowInspectionModal] = useState(false);
+  const [selectedEPI, setSelectedEPI] = useState(null);
+  const [inspectionForm, setInspectionForm] = useState({
+    date_inspection: new Date().toISOString().split('T')[0],
+    resultat: 'Conforme',
+    integrite: true,
+    proprete: true,
+    dommages_visibles: false,
+    coutures: true,
+    fermetures: true,
+    observations: ''
+  });
+  const { toast } = useToast();
+
+  const isAdminOrSupervisor = user?.role === 'admin' || user?.role === 'superviseur';
+
+  useEffect(() => {
+    fetchEPIData();
+  }, [user]);
+
+  const fetchEPIData = async () => {
+    setLoading(true);
+    try {
+      if (isAdminOrSupervisor) {
+        // Admin/Superviseur : charger tous les EPI et les alertes
+        const [alertsResponse] = await Promise.all([
+          axios.get(`${API}/epi/alertes/all`)
+        ]);
+        setAlerts(alertsResponse.data);
+      } else {
+        // Employé : charger ses propres EPI
+        const response = await axios.get(`${API}/epi/employe/${user.id}`);
+        setMyEPIs(response.data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des EPI:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données EPI",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStartInspection = (epi) => {
+    setSelectedEPI(epi);
+    setShowInspectionModal(true);
+  };
+
+  const handleSubmitInspection = async () => {
+    if (!selectedEPI) return;
+
+    try {
+      await axios.post(`${API}/epi/${selectedEPI.id}/inspection`, {
+        ...inspectionForm,
+        inspecteur_id: user.id
+      });
+
+      toast({
+        title: "Inspection enregistrée",
+        description: "L'inspection a été enregistrée avec succès",
+        variant: "success"
+      });
+
+      setShowInspectionModal(false);
+      fetchEPIData();
+      resetInspectionForm();
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'enregistrer l'inspection",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const resetInspectionForm = () => {
+    setInspectionForm({
+      date_inspection: new Date().toISOString().split('T')[0],
+      resultat: 'Conforme',
+      integrite: true,
+      proprete: true,
+      dommages_visibles: false,
+      coutures: true,
+      fermetures: true,
+      observations: ''
+    });
+    setSelectedEPI(null);
+  };
+
+  const getEPINom = (typeEpi) => {
+    const noms = {
+      'casque': 'Casque',
+      'bottes': 'Bottes',
+      'veste_bunker': 'Veste Bunker',
+      'pantalon_bunker': 'Pantalon Bunker',
+      'gants': 'Gants',
+      'masque_scba': 'Masque SCBA',
+      'cagoule': 'Cagoule Anti-Particules'
+    };
+    return noms[typeEpi] || typeEpi;
+  };
+
+  const getEPIIcone = (typeEpi) => {
+    const icones = {
+      'casque': '🪖',
+      'bottes': '👢',
+      'veste_bunker': '🧥',
+      'pantalon_bunker': '👖',
+      'gants': '🧤',
+      'masque_scba': '😷',
+      'cagoule': '🎭'
+    };
+    return icones[typeEpi] || '🛡️';
+  };
+
+  const getEtatColor = (etat) => {
+    const colors = {
+      'Neuf': '#10B981',
+      'Bon': '#3B82F6',
+      'À remplacer': '#F59E0B',
+      'Défectueux': '#EF4444'
+    };
+    return colors[etat] || '#6B7280';
+  };
+
+  if (loading) {
+    return <div className="loading">Chargement des EPI...</div>;
+  }
+
+  // Vue Admin/Superviseur
+  if (isAdminOrSupervisor) {
+    return (
+      <div className="module-epi">
+        <div className="module-epi-header">
+          <div>
+            <h1>🛡️ Gestion des EPI</h1>
+            <p>Vue d'ensemble et actions rapides</p>
+          </div>
+        </div>
+
+        {/* Actions rapides */}
+        <div className="epi-quick-actions-grid">
+          <Card>
+            <CardHeader>
+              <CardTitle>⚠️ Alertes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="alert-stats">
+                <div className="alert-stat-item">
+                  <span className="alert-stat-number">{alerts.filter(a => a.type === 'expiration').length}</span>
+                  <span className="alert-stat-label">Expirations proches</span>
+                </div>
+                <div className="alert-stat-item">
+                  <span className="alert-stat-number">{alerts.filter(a => a.type === 'inspection').length}</span>
+                  <span className="alert-stat-label">Inspections à venir</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Liste des alertes */}
+        {alerts.length > 0 && (
+          <div className="epi-alerts-section">
+            <h3>Alertes EPI</h3>
+            <div className="epi-alerts-list">
+              {alerts.map((alert, index) => (
+                <div key={index} className="epi-alert-card" data-priority={alert.priorite}>
+                  <div className="epi-alert-icon">
+                    {alert.type === 'expiration' ? '⏰' : '🔍'}
+                  </div>
+                  <div className="epi-alert-content">
+                    <strong>{alert.employe_nom}</strong>
+                    <p>{getEPINom(alert.type_epi)} - {alert.type === 'expiration' ? 'Expiration' : 'Inspection'}</p>
+                    <span className="epi-alert-days">Dans {alert.jours_restants} jour(s)</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="epi-info-note">
+          <p>💡 La gestion détaillée des EPI de chaque employé se fait via <strong>Personnel &gt; Fiche employé</strong></p>
+        </div>
+      </div>
+    );
+  }
+
+  // Vue Employé
+  return (
+    <div className="module-epi">
+      <div className="module-epi-header">
+        <div>
+          <h1>🛡️ Mes EPI</h1>
+          <p>Gestion et inspections de vos équipements</p>
+        </div>
+      </div>
+
+      {myEPIs.length > 0 ? (
+        <div className="my-epi-grid">
+          {myEPIs.map(epi => (
+            <Card key={epi.id} className="my-epi-card">
+              <CardHeader>
+                <div className="my-epi-card-header">
+                  <span className="my-epi-icon">{getEPIIcone(epi.type_epi)}</span>
+                  <CardTitle>{getEPINom(epi.type_epi)}</CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="my-epi-details">
+                  <div className="my-epi-detail-row">
+                    <span>Taille:</span>
+                    <strong>{epi.taille}</strong>
+                  </div>
+                  <div className="my-epi-detail-row">
+                    <span>État:</span>
+                    <span style={{ color: getEtatColor(epi.etat), fontWeight: 600 }}>{epi.etat}</span>
+                  </div>
+                  <div className="my-epi-detail-row">
+                    <span>Expiration:</span>
+                    <strong>{epi.date_expiration}</strong>
+                  </div>
+                </div>
+                <div className="my-epi-actions">
+                  <Button 
+                    size="sm" 
+                    onClick={() => handleStartInspection(epi)}
+                    data-testid={`inspect-epi-${epi.id}`}
+                  >
+                    🔍 Inspecter
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="no-epi-message">
+          <p>Aucun EPI n'est actuellement enregistré pour vous.</p>
+          <p>Contactez votre superviseur pour l'attribution de vos équipements.</p>
+        </div>
+      )}
+
+      {/* Modal Inspection NFPA 1851 */}
+      {showInspectionModal && selectedEPI && (
+        <div className="modal-overlay" onClick={() => setShowInspectionModal(false)}>
+          <div className="modal-content medium-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>🔍 Inspection NFPA 1851 - {getEPINom(selectedEPI.type_epi)}</h3>
+              <Button variant="ghost" onClick={() => setShowInspectionModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="inspection-form">
+                <div className="form-field">
+                  <Label>Date d'inspection</Label>
+                  <Input
+                    type="date"
+                    value={inspectionForm.date_inspection}
+                    onChange={(e) => setInspectionForm({...inspectionForm, date_inspection: e.target.value})}
+                  />
+                </div>
+
+                <div className="inspection-criteria">
+                  <h4>Critères d'inspection (Norme NFPA 1851)</h4>
+                  
+                  <label className="inspection-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={inspectionForm.integrite}
+                      onChange={(e) => setInspectionForm({...inspectionForm, integrite: e.target.checked})}
+                    />
+                    <span>Intégrité générale</span>
+                  </label>
+
+                  <label className="inspection-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={inspectionForm.proprete}
+                      onChange={(e) => setInspectionForm({...inspectionForm, proprete: e.target.checked})}
+                    />
+                    <span>Propreté</span>
+                  </label>
+
+                  <label className="inspection-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={!inspectionForm.dommages_visibles}
+                      onChange={(e) => setInspectionForm({...inspectionForm, dommages_visibles: !e.target.checked})}
+                    />
+                    <span>Aucun dommage visible</span>
+                  </label>
+
+                  <label className="inspection-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={inspectionForm.coutures}
+                      onChange={(e) => setInspectionForm({...inspectionForm, coutures: e.target.checked})}
+                    />
+                    <span>Coutures en bon état</span>
+                  </label>
+
+                  <label className="inspection-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={inspectionForm.fermetures}
+                      onChange={(e) => setInspectionForm({...inspectionForm, fermetures: e.target.checked})}
+                    />
+                    <span>Fermetures fonctionnelles</span>
+                  </label>
+                </div>
+
+                <div className="form-field">
+                  <Label>Résultat de l'inspection</Label>
+                  <select
+                    value={inspectionForm.resultat}
+                    onChange={(e) => setInspectionForm({...inspectionForm, resultat: e.target.value})}
+                    className="form-select"
+                  >
+                    <option value="Conforme">Conforme</option>
+                    <option value="Non conforme">Non conforme</option>
+                    <option value="À nettoyer">À nettoyer</option>
+                    <option value="À réparer">À réparer</option>
+                    <option value="Remplacement nécessaire">Remplacement nécessaire</option>
+                  </select>
+                </div>
+
+                <div className="form-field">
+                  <Label>Observations</Label>
+                  <textarea
+                    value={inspectionForm.observations}
+                    onChange={(e) => setInspectionForm({...inspectionForm, observations: e.target.value})}
+                    className="form-textarea"
+                    rows="4"
+                    placeholder="Remarques ou observations..."
+                  />
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowInspectionModal(false)}>
+                  Annuler
+                </Button>
+                <Button onClick={handleSubmitInspection}>
+                  📝 Enregistrer l'inspection
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Dashboard Component optimisé - 100% dynamique
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
