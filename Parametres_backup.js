@@ -77,6 +77,19 @@ const Parametres = ({ user }) => {
                   
                   <div className="setting-inputs-compact">
                     <div className="input-group-compact">
+                      <Label>Stratégie de contact</Label>
+                      <select 
+                        className="form-select"
+                        value={systemSettings.mode_notification || 'simultane'}
+                        onChange={(e) => console.log('change')}
+                      >
+                        <option value="simultane">⚡ Simultané - Tous en même temps</option>
+                        <option value="sequentiel">🎯 Séquentiel - Un par un</option>
+                        <option value="groupe_sequentiel">🔀 Groupes séquentiels - Par groupes</option>
+                      </select>
+                    </div>
+
+                    <div className="input-group-compact">
                       <Label>Délai d'attente (minutes)</Label>
                       <Input
                         type="number"
@@ -86,7 +99,7 @@ const Parametres = ({ user }) => {
                         value={systemSettings.delai_attente_minutes || 1440}
                         onChange={(e) => console.log('change')}
                       />
-                      <small>Temps d'attente avant de passer au suivant (en cas de non-réponse)</small>
+                      <small>Temps d'attente avant de passer au suivant (en cas de non-réponse). Par défaut: 24h (1440 min)</small>
                     </div>
                   </div>
                 </div>
