@@ -889,7 +889,7 @@ const Parametres = ({ user }) => {
           </div>
         )}
 
-        {false && activeTab === 'remplacements' && (
+        {activeTab === 'remplacements' && (
           <div className="remplacements-tab">
             <div className="tab-header">
               <div>
