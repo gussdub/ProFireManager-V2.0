@@ -1077,8 +1077,7 @@ const Parametres = ({ user }) => {
                       '🔀 Groupes séquentiels'
                     } | <strong>Contacts :</strong> max {systemSettings.max_personnes_contact || 5} personnes
                     {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && 
-                      ` | Délai : ${systemSettings.delai_attente_minutes || 1440} min`
-                    }
+                      ` | Délai : ${systemSettings.delai_attente_minutes || 1440} min`}
                   </p>
                 </div>
               </div>
