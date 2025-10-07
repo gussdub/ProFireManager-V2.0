@@ -1465,6 +1465,15 @@ const Personnel = () => {
                     </span>
                   </div>
                 </div>
+
+                {/* Section 4: EPI (Équipements de Protection Individuels) - Optionnel */}
+                <div className="form-section">
+                  <h4 className="section-title">🛡️ Équipements de Protection Individuels (EPI)</h4>
+                  <p className="section-description">Les EPI peuvent être ajoutés maintenant ou plus tard via le module EPI</p>
+                  <div className="epi-form-section">
+                    <p className="info-note">💡 Les EPI seront gérés et modifiés via le module EPI après la création du pompier</p>
+                  </div>
+                </div>
               </div>
 
               <div className="modal-actions">
@@ -1480,7 +1489,7 @@ const Personnel = () => {
         </div>
       )}
 
-      {/* View User Modal - Version modernisée */}
+      {/* View User Modal - Version modernisée */}}
       {showViewModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="view-user-modal">
