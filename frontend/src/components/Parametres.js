@@ -514,7 +514,7 @@ const Parametres = ({ user }) => {
           onClick={() => setActiveTab('types-garde')}
           data-testid="tab-types-garde"
         >
-          🚒 Types de Gardes
+          🚒 Gardes
         </button>
         <button
           className={`tab-button ${activeTab === 'competences' ? 'active' : ''}`}
@@ -528,28 +528,28 @@ const Parametres = ({ user }) => {
           onClick={() => setActiveTab('attribution')}
           data-testid="tab-attribution"
         >
-          ⚙️ Attribution Auto
+          ⚙️ Attribution
         </button>
         <button
           className={`tab-button ${activeTab === 'comptes' ? 'active' : ''}`}
           onClick={() => setActiveTab('comptes')}
           data-testid="tab-comptes"
         >
-          👥 Comptes d'Accès
+          👥 Comptes
         </button>
         <button
           className={`tab-button ${activeTab === 'remplacements' ? 'active' : ''}`}
           onClick={() => setActiveTab('remplacements')}
           data-testid="tab-remplacements"
         >
-          🔄 Paramètres Remplacements
+          🔄 Remplacements
         </button>
         <button
           className={`tab-button ${activeTab === 'disponibilites' ? 'active' : ''}`}
           onClick={() => setActiveTab('disponibilites')}
           data-testid="tab-disponibilites"
         >
-          📅 Paramètres Disponibilités
+          📅 Disponibilités
         </button>
       </div>
 
