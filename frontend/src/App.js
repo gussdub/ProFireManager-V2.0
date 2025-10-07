@@ -241,6 +241,7 @@ const Sidebar = ({ currentPage, setCurrentPage }) => {
   const menuItems = [
     { id: 'dashboard', label: 'Tableau de bord', icon: '📊', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'personnel', label: 'Personnel', icon: '👥', roles: ['admin', 'superviseur'] },
+    { id: 'epi', label: 'EPI', icon: '🛡️', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'planning', label: 'Planning', icon: '📅', roles: ['admin', 'superviseur', 'employe'] },
     { id: 'disponibilites', label: 'Mes disponibilités', icon: '📋', roles: ['employe'] },
     { id: 'remplacements', label: 'Remplacements', icon: '🔄', roles: ['admin', 'superviseur', 'employe'] },
