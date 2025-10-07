@@ -6316,6 +6316,13 @@ const Rapports = () => {
         >
           📈 Analytics
         </button>
+        <button
+          className={`section-button ${activeSection === 'epi' ? 'active' : ''}`}
+          onClick={() => setActiveSection('epi')}
+          data-testid="section-epi"
+        >
+          🛡️ EPI
+        </button>
       </div>
 
       {/* Contenu des sections */}
