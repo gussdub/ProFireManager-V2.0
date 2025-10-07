@@ -1,0 +1,26 @@
+[
+  {
+    "test": "Server Health Check",
+    "success": true,
+    "message": "Server is running: ProFireManager API v2.0",
+    "timestamp": "2025-10-07T14:51:42.908098",
+    "details": {}
+  },
+  {
+    "test": "Admin Authentication",
+    "success": false,
+    "message": "Authentication failed - admin user may not exist",
+    "timestamp": "2025-10-07T14:51:42.920975",
+    "details": {
+      "status_code": 401,
+      "response": "{\"detail\":\"Email ou mot de passe incorrect\"}"
+    }
+  },
+  {
+    "test": "Admin User Creation",
+    "success": false,
+    "message": "Could not create admin user: 403",
+    "timestamp": "2025-10-07T14:51:42.932941",
+    "details": {}
+  }
+]
