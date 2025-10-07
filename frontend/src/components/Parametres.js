@@ -1407,7 +1407,7 @@ const Parametres = ({ user }) => {
       )}
 
       {/* Modal de création de type de garde */}
-      {false && showCreateTypeModal && (
+      {showCreateTypeModal && (
         <div className="modal-overlay" onClick={() => setShowCreateTypeModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="create-type-modal">
             <div className="modal-header">
