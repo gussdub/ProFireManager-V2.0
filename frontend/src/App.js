@@ -4509,6 +4509,20 @@ const Formations = () => {
   const [competences, setCompetences] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedSession, setSelectedSession] = useState(null);
+  const [editSession, setEditSession] = useState({
+    titre: '',
+    competence_id: '',
+    duree_heures: 8,
+    date_debut: '',
+    heure_debut: '09:00',
+    lieu: '',
+    formateur: '',
+    descriptif: '',
+    plan_cours: '',
+    places_max: 20
+  });
   const [newSession, setNewSession] = useState({
     titre: '',
     competence_id: '',
