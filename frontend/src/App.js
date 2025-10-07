@@ -658,8 +658,20 @@ const Personnel = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDisponibilitesModal, setShowDisponibilitesModal] = useState(false);
+  const [showEPIModal, setShowEPIModal] = useState(false);
+  const [showAddEPIModal, setShowAddEPIModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [userDisponibilites, setUserDisponibilites] = useState([]);
+  const [userEPIs, setUserEPIs] = useState([]);
+  const [newEPI, setNewEPI] = useState({
+    type_epi: '',
+    taille: '',
+    date_attribution: new Date().toISOString().split('T')[0],
+    etat: 'Neuf',
+    date_expiration: '',
+    date_prochaine_inspection: '',
+    notes: ''
+  });
   const [newUser, setNewUser] = useState({
     nom: '',
     prenom: '',
