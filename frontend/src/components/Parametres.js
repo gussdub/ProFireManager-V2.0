@@ -1986,6 +1986,180 @@ const Parametres = ({ user }) => {
           </div>
         </div>
       )}
+
+      {/* Modal de gestion des EPI d'un employé */}
+      {showEpiModal && selectedUserEpi && (
+        <div className="modal-overlay" onClick={() => setShowEpiModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="epi-management-modal">
+            <div className="modal-header">
+              <h3>Gestion EPI - {selectedUserEpi.prenom} {selectedUserEpi.nom}</h3>
+              <Button variant="ghost" onClick={() => setShowEpiModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              <div className="epi-management-grid">
+                {episTypesDefaut.map(epiType => (
+                  <div key={epiType.id} className="epi-item-management" data-testid={`epi-item-${epiType.id}`}>
+                    <div className="epi-item-header">
+                      <span className="epi-icon">{epiType.icone}</span>
+                      <h4>{epiType.nom}</h4>
+                      <span className="epi-status-badge ok">✅ En service</span>
+                    </div>
+                    
+                    <div className="epi-item-details">
+                      <div className="form-row">
+                        <div className="form-field">
+                          <Label>Taille</Label>
+                          <select className="form-select" data-testid={`taille-${epiType.id}`}>
+                            {epiType.tailles.map(taille => (
+                              <option key={taille} value={taille}>{taille}</option>
+                            ))}
+                          </select>
+                        </div>
+                        <div className="form-field">
+                          <Label>Numéro de série</Label>
+                          <Input 
+                            placeholder="Ex: SN123456"
+                            data-testid={`serie-${epiType.id}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-field">
+                          <Label>Date de mise en service</Label>
+                          <Input 
+                            type="date"
+                            data-testid={`date-service-${epiType.id}`}
+                          />
+                        </div>
+                        <div className="form-field">
+                          <Label>Prochaine inspection</Label>
+                          <Input 
+                            type="date"
+                            data-testid={`date-inspection-${epiType.id}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="form-row">
+                        <div className="form-field">
+                          <Label>Date d'expiration</Label>
+                          <Input 
+                            type="date"
+                            data-testid={`date-expiration-${epiType.id}`}
+                          />
+                        </div>
+                        <div className="form-field">
+                          <Label>Statut</Label>
+                          <select className="form-select" data-testid={`statut-${epiType.id}`}>
+                            <option value="en_service">✅ En service</option>
+                            <option value="maintenance">🔧 Maintenance</option>
+                            <option value="a_remplacer">⚠️ À remplacer</option>
+                            <option value="retire">❌ Retiré</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="form-field">
+                        <Label>Notes/Observations</Label>
+                        <textarea 
+                          className="form-textarea" 
+                          rows="2" 
+                          placeholder="Notes d'inspection, dommages, réparations..."
+                          data-testid={`notes-${epiType.id}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEpiModal(false)}>Annuler</Button>
+                <Button variant="default" data-testid="save-epi-btn">
+                  💾 Sauvegarder les EPI
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de rapport EPI */}
+      {showEpiReportModal && (
+        <div className="modal-overlay" onClick={() => setShowEpiReportModal(false)}>
+          <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="epi-report-modal">
+            <div className="modal-header">
+              <h3>📊 Rapport EPI - Alertes et Inventaire</h3>
+              <Button variant="ghost" onClick={() => setShowEpiReportModal(false)}>✕</Button>
+            </div>
+            <div className="modal-body">
+              {/* Alertes urgentes */}
+              <div className="epi-alerts-section">
+                <h4>⚠️ EPI nécessitant une action (7)</h4>
+                <div className="alerts-list">
+                  <div className="alert-item urgent">
+                    <span className="alert-icon">🚨</span>
+                    <div className="alert-content">
+                      <span className="alert-employee">Jean Dupont - Casque</span>
+                      <span className="alert-message">Expiré depuis 5 jours</span>
+                    </div>
+                    <span className="alert-date">02/10/2024</span>
+                  </div>
+                  
+                  <div className="alert-item warning">
+                    <span className="alert-icon">⚠️</span>
+                    <div className="alert-content">
+                      <span className="alert-employee">Marie Martin - Bottes</span>
+                      <span className="alert-message">Expiration dans 15 jours</span>
+                    </div>
+                    <span className="alert-date">22/10/2024</span>
+                  </div>
+                  
+                  <div className="alert-item info">
+                    <span className="alert-icon">🔍</span>
+                    <div className="alert-content">
+                      <span className="alert-employee">Pierre Tremblay - Veste Bunker</span>
+                      <span className="alert-message">Inspection due dans 7 jours</span>
+                    </div>
+                    <span className="alert-date">14/10/2024</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Statistiques */}
+              <div className="epi-stats-section">
+                <h4>📈 Statistiques générales</h4>
+                <div className="stats-grid">
+                  <div className="stat-card">
+                    <span className="stat-number">156</span>
+                    <span className="stat-label">Total EPI</span>
+                  </div>
+                  <div className="stat-card">
+                    <span className="stat-number">142</span>
+                    <span className="stat-label">En service</span>
+                  </div>
+                  <div className="stat-card warning">
+                    <span className="stat-number">7</span>
+                    <span className="stat-label">À vérifier</span>
+                  </div>
+                  <div className="stat-card danger">
+                    <span className="stat-number">3</span>
+                    <span className="stat-label">Expirés</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-actions">
+                <Button variant="outline" onClick={() => setShowEpiReportModal(false)}>Fermer</Button>
+                <Button variant="default" data-testid="export-epi-report-btn">
+                  📋 Exporter rapport
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
