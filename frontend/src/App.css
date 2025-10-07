@@ -4617,8 +4617,12 @@ body {
 }
 
 .my-epi-card {
+  background: white;
   border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .my-epi-card:hover {
@@ -4631,6 +4635,20 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.my-epi-card-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.my-epi-card-body {
+  padding: 1.5rem;
 }
 
 .my-epi-icon {
