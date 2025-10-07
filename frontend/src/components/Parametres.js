@@ -1088,7 +1088,7 @@ const Parametres = ({ user }) => {
 
       {/* Modals Section */}
       {/* Modal d'édition type de garde avec jours */}
-      {showEditTypeModal && editingItem && (
+      {false && showEditTypeModal && editingItem && (
         <div className="modal-overlay" onClick={() => setShowEditTypeModal(false)}>
           <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()} data-testid="edit-type-modal">
             <div className="modal-header">
