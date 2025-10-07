@@ -1039,7 +1039,14 @@ const Parametres = ({ user }) => {
                     </span>
                   </div>
                   <p className="summary-result">
-                    <strong>Contacts :</strong> max {systemSettings.max_personnes_contact} personnes
+                    <strong>Mode :</strong> {
+                      systemSettings.mode_notification === 'simultane' ? 'Simultané' :
+                      systemSettings.mode_notification === 'sequentiel' ? 'Séquentiel' : 
+                      `Groupes de ${systemSettings.taille_groupe || 3}`
+                    } | <strong>Contacts :</strong> max {systemSettings.max_personnes_contact} personnes
+                    {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && 
+                      ` | Délai : ${systemSettings.delai_attente_minutes || 1440} min`
+                    }
                   </p>
                 </div>
               </div>
