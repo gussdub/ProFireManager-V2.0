@@ -551,6 +551,13 @@ const Parametres = ({ user }) => {
         >
           📅 Disponibilités
         </button>
+        <button
+          className={`tab-button ${activeTab === 'epi' ? 'active' : ''}`}
+          onClick={() => setActiveTab('epi')}
+          data-testid="tab-epi"
+        >
+          🛡️ EPI
+        </button>
       </div>
 
       {/* Contenu conditionnel selon l'onglet actif */}
