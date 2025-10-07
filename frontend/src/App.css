@@ -4898,6 +4898,86 @@ body {
 
 .no-epi-inline {
   text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  font-style: italic;
+  background: white;
+  border-radius: 8px;
+}
+
+/* EPI Tailles Grid dans Modals */
+.epi-tailles-grid-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.epi-taille-row {
+  display: grid;
+  grid-template-columns: 40px 1fr 200px;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+}
+
+.epi-taille-row:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.epi-taille-icon-modal {
+  font-size: 1.75rem;
+  text-align: center;
+}
+
+.epi-taille-label-modal {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.epi-taille-input-modal {
+  font-size: 0.9rem;
+}
+
+.epi-taille-input-modal:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+.epi-note-modal {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid #93c5fd;
+  border-radius: 10px;
+  color: #1e40af;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.epi-note-modal strong {
+  font-weight: 700;
+}
+
+/* Responsive pour grille EPI */
+@media (max-width: 768px) {
+  .epi-taille-row {
+    grid-template-columns: 40px 1fr;
+    gap: 0.75rem;
+  }
+  
+  .epi-taille-input-modal {
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+  }
+}
 
 /* Rapport EPI Styles */
 .rapport-epi {
