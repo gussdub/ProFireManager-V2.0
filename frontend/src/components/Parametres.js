@@ -1154,40 +1154,7 @@ const Parametres = ({ user }) => {
                   </div>
                 </div>
 
-                <div className="settings-column">
-                  <h4 className="compact-title">📊 État actuel</h4>
-                  <div className="status-info">
-                    <div className="status-item">
-                      <span className="status-label">Prochaine date limite :</span>
-                      <span className="status-value">
-                        {systemSettings.blocage_dispos_active ? 
-                          `${systemSettings.jour_blocage_dispos || 15} ${new Date().getMonth() === 11 ? 'janvier' : 
-                            ['février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'][new Date().getMonth()]
-                          } à minuit` : 
-                          'Système désactivé'
-                        }
-                      </span>
-                    </div>
-                    <div className="status-item">
-                      <span className="status-label">Mois concerné :</span>
-                      <span className="status-value">
-                        {systemSettings.blocage_dispos_active ? 
-                          ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][(new Date().getMonth() + 1) % 12] :
-                          'Aucun'
-                        }
-                      </span>
-                    </div>
-                    <div className="status-item">
-                      <span className="status-label">Saisie libre pour :</span>
-                      <span className="status-value">
-                        {systemSettings.blocage_dispos_active ? 
-                          'Mois +2 et suivants' : 
-                          'Tous les mois'
-                        }
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                {/* Section État actuel supprimée pour alléger le design */}
               </div>
             </div>
           </div>
