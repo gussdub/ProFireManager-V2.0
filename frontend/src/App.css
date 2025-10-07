@@ -4775,6 +4775,134 @@ body {
   font-weight: 600;
 }
 
+
+/* EPI Accordion dans Modals Personnel */
+.section-accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.section-accordion-header:hover {
+  background: #f1f5f9;
+}
+
+.accordion-icon {
+  font-size: 0.875rem;
+  color: #64748b;
+  transition: transform 0.3s ease;
+}
+
+.epi-accordion-content {
+  animation: slideDown 0.3s ease-out;
+  padding: 1rem;
+  background: #fafbfc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+.epi-inline-actions {
+  margin-bottom: 1rem;
+}
+
+.epi-inline-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.epi-inline-item {
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.epi-inline-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.epi-inline-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.epi-inline-icon {
+  font-size: 1.5rem;
+}
+
+.epi-inline-header strong {
+  font-size: 1rem;
+  color: #0f172a;
+}
+
+.epi-inline-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-field-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field-inline label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.epi-inline-input,
+.form-select-inline {
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.epi-inline-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.no-epi-inline {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  font-style: italic;
+  background: white;
+  border-radius: 8px;
+}
+
 .no-epi-text {
   color: #64748b;
   font-style: italic;
