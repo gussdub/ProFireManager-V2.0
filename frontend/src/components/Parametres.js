@@ -961,59 +961,30 @@ const Parametres = ({ user }) => {
 
                     {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && (
                       <div className="input-group-compact">
-                        <Label>Délai d'attente (heures)</Label>
+                        <Label>Délai d'attente (minutes)</Label>
                         <div className="input-with-reset">
                           <Input
                             type="number"
-                            min="1"
-                            max="72"
-                            value={systemSettings.delai_attente_heures || 24}
-                            onChange={(e) => handleSettingChange('delai_attente_heures', parseInt(e.target.value))}
+                            min="30"
+                            max="4320"
+                            step="30"
+                            value={systemSettings.delai_attente_minutes || 1440}
+                            onChange={(e) => handleSettingChange('delai_attente_minutes', parseInt(e.target.value))}
                           />
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            onClick={() => handleSettingChange('delai_attente_heures', 24)}
+                            onClick={() => handleSettingChange('delai_attente_minutes', 1440)}
                           >
                             🔄
                           </Button>
                         </div>
                         <small style={{display: 'block', marginTop: '0.5rem', color: '#6b7280'}}>
-                          Temps d'attente avant de passer au suivant (en cas de non-réponse)
+                          Temps d'attente avant de passer au suivant (en cas de non-réponse). Par défaut: 24h (1440 min)
                         </small>
                       </div>
                     )}
-                  </div>
-                </div>
-              </div>
 
-              <div className="settings-row">
-                <div className="settings-column">
-                  <h4 className="compact-title">Délais et limites</h4>
-                  <div className="setting-inputs-compact">
-                    <div className="input-group-compact">
-                      <Label>Délai de réponse (minutes)</Label>
-                      <div className="input-with-reset">
-                        <Input
-                          type="number"
-                          min="30"
-                          max="10080"
-                          step="30"
-                          value={systemSettings.delai_reponse_minutes}
-                          onChange={(e) => handleSettingChange('delai_reponse_minutes', parseInt(e.target.value))}
-                          data-testid="delai-reponse-minutes-input"
-                        />
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleSettingChange('delai_reponse_minutes', 2880)}
-                          data-testid="reset-delai-btn"
-                        >
-                          🔄
-                        </Button>
-                      </div>
-                    </div>
-                    
                     <div className="input-group-compact">
                       <Label>Max personnes à contacter</Label>
                       <div className="input-with-reset">
@@ -1021,20 +992,24 @@ const Parametres = ({ user }) => {
                           type="number"
                           min="1"
                           max="20"
-                          value={systemSettings.max_personnes_contact}
+                          value={systemSettings.max_personnes_contact || 5}
                           onChange={(e) => handleSettingChange('max_personnes_contact', parseInt(e.target.value))}
-                          data-testid="max-contact-input"
                         />
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleSettingChange('max_personnes_contact', 5)}
-                          data-testid="reset-contact-btn"
                         >
                           🔄
                         </Button>
                       </div>
+                      <small style={{display: 'block', marginTop: '0.5rem', color: '#6b7280'}}>
+                        Nombre maximum d'employés à contacter pour un remplacement
+                      </small>
                     </div>
+                  </div>
+                </div>
+              </div>
                   </div>
                 </div>
 
