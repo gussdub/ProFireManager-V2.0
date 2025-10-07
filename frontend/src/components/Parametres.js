@@ -14,6 +14,9 @@ const Parametres = ({ user }) => {
   const [typesGarde, setTypesGarde] = useState([]);
   const [formations, setFormations] = useState([]);
   const [users, setUsers] = useState([]);
+  const [episTypes, setEpisTypes] = useState([]);
+  const [selectedUserEpi, setSelectedUserEpi] = useState(null);
+  const [epiAlerts, setEpiAlerts] = useState([]);
   
   // Modals states
   const [showCreateTypeModal, setShowCreateTypeModal] = useState(false);
