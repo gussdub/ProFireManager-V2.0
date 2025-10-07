@@ -900,6 +900,93 @@ const Parametres = ({ user }) => {
             </div>
             
             <div className="replacement-settings-compact">
+              {/* Nouveau : Mode de notification */}
+              <div className="settings-row">
+                <div className="settings-column">
+                  <h4 className="compact-title">🔔 Mode de notification</h4>
+                  <p style={{fontSize: '0.9rem', color: '#6b7280', marginBottom: '1rem'}}>
+                    Définissez comment les employés sont contactés pour les remplacements
+                  </p>
+                  
+                  <div className="setting-inputs-compact">
+                    <div className="input-group-compact">
+                      <Label>Stratégie de contact</Label>
+                      <select 
+                        className="form-select"
+                        value={systemSettings.mode_notification || 'simultane'}
+                        onChange={(e) => handleSettingChange('mode_notification', e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem',
+                          borderRadius: '0.375rem',
+                          border: '1px solid #d1d5db',
+                          fontSize: '0.95rem'
+                        }}
+                      >
+                        <option value="simultane">⚡ Simultané - Tous en même temps</option>
+                        <option value="sequentiel">🎯 Séquentiel - Un par un</option>
+                        <option value="groupe_sequentiel">🔀 Groupes séquentiels - Par groupes</option>
+                      </select>
+                      <small style={{display: 'block', marginTop: '0.5rem', color: '#6b7280'}}>
+                        {systemSettings.mode_notification === 'simultane' && 'Tous les employés disponibles reçoivent la notification immédiatement'}
+                        {systemSettings.mode_notification === 'sequentiel' && 'Les employés sont contactés un par un selon la priorité'}
+                        {systemSettings.mode_notification === 'groupe_sequentiel' && 'Les employés sont contactés par groupes successifs'}
+                      </small>
+                    </div>
+
+                    {systemSettings.mode_notification === 'groupe_sequentiel' && (
+                      <div className="input-group-compact">
+                        <Label>Taille du groupe</Label>
+                        <div className="input-with-reset">
+                          <Input
+                            type="number"
+                            min="2"
+                            max="10"
+                            value={systemSettings.taille_groupe || 3}
+                            onChange={(e) => handleSettingChange('taille_groupe', parseInt(e.target.value))}
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSettingChange('taille_groupe', 3)}
+                          >
+                            🔄
+                          </Button>
+                        </div>
+                        <small style={{display: 'block', marginTop: '0.5rem', color: '#6b7280'}}>
+                          Nombre d'employés notifiés simultanément dans chaque groupe
+                        </small>
+                      </div>
+                    )}
+
+                    {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && (
+                      <div className="input-group-compact">
+                        <Label>Délai d'attente (heures)</Label>
+                        <div className="input-with-reset">
+                          <Input
+                            type="number"
+                            min="1"
+                            max="72"
+                            value={systemSettings.delai_attente_heures || 24}
+                            onChange={(e) => handleSettingChange('delai_attente_heures', parseInt(e.target.value))}
+                          />
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => handleSettingChange('delai_attente_heures', 24)}
+                          >
+                            🔄
+                          </Button>
+                        </div>
+                        <small style={{display: 'block', marginTop: '0.5rem', color: '#6b7280'}}>
+                          Temps d'attente avant de passer au suivant (en cas de non-réponse)
+                        </small>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
               <div className="settings-row">
                 <div className="settings-column">
                   <h4 className="compact-title">Délais et limites</h4>
