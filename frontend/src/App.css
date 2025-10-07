@@ -4444,6 +4444,319 @@ body {
 
 .no-data-text {
   color: #94a3b8;
+
+/* ==================== MODULE EPI STYLES ==================== */
+
+.module-epi {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.module-epi-header {
+  margin-bottom: 2rem;
+}
+
+.module-epi-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 0.5rem;
+}
+
+.module-epi-header p {
+  color: #64748b;
+  font-size: 1rem;
+}
+
+/* Actions rapides grid */
+.epi-quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.alert-stats {
+  display: flex;
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+.alert-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.alert-stat-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.alert-stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  text-align: center;
+}
+
+/* Alertes EPI */
+.epi-alerts-section {
+  margin: 2rem 0;
+}
+
+.epi-alerts-section h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0f172a;
+}
+
+.epi-alerts-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.epi-alert-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.epi-alert-card[data-priority="haute"] {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.epi-alert-card[data-priority="moyenne"] {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.epi-alert-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.epi-alert-icon {
+  font-size: 2rem;
+}
+
+.epi-alert-content {
+  flex-grow: 1;
+}
+
+.epi-alert-content strong {
+  display: block;
+  font-size: 1rem;
+  color: #0f172a;
+  margin-bottom: 0.25rem;
+}
+
+.epi-alert-content p {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.epi-alert-days {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  background: #dc2626;
+  color: white;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Mes EPI - Vue employé */
+.my-epi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.my-epi-card {
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.my-epi-card:hover {
+  border-color: #dc2626;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.1);
+  transform: translateY(-4px);
+}
+
+.my-epi-card-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.my-epi-icon {
+  font-size: 2.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.my-epi-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.my-epi-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 8px;
+}
+
+.my-epi-detail-row span {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.my-epi-detail-row strong {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.my-epi-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.no-epi-message {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.no-epi-message p {
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.epi-info-note {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 2px solid #60a5fa;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.epi-info-note p {
+  color: #1e40af;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Inspection Modal */
+.inspection-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inspection-criteria {
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.inspection-criteria h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 1rem;
+}
+
+.inspection-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inspection-checkbox:hover {
+  background: #f1f5f9;
+}
+
+.inspection-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.inspection-checkbox span {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 500;
+}
+
+/* Section description */
+.section-description {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.epi-form-section {
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.info-note {
+  margin: 0;
+  color: #1e40af;
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .module-epi {
+    padding: 1rem;
+  }
+
+  .my-epi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .epi-alerts-list {
+    grid-template-columns: 1fr;
+  }
+
+  .alert-stats {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
   font-size: 0.875rem;
   font-style: italic;
   margin-top: 0.5rem;
