@@ -5582,15 +5582,25 @@ const MonProfil = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const [userResponse, formationsResponse, statsResponse] = await Promise.all([
+        const [userResponse, formationsResponse, statsResponse, episResponse] = await Promise.all([
           axios.get(`${API}/users/${user.id}`),
           axios.get(`${API}/formations`),
-          axios.get(`${API}/users/${user.id}/stats-mensuelles`)
+          axios.get(`${API}/users/${user.id}/stats-mensuelles`),
+          axios.get(`${API}/epi/employe/${user.id}`)
         ]);
         
         setUserProfile(userResponse.data);
         setFormations(formationsResponse.data);
         setMonthlyStats(statsResponse.data);
+        setMyEPIs(episResponse.data);
+        
+        // Créer un objet de tailles pour l'édition
+        const tailles = {};
+        episResponse.data.forEach(epi => {
+          tailles[epi.type_epi] = epi.taille;
+        });
+        setEpiTailles(tailles);
+        
         setProfileData({
           nom: userResponse.data.nom,
           prenom: userResponse.data.prenom,
