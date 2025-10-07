@@ -5655,6 +5655,66 @@ const MonProfil = () => {
     }
   };
 
+  const handleSaveEPITailles = async () => {
+    try {
+      // Mettre à jour chaque EPI avec sa nouvelle taille
+      const updatePromises = myEPIs.map(epi => {
+        if (epiTailles[epi.type_epi] && epiTailles[epi.type_epi] !== epi.taille) {
+          return axios.put(`${API}/epi/${epi.id}`, {
+            taille: epiTailles[epi.type_epi]
+          });
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(updatePromises);
+
+      // Recharger les EPI
+      const response = await axios.get(`${API}/epi/employe/${user.id}`);
+      setMyEPIs(response.data);
+
+      toast({
+        title: "Tailles mises à jour",
+        description: "Vos tailles d'EPI ont été sauvegardées",
+        variant: "success"
+      });
+
+      setIsEditingEPI(false);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les tailles",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const getEPINom = (typeEpi) => {
+    const noms = {
+      'casque': 'Casque',
+      'bottes': 'Bottes',
+      'veste_bunker': 'Veste Bunker',
+      'pantalon_bunker': 'Pantalon Bunker',
+      'gants': 'Gants',
+      'masque_apria': 'Masque APRIA',
+      'cagoule': 'Cagoule Anti-Particules'
+    };
+    return noms[typeEpi] || typeEpi;
+  };
+
+  const getEPIIcone = (typeEpi) => {
+    const icones = {
+      'casque': '🪖',
+      'bottes': '👢',
+      'veste_bunker': '🧥',
+      'pantalon_bunker': '👖',
+      'gants': '🧤',
+      'masque_apria': '😷',
+      'cagoule': '🎭'
+    };
+    return icones[typeEpi] || '🛡️';
+  };
+
   const handleChangePassword = async () => {
     if (!passwordData.current_password || !passwordData.new_password || !passwordData.confirm_password) {
       toast({
