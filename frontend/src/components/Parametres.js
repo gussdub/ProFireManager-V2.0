@@ -905,8 +905,55 @@ const Parametres = ({ user }) => {
             <div className="replacement-settings-compact">
               <div className="settings-row">
                 <div className="settings-column">
-                  <h4 className="compact-title">Délais et limites</h4>
+                  <h4 className="compact-title">🔔 Mode de notification</h4>
+                  <p>Définissez comment les employés sont contactés pour les remplacements</p>
+                  
                   <div className="setting-inputs-compact">
+                    <div className="input-group-compact">
+                      <Label>Stratégie de contact</Label>
+                      <select 
+                        className="form-select"
+                        value={systemSettings.mode_notification || 'simultane'}
+                        onChange={(e) => handleSettingChange('mode_notification', e.target.value)}
+                        data-testid="mode-notification-select"
+                      >
+                        <option value="simultane">⚡ Simultané - Tous en même temps</option>
+                        <option value="sequentiel">🎯 Séquentiel - Un par un</option>
+                        <option value="groupe_sequentiel">🔀 Groupes séquentiels - Par groupes</option>
+                      </select>
+                    </div>
+
+                    {systemSettings.mode_notification === 'groupe_sequentiel' && (
+                      <div className="input-group-compact">
+                        <Label>Taille du groupe</Label>
+                        <Input
+                          type="number"
+                          min="2"
+                          max="10"
+                          value={systemSettings.taille_groupe || 3}
+                          onChange={(e) => handleSettingChange('taille_groupe', parseInt(e.target.value))}
+                          data-testid="taille-groupe-input"
+                        />
+                        <small>Nombre de personnes contactées simultanément par groupe</small>
+                      </div>
+                    )}
+
+                    {(systemSettings.mode_notification === 'sequentiel' || systemSettings.mode_notification === 'groupe_sequentiel') && (
+                      <div className="input-group-compact">
+                        <Label>Délai d'attente (minutes)</Label>
+                        <Input
+                          type="number"
+                          min="30"
+                          max="4320"
+                          step="30"
+                          value={systemSettings.delai_attente_minutes || 1440}
+                          onChange={(e) => handleSettingChange('delai_attente_minutes', parseInt(e.target.value))}
+                          data-testid="delai-attente-input"
+                        />
+                        <small>Temps d'attente avant de passer au suivant (en cas de non-réponse). Par défaut: 24h (1440 min)</small>
+                      </div>
+                    )}
+
                     <div className="input-group-compact">
                       <Label>Max personnes à contacter</Label>
                       <div className="input-with-reset">
