@@ -5153,7 +5153,7 @@ const Formations = () => {
                 <Button variant="outline" onClick={() => setShowEditModal(false)}>
                   Annuler
                 </Button>
-                <Button variant="default" miners={handleUpdateSession} data-testid="update-session-submit-btn">
+                <Button variant="default" onClick={handleUpdateSession} data-testid="update-session-submit-btn">
                   💾 Sauvegarder les modifications
                 </Button>
               </div>
