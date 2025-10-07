@@ -174,6 +174,14 @@ const Parametres = ({ user }) => {
       duree_vie_annees: 15,
       inspection_mois: 12,
       tailles: ['S', 'M', 'L']
+    },
+    { 
+      id: 'cagoule',
+      nom: 'Cagoule Anti-Particules', 
+      icone: '🎭',
+      duree_vie_annees: 10,
+      inspection_mois: 12,
+      tailles: ['S', 'M', 'L', 'XL']
     }
   ];
 
