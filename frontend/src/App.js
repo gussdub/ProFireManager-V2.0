@@ -2005,45 +2005,40 @@ const Personnel = () => {
                   </div>
                 </div>
 
-                {/* Compétences */}
-                <div className="detail-section">
-                  <h5>📜 Compétences et certifications</h5>
-                  {selectedUser.formations?.length > 0 ? (
-                    <div className="competences-view">
-                      {selectedUser.formations.map((formationId, index) => (
-                        <div key={index} className="competence-badge-view">
-                          <span className="competence-name">{getFormationName(formationId)}</span>
-                          <span className="competence-status">✅ Certifié</span>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="no-competences">
-                      <p>Aucune compétence enregistrée</p>
-                    </div>
-                  )}
-                </div>
+                {/* Sections compactes en 2 colonnes */}
+                <div className="detail-sections-grid">
+                  {/* Compétences */}
+                  <div className="detail-section-compact">
+                    <h5>📜 Compétences</h5>
+                    {selectedUser.formations?.length > 0 ? (
+                      <div className="competences-compact">
+                        {selectedUser.formations.map((formationId, index) => (
+                          <span key={index} className="competence-chip">
+                            {getFormationName(formationId)}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-data-compact">Aucune</p>
+                    )}
+                  </div>
 
-                {/* EPI - Équipements de Protection Individuels */}
-                <div className="detail-section">
-                  <h5>🛡️ Équipements de Protection Individuels (EPI)</h5>
-                  {userEPIs.length > 0 ? (
-                    <div className="epi-readonly-list">
-                      {userEPIs.map(epi => (
-                        <div key={epi.id} className="epi-readonly-item">
-                          <span className="epi-readonly-icon">{getEPIIcone(epi.type_epi)}</span>
-                          <div className="epi-readonly-info">
-                            <strong>{getEPINom(epi.type_epi)}</strong>
-                            <span className="epi-readonly-details">
-                              Taille: {epi.taille} • État: {epi.etat}
-                            </span>
+                  {/* EPI - Équipements de Protection Individuels */}
+                  <div className="detail-section-compact">
+                    <h5>🛡️ EPI</h5>
+                    {userEPIs.length > 0 ? (
+                      <div className="epi-compact-list">
+                        {userEPIs.map(epi => (
+                          <div key={epi.id} className="epi-compact-item">
+                            <span>{getEPIIcone(epi.type_epi)}</span>
+                            <span className="epi-compact-text">{getEPINom(epi.type_epi)} ({epi.taille})</span>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="no-data-text">Aucun EPI enregistré</p>
-                  )}
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="no-data-compact">Aucun</p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Actions rapides */}
