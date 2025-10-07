@@ -3954,6 +3954,174 @@ body {
 
 .rapports-header h1 {
   font-size: 2rem;
+/* ==================== EPI STYLES ==================== */
+
+/* EPI Types Modern Cards */
+.epi-types-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.epi-modern-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.epi-modern-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.epi-modern-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.epi-card-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.epi-icon-large {
+  font-size: 3rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.epi-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.epi-specs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spec-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.spec-icon {
+  font-size: 1.25rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.spec-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.spec-value {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.9rem;
+}
+
+.spec-label {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* EPI Info Section */
+.epi-info-section {
+  margin: 2rem 0;
+}
+
+.info-card {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border: 1px solid #3b82f6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.info-card h4 {
+  color: #1e40af;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 1.125rem;
+}
+
+.info-card p {
+  color: #1e40af;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.info-card p:last-child {
+  margin-bottom: 0;
+}
+
+.info-card strong {
+  font-weight: 600;
+}
+
+/* EPI Quick Actions */
+.epi-quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.epi-quick-actions button {
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  font-weight: 500;
+}
+
+/* Responsive EPI */
+@media (max-width: 768px) {
+  .epi-types-modern-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .spec-item {
+    padding: 0.5rem;
+  }
+  
+  .epi-icon-large {
+    font-size: 2.5rem;
+  }
+  
+  .spec-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+}
   font-weight: 700;
   color: #1e293b;
   margin-bottom: 0.5rem;
