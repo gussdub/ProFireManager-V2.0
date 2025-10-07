@@ -968,6 +968,45 @@ class ParametresRemplacements(BaseModel):
     priorite_grade: bool = True
     priorite_competences: bool = True
 
+# EPI Models
+class EPIEmploye(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    employe_id: str
+    type_epi: str  # casque, bottes, veste_bunker, pantalon_bunker, gants, masque_scba
+    taille: str
+    date_attribution: str
+    etat: str = "Neuf"  # Neuf, Bon, À remplacer, Défectueux
+    date_expiration: str
+    date_prochaine_inspection: Optional[str] = None
+    historique_inspections: List[Dict[str, Any]] = []
+    notes: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class EPIEmployeCreate(BaseModel):
+    employe_id: str
+    type_epi: str
+    taille: str
+    date_attribution: str
+    etat: str = "Neuf"
+    date_expiration: str
+    date_prochaine_inspection: Optional[str] = None
+    notes: Optional[str] = None
+
+class EPIEmployeUpdate(BaseModel):
+    taille: Optional[str] = None
+    etat: Optional[str] = None
+    date_expiration: Optional[str] = None
+    date_prochaine_inspection: Optional[str] = None
+    notes: Optional[str] = None
+
+class InspectionEPI(BaseModel):
+    date_inspection: str
+    inspecteur_id: str
+    resultat: str  # Conforme, Non conforme, Remplacement nécessaire
+    observations: Optional[str] = None
+    photos: List[str] = []  # URLs des photos d'inspection
+
 # Demandes de congé routes
 @api_router.post("/demandes-conge", response_model=DemandeCongé)
 async def create_demande_conge(demande: DemandeCongeCreate, current_user: User = Depends(get_current_user)):
