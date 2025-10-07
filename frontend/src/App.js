@@ -6029,6 +6029,8 @@ const AppLayout = () => {
         return <Dashboard />;
       case 'personnel':
         return <Personnel />;
+      case 'epi':
+        return <ModuleEPI user={user} />;
       case 'planning':
         return <Planning />;
       case 'remplacements':
