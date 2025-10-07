@@ -1226,6 +1226,155 @@ const Parametres = ({ user }) => {
             </div>
           </div>
         )}
+
+        {activeTab === 'epi' && (
+          <div className="epi-tab">
+            <div className="tab-header">
+              <div>
+                <h2>Gestion des Équipements de Protection Individuels (EPI)</h2>
+                <p>Configuration et suivi des EPI selon les normes NFPA canadiennes</p>
+              </div>
+              <Button 
+                variant="default" 
+                onClick={() => setShowEpiReportModal(true)}
+                data-testid="epi-report-btn"
+              >
+                📊 Rapport EPI
+              </Button>
+            </div>
+            
+            <div className="epi-content">
+              {/* Configuration des notifications EPI */}
+              <div className="settings-row">
+                <div className="settings-column">
+                  <h4 className="compact-title">🔔 Notifications EPI</h4>
+                  <div className="setting-inputs-compact">
+                    <label className="setting-toggle">
+                      <div className="toggle-info">
+                        <span>Activer les notifications EPI</span>
+                        <small>Alertes automatiques pour inspections et remplacements</small>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={systemSettings.epi_notifications_actives}
+                        onChange={(e) => handleSettingChange('epi_notifications_actives', e.target.checked)}
+                        data-testid="toggle-epi-notifications"
+                      />
+                    </label>
+
+                    {systemSettings.epi_notifications_actives && (
+                      <>
+                        <div className="input-group-compact">
+                          <Label>Alerte expiration (jours d'avance)</Label>
+                          <Input
+                            type="number"
+                            min="7"
+                            max="180"
+                            value={systemSettings.epi_jours_avance_expiration || 30}
+                            onChange={(e) => handleSettingChange('epi_jours_avance_expiration', parseInt(e.target.value))}
+                            data-testid="epi-expiration-days"
+                          />
+                          <small>Notifier {systemSettings.epi_jours_avance_expiration || 30} jours avant expiration</small>
+                        </div>
+
+                        <div className="input-group-compact">
+                          <Label>Alerte inspection (jours d'avance)</Label>
+                          <Input
+                            type="number"
+                            min="3"
+                            max="60"
+                            value={systemSettings.epi_jours_avance_inspection || 14}
+                            onChange={(e) => handleSettingChange('epi_jours_avance_inspection', parseInt(e.target.value))}
+                            data-testid="epi-inspection-days"
+                          />
+                          <small>Notifier {systemSettings.epi_jours_avance_inspection || 14} jours avant inspection</small>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="settings-column">
+                  <h4 className="compact-title">⚡ Actions rapides</h4>
+                  <div className="epi-quick-actions">
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowEpiReportModal(true)}
+                      data-testid="view-epi-alerts"
+                    >
+                      ⚠️ EPI à vérifier
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => console.log('Export inventaire')}
+                      data-testid="export-epi-inventory"
+                    >
+                      📋 Inventaire complet
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Types d'EPI et normes NFPA */}
+              <div className="epi-types-section">
+                <h4>🛡️ Types d'EPI et normes NFPA</h4>
+                <div className="epi-types-grid">
+                  {episTypesDefaut.map(epi => (
+                    <div key={epi.id} className="epi-type-card" data-testid={`epi-type-${epi.id}`}>
+                      <div className="epi-type-header">
+                        <span className="epi-icon">{epi.icone}</span>
+                        <div className="epi-info">
+                          <h5>{epi.nom}</h5>
+                          <div className="epi-details">
+                            <span className="epi-detail">⏱️ Durée de vie: {epi.duree_vie_annees} ans</span>
+                            <span className="epi-detail">🔍 Inspection: {epi.inspection_mois} mois</span>
+                            <span className="epi-detail">📏 Tailles: {epi.tailles.length} options</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Gestion par employé */}
+              <div className="epi-employees-section">
+                <h4>👥 EPI par employé</h4>
+                <div className="employees-epi-list">
+                  {users.map(user => (
+                    <div key={user.id} className="employee-epi-card" data-testid={`employee-epi-${user.id}`}>
+                      <div className="employee-info">
+                        <div className="employee-avatar">
+                          <span>👤</span>
+                        </div>
+                        <div className="employee-details">
+                          <h5>{user.prenom} {user.nom}</h5>
+                          <span className="employee-role">{user.grade} - {user.type_emploi === 'temps_plein' ? 'Temps plein' : 'Temps partiel'}</span>
+                        </div>
+                      </div>
+                      <div className="epi-status-summary">
+                        <span className="epi-count">6/6 EPI</span>
+                        <span className="epi-alerts">⚠️ 2 à vérifier</span>
+                      </div>
+                      <div className="epi-actions">
+                        <Button 
+                          variant="ghost" 
+                          onClick={() => {
+                            setSelectedUserEpi(user);
+                            setShowEpiModal(true);
+                          }}
+                          data-testid={`manage-epi-${user.id}`}
+                        >
+                          ⚙️ Gérer EPI
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Modal d'édition type de garde avec jours */}
