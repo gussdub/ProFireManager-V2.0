@@ -565,11 +565,11 @@ const ModuleEPI = ({ user }) => {
 
         {/* Actions rapides */}
         <div className="epi-quick-actions-grid">
-          <Card>
-            <CardHeader>
-              <CardTitle>⚠️ Alertes</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <div className="epi-stat-card">
+            <div className="epi-stat-header">
+              <h3>⚠️ Alertes</h3>
+            </div>
+            <div className="epi-stat-body">
               <div className="alert-stats">
                 <div className="alert-stat-item">
                   <span className="alert-stat-number">{alerts.filter(a => a.type === 'expiration').length}</span>
@@ -580,14 +580,14 @@ const ModuleEPI = ({ user }) => {
                   <span className="alert-stat-label">Inspections à venir</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Liste des alertes */}
         {alerts.length > 0 && (
           <div className="epi-alerts-section">
-            <h3>Alertes EPI</h3>
+            <h3>📋 Alertes EPI</h3>
             <div className="epi-alerts-list">
               {alerts.map((alert, index) => (
                 <div key={index} className="epi-alert-card" data-priority={alert.priorite}>
