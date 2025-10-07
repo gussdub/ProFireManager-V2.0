@@ -5567,6 +5567,7 @@ const MonProfil = () => {
   });
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditingEPI, setIsEditingEPI] = useState(false);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     current_password: '',
@@ -5574,6 +5575,8 @@ const MonProfil = () => {
     confirm_password: ''
   });
   const [profileData, setProfileData] = useState({});
+  const [myEPIs, setMyEPIs] = useState([]);
+  const [epiTailles, setEpiTailles] = useState({});
   const { toast } = useToast();
 
   useEffect(() => {
